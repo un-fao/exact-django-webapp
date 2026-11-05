@@ -159,6 +159,7 @@ from django.utils.translation import override as translation_override
 from api.services import async_jobs
 from api.services import finalization
 from api.services import report_links
+from api.services import livestock_manure_n
 from api.services.project_invitations import InvitationNotAcceptableError, accept_invitation
 
 logger = logging.getLogger("console")
@@ -2955,7 +2956,7 @@ def generic_module_viewset(model: Module):
                     openapi.IN_QUERY,
                     description="Aggregate results by",
                     type=openapi.TYPE_STRING,
-                    enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value],
+                    enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value, "managed_manure_n"],
                 ),
                 openapi.Parameter("cached", openapi.IN_QUERY, description="Use cached results", type=openapi.TYPE_BOOLEAN),
             ],
@@ -2987,6 +2988,11 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
+                if request.query_params.get("aggregate") == livestock_manure_n.MANAGED_MANURE_N_AGGREGATE:
+                    if not isinstance(module, Livestock):
+                        return utils.ErrorResponse("aggregate=managed_manure_n is only available for the Livestock module.")
+                    return Response(livestock_manure_n.managed_manure_n(module))
+
                 aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
                 use_cached_results = request.query_params.get("cached", "true") == "true"
                 module_results, frozen = finalization.module_results(module, aggregate_by, use_cache=use_cached_results)

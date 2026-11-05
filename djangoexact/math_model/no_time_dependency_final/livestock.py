@@ -14,6 +14,14 @@ from .ghg_emissions_classes import (
 )
 
 from .generalized_modules import BaseModule
+from .manure_nitrogen import (
+    BEDDING_SYSTEMS,
+    DIGESTER,
+    codigestate_n2o_n,
+    effective_system_shares,
+    managed_manure_n_available,
+    share_of,
+)
 
 from dataclasses import dataclass
 from typing import Optional, List
@@ -84,6 +92,13 @@ class Livestock(BaseModule):
     nitrous_constant: float
     volatilization_multiplier: float
     leaching_multiplier: float
+    # Names of the managed systems, aligned with percentage_system_default_*; needed to place co-digestate and bedding N.
+    manure_system_names_start: Optional[List[Optional[str]]] = None
+    manure_system_names_end: Optional[List[Optional[str]]] = None
+    codigestate_n_start: Optional[float] = None
+    codigestate_n_end: Optional[float] = None
+    bedding_n_start: Optional[float] = None
+    bedding_n_end: Optional[float] = None
 
     def __post_init__(self):
         super().__post_init__()
@@ -99,6 +114,27 @@ class Livestock(BaseModule):
         self.n2o_prp_direct_head_end_tier_2_default = None
 
         self.livestock_heads_yearly_breakdown = compute_yearly_or_half_year_cumulative(self.head_number_start, self.head_number_end, self.implementation_time, self.capitalization_time, self.rate_type)
+
+        self.managed_manure_n_available_start = None
+        self.managed_manure_n_available_end = None
+
+    def _manure_n_period(self, names, percentage_system, percentage_prp_default, percentage_prp_tier_2, ef3, frac_gas, frac_leach, n_cdg, n_bedding, heads, tam, ner):
+        """Co-digestate N2O-N (direct, volatilised, leached; kg N2O-N/yr) and managed manure N available (kg N/yr) for one period."""
+        shares = effective_system_shares(percentage_system, percentage_prp_default, percentage_prp_tier_2)
+        names = names or [None] * len(shares)
+        if n_cdg and share_of(names, shares, [DIGESTER]) == 0:
+            raise ValueError("Co-digestate N needs a share of manure managed in an anaerobic digester.")
+        if n_bedding and share_of(names, shares, BEDDING_SYSTEMS) == 0:
+            raise ValueError("Co-bedding N needs a share of manure in solid storage or deep bedding.")
+
+        cdg_n2o_n = (0.0, 0.0, 0.0)
+        if n_cdg:
+            i = names.index(DIGESTER)
+            cdg_n2o_n = codigestate_n2o_n(n_cdg, ef3[i], frac_gas[i], frac_leach[i], self.volatilization_multiplier, self.leaching_multiplier)
+
+        nex = tam / 1000 * ner * 365
+        available = managed_manure_n_available(heads, nex, names, shares, ef3, frac_gas, frac_leach, n_cdg or 0.0, n_bedding or 0.0)
+        return cdg_n2o_n, available
 
     def calculate_emissions(self):
         def calculate_methane_enteric_fermentation_emissions():
@@ -223,8 +259,8 @@ class Livestock(BaseModule):
 
                 # SYSTEM AND PRP EMISSIONS
 
-                annual_start_system_n2o = sum(n2o_system_direct_head_start) * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant
-                annual_end_system_n2o = sum(n2o_system_direct_head_end) * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant
+                annual_start_system_n2o = sum(n2o_system_direct_head_start) * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant + cdg_start[0] / 1000 * 44 / 28 * self.nitrous_constant
+                annual_end_system_n2o = sum(n2o_system_direct_head_end) * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant + cdg_end[0] / 1000 * 44 / 28 * self.nitrous_constant
 
                 nmm_direct_emissions_yearly = compute_yearly_or_half_year_cumulative(annual_start_system_n2o, annual_end_system_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
 
@@ -279,8 +315,8 @@ class Livestock(BaseModule):
                     self.n20_system_indirect_volatization_tier_2_end,
                 )
 
-                annual_start_system = sum(n2o_head_system_start) * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant * self.volatilization_multiplier
-                annual_end_system = sum(n2o_heah_system_end) * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant * self.volatilization_multiplier
+                annual_start_system = sum(n2o_head_system_start) * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant * self.volatilization_multiplier + cdg_start[1] / 1000 * 44 / 28 * self.nitrous_constant
+                annual_end_system = sum(n2o_heah_system_end) * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant * self.volatilization_multiplier + cdg_end[1] / 1000 * 44 / 28 * self.nitrous_constant
 
                 # NOTE MAYBE A GENERALIZED FUNCTION CAN BE DONE FOR THIS NOW?
                 nmm_indirect_volatization_emissions_yearly_system = compute_yearly_or_half_year_cumulative(
@@ -350,8 +386,8 @@ class Livestock(BaseModule):
                     self.n20_system_indirect_leaching_tier_2_end,
                 )
 
-                annual_start_system = sum(n2o_system_start) * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier
-                annual_end_system = sum(n2o_system_end) * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier
+                annual_start_system = sum(n2o_system_start) * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier + cdg_start[2] / 1000 * 44 / 28 * self.nitrous_constant
+                annual_end_system = sum(n2o_system_end) * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier + cdg_end[2] / 1000 * 44 / 28 * self.nitrous_constant
 
                 nmm_indirect_leaching_emissions_yearly_system = compute_yearly_or_half_year_cumulative(
                     annual_start_system, annual_end_system, self.implementation_time, self.capitalization_time, self.rate_type
@@ -385,6 +421,35 @@ class Livestock(BaseModule):
             except Exception as e:
                 traceback.print_exc()
                 raise e
+
+        cdg_start, self.managed_manure_n_available_start = self._manure_n_period(
+            self.manure_system_names_start,
+            self.percentage_system_default_start,
+            self.percentage_prp_default_start,
+            self.percentage_prp_tier_2_start,
+            self.ef_system_nitrous_direct_start,
+            self.ef_system_nitrous_indirect_volatization_start,
+            self.ef_system_nitrous_indirect_leaching_start,
+            self.codigestate_n_start,
+            self.bedding_n_start,
+            self.head_number_start,
+            self.tam_start,
+            self.ner_start,
+        )
+        cdg_end, self.managed_manure_n_available_end = self._manure_n_period(
+            self.manure_system_names_end,
+            self.percentage_system_default_end,
+            self.percentage_prp_default_end,
+            self.percentage_prp_tier_2_end,
+            self.ef_system_nitrous_direct_end,
+            self.ef_system_nitrous_indirect_volatization_end,
+            self.ef_system_nitrous_indirect_leaching_end,
+            self.codigestate_n_end,
+            self.bedding_n_end,
+            self.head_number_end,
+            self.tam_end,
+            self.ner_end,
+        )
 
         calculate_methane_enteric_fermentation_emissions()
         calculate_methane_manure_management_emissions()
