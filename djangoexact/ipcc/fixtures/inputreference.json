@@ -206,5 +206,83 @@
       "production_quantity_multiplier": 1.0,
       "production_emissions_multiplier": 1.0
     }
+  },
+  {
+    "model": "ipcc.inputreference",
+    "pk": 97,
+    "fields": {
+      "input_type": 34,
+      "co2_multiplier": null,
+      "co2_emissions_multiplier": 3.66666666666667,
+      "n2o_quantity_multiplier": 1.0,
+      "n2o_emissions_multiplier": 416.42857142857144,
+      "production_quantity_multiplier": 1.0,
+      "production_emissions_multiplier": 1.0
+    }
+  },
+  {
+    "model": "ipcc.inputreference",
+    "pk": 98,
+    "fields": {
+      "input_type": 35,
+      "co2_multiplier": 1.0,
+      "co2_emissions_multiplier": 3.66666666666667,
+      "n2o_quantity_multiplier": 0.467,
+      "n2o_emissions_multiplier": 416.42857142857144,
+      "production_quantity_multiplier": 0.467,
+      "production_emissions_multiplier": 1.0
+    }
+  },
+  {
+    "model": "ipcc.inputreference",
+    "pk": 99,
+    "fields": {
+      "input_type": 36,
+      "co2_multiplier": null,
+      "co2_emissions_multiplier": 3.66666666666667,
+      "n2o_quantity_multiplier": 1.0,
+      "n2o_emissions_multiplier": 416.42857142857144,
+      "production_quantity_multiplier": 1.0,
+      "production_emissions_multiplier": 1.0
+    }
+  },
+  {
+    "model": "ipcc.inputreference",
+    "pk": 100,
+    "fields": {
+      "input_type": 37,
+      "co2_multiplier": null,
+      "co2_emissions_multiplier": 3.66666666666667,
+      "n2o_quantity_multiplier": 1.0,
+      "n2o_emissions_multiplier": 416.42857142857144,
+      "production_quantity_multiplier": 1.0,
+      "production_emissions_multiplier": 1.0
+    }
+  },
+  {
+    "model": "ipcc.inputreference",
+    "pk": 101,
+    "fields": {
+      "input_type": 38,
+      "co2_multiplier": null,
+      "co2_emissions_multiplier": 3.66666666666667,
+      "n2o_quantity_multiplier": 1.0,
+      "n2o_emissions_multiplier": 416.42857142857144,
+      "production_quantity_multiplier": 1.0,
+      "production_emissions_multiplier": 1.0
+    }
+  },
+  {
+    "model": "ipcc.inputreference",
+    "pk": 102,
+    "fields": {
+      "input_type": 39,
+      "co2_multiplier": null,
+      "co2_emissions_multiplier": 3.66666666666667,
+      "n2o_quantity_multiplier": 1.0,
+      "n2o_emissions_multiplier": 416.42857142857144,
+      "production_quantity_multiplier": null,
+      "production_emissions_multiplier": 1.0
+    }
   }
 ]
