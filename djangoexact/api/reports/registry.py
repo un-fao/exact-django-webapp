@@ -42,6 +42,7 @@ def _build_registry() -> dict[type, type]:
         PackagingReport,
         ProcessingReport,
         SmallFisheryReport,
+        SolidWasteReport,
         StorageReport,
         TransportReport,
         WaterbodyReport,
@@ -71,6 +72,7 @@ def _build_registry() -> dict[type, type]:
         api_models.Packaging: PackagingReport,
         api_models.Processing: ProcessingReport,
         api_models.Storage: StorageReport,
+        api_models.SolidWaste: SolidWasteReport,
     }
 
 

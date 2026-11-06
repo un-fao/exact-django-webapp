@@ -6,6 +6,7 @@ Each class implements compute() -> ModuleResult.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from itertools import zip_longest
 from typing import Any
 
 import logging as log
@@ -19,6 +20,7 @@ import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 from .base import BaseModuleReport, NotReadyError
 from .cache import submodule_balance_emissions
 from .data_types import InventoryItem, MetadataWrite, ModuleResult, ResultRow
+from . import land_pools
 from .extractors import _add, extract_emissions
 
 
@@ -91,23 +93,28 @@ class LandModuleReport(BaseModuleReport):
                         f"Could not cache units_breakdown for module {self.module.pk}: {exc}"
                     )
 
-    def _extract_land_base(self):
-        """Return (biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4) from balance emissions."""
+    def _extract_land_base(self, fire_activity=math_utils.ActivityTypes.RESIDUE_BURNING):
+        """Return (soil_co2, soil_n2o, fire_n2o, fire_ch4) from balance emissions."""
         es = self.emissions_set
-        biomass_co2 = self._extract(es, math_utils.ActivityTypes.BIOMASS, math_utils.GasTypes.CO2)
         soil_co2 = self._extract(es, math_utils.ActivityTypes.SOIL_CO2_CHANGE, math_utils.GasTypes.CO2)
         soil_n2o = self._extract(es, math_utils.ActivityTypes.SOM, math_utils.GasTypes.N2O)
-        fire_n2o = self._extract(es, math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.N2O)
-        fire_ch4 = self._extract(es, math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.CH4)
-        return biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4
+        fire_n2o = self._extract(es, fire_activity, math_utils.GasTypes.N2O)
+        fire_ch4 = self._extract(es, fire_activity, math_utils.GasTypes.CH4)
+        return soil_co2, soil_n2o, fire_n2o, fire_ch4
+
+    def _pool_co2(self, activities) -> list[float]:
+        return land_pools.co2(self.emissions_set, activities, self._project_duration)
+
+    def _pool_rows(self) -> list[ResultRow]:
+        return [ResultRow(land_pools.LABEL_BIOMASS, self._pool_co2(land_pools.BIOMASS))]
 
     def _standard_result_rows(
         self,
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4,
+        soil_co2, soil_n2o, fire_n2o, fire_ch4,
         extra_rows: list[ResultRow] | None = None,
     ) -> list[ResultRow]:
         rows = [
-            ResultRow("CO2 in biomass", biomass_co2),
+            *self._pool_rows(),
             ResultRow("CO2 in soils", soil_co2),
             ResultRow("N2O in soils", soil_n2o),
             ResultRow("N2O from fires", fire_n2o),
@@ -115,7 +122,16 @@ class LandModuleReport(BaseModuleReport):
         ]
         if extra_rows:
             rows.extend(extra_rows)
-        return rows
+        return rows + self._unallocated_rows(rows)
+
+    def _unallocated_rows(self, rows: list[ResultRow]) -> list[ResultRow]:
+        """Whatever the module total holds beyond ``rows``, so the rows add up to the total."""
+        rest = self._balance_total()
+        for row in rows:
+            rest = [t - v for t, v in zip_longest(rest, row.yearly_values, fillvalue=0)]
+        if all(abs(v) < 1e-9 for v in rest):
+            return []
+        return [ResultRow("Other emissions (CO2-eq)", rest)]
 
     def _inventory_items(self, activity_title: str) -> list[InventoryItem]:
         return self._inventory_items_from_module(activity_title)
@@ -129,15 +145,15 @@ class LandUseChangeReport(LandModuleReport):
         self.calculator = calculators.LandUseChangeCalculator(self.module)
         super().__post_init__()
 
+    def _pool_rows(self) -> list[ResultRow]:
+        return [
+            *super()._pool_rows(),
+            ResultRow(land_pools.LABEL_DOM, self._pool_co2(land_pools.DOM)),
+        ]
+
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
-
-        # LandUseChange adds DOM CO2 to soil_co2
-        dom_co2 = self._extract(
-            self.emissions_set, math_utils.ActivityTypes.DOM, math_utils.GasTypes.CO2
-        )
-        soil_co2 = _add(soil_co2, dom_co2)
+        soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
 
         m = self.module
         mw = [
@@ -172,7 +188,7 @@ class LandUseChangeReport(LandModuleReport):
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Land Use Change",
-            result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
+            result_rows=self._standard_result_rows(soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
             total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
@@ -231,7 +247,7 @@ class PerennialCroplandReport(LandModuleReport):
 
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
+        soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
 
         m = self.module
         units = m.area
@@ -280,7 +296,7 @@ class PerennialCroplandReport(LandModuleReport):
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Perennial Cropland",
-            result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
+            result_rows=self._standard_result_rows(soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
             additional_indicator_rows_w=ai_w,
             additional_indicator_rows_wo=ai_wo,
@@ -343,7 +359,7 @@ class AnnualCroplandReport(LandModuleReport):
 
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
+        soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
 
         m = self.module
         units = m.area
@@ -409,7 +425,7 @@ class AnnualCroplandReport(LandModuleReport):
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Annual Cropland",
-            result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
+            result_rows=self._standard_result_rows(soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
             additional_indicator_rows_w=ai_w,
             additional_indicator_rows_wo=ai_wo,
@@ -432,7 +448,7 @@ class SetAsideReport(LandModuleReport):
 
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
+        soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
 
         m = self.module
         units = m.area
@@ -450,7 +466,7 @@ class SetAsideReport(LandModuleReport):
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Set Aside",
-            result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
+            result_rows=self._standard_result_rows(soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
             total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
@@ -471,7 +487,7 @@ class GrasslandReport(LandModuleReport):
 
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
+        soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
 
         m = self.module
         units = m.area
@@ -520,7 +536,7 @@ class GrasslandReport(LandModuleReport):
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Grassland",
-            result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
+            result_rows=self._standard_result_rows(soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
             total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
@@ -541,12 +557,12 @@ class OtherLandReport(LandModuleReport):
 
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
+        soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
         m = self.module
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title=m.module_type.name,
-            result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
+            result_rows=self._standard_result_rows(soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=[],
             total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
@@ -565,9 +581,13 @@ class CoastalWetlandReport(LandModuleReport):
         self.calculator: calculators.CoastalWetlandCalculator = calculators.CoastalWetlandCalculator(self.module)
         super().__post_init__()
 
+    def _pool_rows(self) -> list[ResultRow]:
+        # The coastal wetland Biomass line already holds litter and deadwood with AGB and BGB.
+        return [ResultRow("CO2 in biomass and dead organic matter (AGB+BGB+litter+deadwood)", self._pool_co2(land_pools.BIOMASS))]
+
     def compute(self) -> ModuleResult:
         activity_title = self.module.activity.name
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
+        soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
 
         # CoastalWetland adds drainage CO2 to soil_co2
         drainage_co2 = self._extract(
@@ -627,7 +647,7 @@ class CoastalWetlandReport(LandModuleReport):
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Coastal Wetland",
-            result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4),
+            result_rows=self._standard_result_rows(soil_co2, soil_n2o, fire_n2o, fire_ch4),
             metadata_writes=mw,
             total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
@@ -872,14 +892,7 @@ class FloodedRiceReport(LandModuleReport):
         m = self.module
         es = self.emissions_set
 
-        # FloodedRice uses STRAW_BURNING instead of RESIDUE_BURNING for fire
-        # sources, so _extract_land_base() (which assumes RESIDUE_BURNING) is
-        # not applicable here.
-        biomass_co2 = self._extract(es, math_utils.ActivityTypes.BIOMASS, math_utils.GasTypes.CO2)
-        soil_co2 = self._extract(es, math_utils.ActivityTypes.SOIL_CO2_CHANGE, math_utils.GasTypes.CO2)
-        soil_n2o = self._extract(es, math_utils.ActivityTypes.SOM, math_utils.GasTypes.N2O)
-        fire_n2o = self._extract(es, math_utils.ActivityTypes.STRAW_BURNING, math_utils.GasTypes.N2O)
-        fire_ch4 = self._extract(es, math_utils.ActivityTypes.STRAW_BURNING, math_utils.GasTypes.CH4)
+        soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base(math_utils.ActivityTypes.STRAW_BURNING)
         rice_ch4 = self._extract(es, math_utils.ActivityTypes.CH4_EMITTED_RICE, math_utils.GasTypes.CH4)
 
         # All minor-season contributions are already merged into
@@ -938,7 +951,7 @@ class FloodedRiceReport(LandModuleReport):
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title=m.module_type.name,
-            result_rows=self._standard_result_rows(biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4, extra_rows),
+            result_rows=self._standard_result_rows(soil_co2, soil_n2o, fire_n2o, fire_ch4, extra_rows),
             metadata_writes=mw,
             total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
@@ -957,58 +970,33 @@ class ForestManagementReport(LandModuleReport):
         self.calculator: calculators.ForestManagementCalculator = calculators.ForestManagementCalculator(self.module)
         super().__post_init__()
 
+    def _pool_rows(self) -> list[ResultRow]:
+        return [
+            ResultRow(land_pools.LABEL_AGB, self._pool_co2(land_pools.AGB)),
+            ResultRow(land_pools.LABEL_BGB, self._pool_co2(land_pools.BGB)),
+            ResultRow(land_pools.LABEL_DOM, self._pool_co2(land_pools.DOM)),
+        ]
+
     def compute(self) -> ModuleResult:  # noqa: C901
         activity_title = self.module.activity.name
         m = self.module
+        if m.is_stock_difference():
+            return self._compute_stock_difference(activity_title)
         es = self.emissions_set
-
-        def extr(activity, gas):
-            return self._extract(es, activity, gas)
 
         AT = math_utils.ActivityTypes
         GT = math_utils.GasTypes
-
-        rotation_hwp_agb_co2 = extr(AT.HWP_ROTATION_AGB, GT.CO2)
-        rotation_hwp_bgb_co2 = extr(AT.HWP_ROTATION_BGB, GT.CO2)
-        rotation_agb_co2 = extr(AT.ROTATION_AGB, GT.CO2)
-        rotation_agb_n2o = extr(AT.ROTATION_AGB, GT.N2O)
-        rotation_agb_ch4 = extr(AT.ROTATION_AGB, GT.CH4)
-        rotation_bgb_co2 = extr(AT.ROTATION_BGB, GT.CO2)
-        rotation_bgb_n2o = extr(AT.ROTATION_BGB, GT.N2O)
-        rotation_bgb_ch4 = extr(AT.ROTATION_BGB, GT.CH4)
-        disturbance_agb_co2 = extr(AT.DISTURBANCE_AGB, GT.CO2)
-        disturbance_bgb_co2 = extr(AT.DISTURBANCE_BGB, GT.CO2)
-        disturbance_fire_agb_n2o = extr(AT.DISTURBANCE_FIRE_AGB, GT.N2O)
-        disturbance_fire_agb_ch4 = extr(AT.DISTURBANCE_FIRE_AGB, GT.CH4)
-        disturbance_fire_bgb_n2o = extr(AT.DISTURBANCE_FIRE_BGB, GT.N2O)
-        disturbance_fire_bgb_ch4 = extr(AT.DISTURBANCE_FIRE_BGB, GT.CH4)
-        logging_hwp_agb_co2 = extr(AT.HWP_LOGGING_AGB, GT.CO2)
-        logging_hwp_bgb_co2 = extr(AT.HWP_LOGGING_BGB, GT.CO2)
-        logging_agb_co2 = extr(AT.LOGGING_AGB, GT.CO2)
-        logging_agb_n2o = extr(AT.LOGGING_AGB, GT.N2O)
-        logging_agb_ch4 = extr(AT.LOGGING_AGB, GT.CH4)
-        logging_bgb_co2 = extr(AT.LOGGING_BGB, GT.CO2)
-        logging_bgb_n2o = extr(AT.LOGGING_BGB, GT.N2O)
-        logging_bgb_ch4 = extr(AT.LOGGING_BGB, GT.CH4)
-        degradation_agb_co2 = extr(AT.DEGRADATION_AGB, GT.CO2)
-        degradation_bgb_co2 = extr(AT.DEGRADATION_BGB, GT.CO2)
-        degradation_litter_co2 = extr(AT.DEGRADATION_LITTER, GT.CO2)
-        degradation_deadwood_co2 = extr(AT.DEGRADATION_DEADWOOD, GT.CO2)
-        growth_agb_co2 = extr(AT.AGB_GROWTH, GT.CO2)
-        growth_bgb_co2 = extr(AT.BGB_GROWTH, GT.CO2)
-        litter_co2 = extr(AT.LITTER, GT.CO2)
-        deadwood_co2 = extr(AT.DEADWOOD, GT.CO2)
-
-        hwp_co2 = _add(_add(_add(rotation_hwp_agb_co2, rotation_hwp_bgb_co2), logging_hwp_agb_co2), logging_hwp_bgb_co2)
-        fire_n2o = _add(_add(_add(_add(_add(rotation_agb_n2o, rotation_bgb_n2o), disturbance_fire_agb_n2o), disturbance_fire_bgb_n2o), logging_agb_n2o), logging_bgb_n2o)
-        fire_ch4 = _add(_add(_add(_add(_add(rotation_agb_ch4, rotation_bgb_ch4), disturbance_fire_agb_ch4), disturbance_fire_bgb_ch4), logging_agb_ch4), logging_bgb_ch4)
-        biomass_loss_co2 = _add(_add(_add(_add(_add(_add(_add(_add(_add(
-            rotation_agb_co2, rotation_bgb_co2), disturbance_agb_co2), disturbance_bgb_co2),
-            logging_agb_co2), logging_bgb_co2), degradation_agb_co2), degradation_bgb_co2),
-            degradation_litter_co2), degradation_deadwood_co2)
-        biomass_gain_co2 = _add(_add(_add(growth_agb_co2, growth_bgb_co2), litter_co2), deadwood_co2)
-
-        zeros = [0.0] * self._project_duration
+        fire_activities = (
+            AT.ROTATION_AGB, AT.ROTATION_BGB,
+            AT.LOGGING_AGB, AT.LOGGING_BGB,
+            AT.DISTURBANCE_FIRE_AGB, AT.DISTURBANCE_FIRE_BGB,
+        )
+        fire_n2o = [0.0] * self._project_duration
+        fire_ch4 = [0.0] * self._project_duration
+        for activity in fire_activities:
+            fire_n2o = _add(fire_n2o, self._extract(es, activity, GT.N2O))
+            fire_ch4 = _add(fire_ch4, self._extract(es, activity, GT.CH4))
+        soil_co2, soil_n2o, _, _ = self._extract_land_base()
 
         # Metadata
         default = defaults.ForestManagementDefaults(input=m).get_defaults()
@@ -1036,8 +1024,8 @@ class ForestManagementReport(LandModuleReport):
                 continue
             mw += [
                 MetadataWrite(1, col, m.area),
-                MetadataWrite(2, col, m.forest_type.name),
-                MetadataWrite(3, col, m.forest_condition_type.name),
+                MetadataWrite(2, col, m.forest_type.name if m.forest_type else None),
+                MetadataWrite(3, col, m.forest_condition_type.name if m.forest_condition_type else None),
                 MetadataWrite(4, col, getattr(m, f"rotation_length_yrs_{sfx}")),
                 MetadataWrite(5, col, getattr(m, f"rotation_percentage_biomass_for_energy_{sfx}")),
                 MetadataWrite(6, col, getattr(m, f"rotation_start_year_t2_{sfx}")),
@@ -1080,22 +1068,53 @@ class ForestManagementReport(LandModuleReport):
             MetadataWrite(deg_row, 6, m.average_yearly_degradation_percentage_thread.format_comments()),
         ]
 
-        # ForestManagement result rows: standard 5 rows (biomass/soil zeros) + HWP, loss, gain
-        result_rows = [
-            ResultRow("CO2 in biomass", zeros),
-            ResultRow("CO2 in soils", zeros),
-            ResultRow("N2O in soils", zeros),
-            ResultRow("N2O from fires", fire_n2o),
-            ResultRow("CH4 from fires", fire_ch4),
-            ResultRow("CO2 from HWP (rotation and logging)", hwp_co2),
-            ResultRow("CO2 from biomass loss", biomass_loss_co2),
-            ResultRow("CO2 from biomass gain", biomass_gain_co2),
-        ]
+        result_rows = self._standard_result_rows(soil_co2, soil_n2o, fire_n2o, fire_ch4)
 
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Forest Management",
             result_rows=result_rows,
+            metadata_writes=mw,
+            total_emissions=self._balance_total(),
+            units_breakdown_w=self._units_breakdown_w,
+            units_breakdown_wo=self._units_breakdown_wo,
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+            _inventory_items=self._inventory_items(activity_title),
+        )
+
+
+    def _compute_stock_difference(self, activity_title: str) -> ModuleResult:
+        # The gain-loss defaults and inputs (growth, rotation, logging, disturbances) do not apply here.
+        m = self.module
+        zeros = [0.0] * self._project_duration
+
+        pools = [("agb", "AGB"), ("bgb", "BGB"), ("litter", "Litter"), ("deadwood", "Deadwood")]
+        mw = [
+            MetadataWrite(1, 1, "Hectares"),
+            MetadataWrite(2, 1, "Type of forest"),
+            MetadataWrite(3, 1, "Forest category"),
+            MetadataWrite(4, 1, "Approach"),
+            MetadataWrite(5, 1, "Data source"),
+            MetadataWrite(4, 2, m.get_approach_display()),
+            MetadataWrite(5, 2, m.data_source.short_name if m.data_source else None),
+        ]
+        mw += [MetadataWrite(6 + i, 1, f"{label} stock (tC/ha)") for i, (_, label) in enumerate(pools)]
+        for col, is_state, sfx in [(2, m.is_start(), "start"), (3, m.is_with(), "w"), (4, m.is_without(), "wo")]:
+            if not is_state:
+                continue
+            mw += [
+                MetadataWrite(1, col, m.area),
+                MetadataWrite(2, col, m.forest_type.name if m.forest_type else None),
+                MetadataWrite(3, col, m.forest_condition_type.name if m.forest_condition_type else None),
+            ]
+            mw += [MetadataWrite(6 + i, col, getattr(m, f"stock_{pool}_{sfx}")) for i, (pool, _) in enumerate(pools)]
+
+        return ModuleResult(
+            title=m.module_type.name,
+            metadata_section_title="Forest Management (stock difference)",
+            # The forest pool rows carry AGB, BGB, litter and deadwood; stock difference books no soil or fire lines.
+            result_rows=self._standard_result_rows(zeros, zeros, zeros, zeros),
             metadata_writes=mw,
             total_emissions=self._balance_total(),
             units_breakdown_w=self._units_breakdown_w,
@@ -1151,7 +1170,7 @@ class SettlementReport(LandModuleReport):
         # emissions (biomass / SOC / SOM-N2O / fire) in addition to the
         # roads/buildings submodules. These 5 rows were hardcoded to zeros
         # and excluded from the total: see exact-django-webapp-jcb.
-        biomass_co2, soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
+        soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
         buildings_co2, roads_co2, infra_co2 = self._compute_submodule_emissions(dur)
 
         # Metadata: buildings, roads, other_infrastructures sub-loops
@@ -1209,7 +1228,7 @@ class SettlementReport(LandModuleReport):
             mw.append(MetadataWrite(2 + row + i, 6, infra.area_m2_thread.format_comments()))
 
         result_rows = [
-            ResultRow("CO2 in biomass", biomass_co2),
+            *self._pool_rows(),
             ResultRow("CO2 in soils", soil_co2),
             ResultRow("N2O in soils", soil_n2o),
             ResultRow("N2O from fires", fire_n2o),

@@ -35,14 +35,28 @@ def _models():
     return models
 
 
+def _has_own_calculator(module) -> bool:
+    from api.calculators import CalculatorFactory
+
+    try:
+        CalculatorFactory().get_calculator(module)
+    except Exception:
+        return False
+    return True
+
+
 def iter_result_modules(project) -> Iterator:
+    """Every module and submodule of a project that has results of its own to freeze."""
     for activity in project.activities.all():
         for module in activity.modules:
             if not module:
                 continue
             yield module
             for submodule in getattr(module, "submodules", None) or []:
-                yield submodule
+                # Some submodules (ForestDisturbance, the minor-season croplands) are calculated
+                # only inside their parent's calculator, so they have no results to freeze.
+                if _has_own_calculator(submodule):
+                    yield submodule
 
 
 def is_ready_for_results(module) -> bool:
@@ -79,6 +93,8 @@ def compute_module_results(module) -> dict:
     ):
         data = DynamicResultFactory.create(activity, result.breakdown(by=by), aggregate_by=by).data
         data["inventory"] = inventory.breakdown(by=by)
+        # Module-specific blocks next to the emissions (solid waste food-waste flows); the results serializer passes them through.
+        data.update(getattr(calculator, "results_extra", {}))
         computed[key] = data
 
     computed["units"] = None

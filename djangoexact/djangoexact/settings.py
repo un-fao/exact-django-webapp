@@ -133,7 +133,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
-    "minitool.middleware.DatabaseConnectionMiddleware",  # Add connection cleanup middleware
 ]
 
 ROOT_URLCONF = "djangoexact.urls"
@@ -218,6 +217,9 @@ else:
         # test_<name> database is used, so a local `manage.py test` can never
         # drop or flush the developer's real database.
         DATABASES["default"]["TEST"] = {"NAME": os.getenv("DB_NAME", default="$DB_NAME")}
+
+# Seeds the project groups' permissions, which no fixture or migration provides.
+TEST_RUNNER = "api.tests.runner.SeededTestRunner"
 
 DATABASE_ROUTERS = ["ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
 

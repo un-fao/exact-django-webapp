@@ -57,7 +57,9 @@ class FloodedRice(LandModule):
         self.SFp = self.SFp_tier_2 if self.SFp_tier_2 is not None else self.SFp_ref
 
         # NOTE: this is a default value that is calculated based on the input values, needed for the frontend
-        self.straw_tonnes_tier_2_default = self.yield_ref * self.rice_slope + self.rice_intercept
+        # Same yield as calculate_emissions: regions without an IPCC rice yield (yield_ref None) rely on the Tier 2 yield.
+        yield_value = self.yield_ref if self.yield_tier_2 is None else self.yield_tier_2
+        self.straw_tonnes_tier_2_default = yield_value * self.rice_slope + self.rice_intercept
         self.SFo_tier_2_default = (1 + (self.straw_tonnes_tier_2 if self.straw_tonnes_tier_2 is not None else self.straw_tonnes_tier_2_default) * self.cfoa) ** 0.59
         self.adjusted_daily_ef_methane_tier_2_default = self.EFc * self.SFw * self.SFp * (self.SFo_tier_2 if self.SFo_tier_2 is not None else self.SFo_tier_2_default)
 

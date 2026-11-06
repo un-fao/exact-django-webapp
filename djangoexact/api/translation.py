@@ -181,6 +181,11 @@ class FuelTypeTranslationOptions(NameOnlyTranslationOptions):
     pass
 
 
+@register(models.ValueChainStage)
+class ValueChainStageTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
 @register(models.CropType)
 class CropTypeTranslationOptions(NameOnlyTranslationOptions):
     pass
@@ -253,4 +258,14 @@ class WaterManagementTypeAfterCultivationTranslationOptions(NameOnlyTranslationO
 
 @register(models.PackagingMaterialType)
 class PackagingMaterialTypeTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
+@register(models.AnalysisPurpose)
+class AnalysisPurposeTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
+@register(models.ProjectPhase)
+class ProjectPhaseTranslationOptions(NameOnlyTranslationOptions):
     pass
