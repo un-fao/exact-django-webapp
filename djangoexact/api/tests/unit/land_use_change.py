@@ -2,7 +2,7 @@ from rest_framework import status
 import api.models as models
 import logging as log
 from . import base_module
-from . import factories
+from .factories import UnitTestAnnualCroplandFactory, UnitTestForestManagementFactory, UnitTestOtherLandFactory, UnitTestGrasslandFactory
 import logging
 
 logging.getLogger().setLevel(logging.CRITICAL)
@@ -58,7 +58,7 @@ class AnnualToForestTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the annual cropland modules using unit test factories.
         """
         # Use factory to get reliable configuration data
-        annual_config_data = factories.UnitTestAnnualCroplandFactory.build()
+        annual_config_data = UnitTestAnnualCroplandFactory.build()
 
         # Extract the configuration data for API calls
         config_data = {
@@ -80,7 +80,7 @@ class AnnualToForestTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the forest management module using unit test factories.
         """
         # Use factory to get reliable configuration data
-        forest_config_data = factories.UnitTestForestManagementFactory.build()
+        forest_config_data = UnitTestForestManagementFactory.build()
 
         # Extract the configuration data for API calls
         config_data = {
@@ -236,7 +236,7 @@ class ForestToAnnualTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the forest management modules using unit test factories.
         """
         # Use factory to get reliable configuration data
-        forest_config_data = factories.ForestManagementFactory.build()
+        forest_config_data = UnitTestForestManagementFactory.build()
 
         # Extract the configuration data for API calls
         config_data = {
@@ -253,7 +253,7 @@ class ForestToAnnualTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the annual cropland module using unit test factories.
         """
         # Use factory to get reliable configuration data
-        annual_config_data = factories.AnnualCroplandFactory.build()
+        annual_config_data = UnitTestAnnualCroplandFactory.build()
 
         # Extract the configuration data for API calls
         config_data = {
@@ -354,7 +354,7 @@ class AnnualToOtherLandTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the annual cropland modules using unit test factories.
         """
         # Use factory to get reliable configuration data
-        annual_config_data = factories.UnitTestAnnualCroplandFactory.build()
+        annual_config_data = UnitTestAnnualCroplandFactory.build()
 
         # Extract the configuration data for API calls
         config_data = {
@@ -379,7 +379,7 @@ class AnnualToOtherLandTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the other land module using unit test factories.
         """
         # Use factory to get reliable configuration data
-        other_land_config_data = factories.UnitTestOtherLandFactory.build()
+        other_land_config_data = UnitTestOtherLandFactory.build()
 
         # Extract the configuration data for API calls
         config_data = {
@@ -594,7 +594,7 @@ class AnnualToGrasslandTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the annual cropland modules using unit test factories.
         """
         # Use factory to get reliable configuration data
-        annual_config_data = factories.AnnualCroplandFactory.build()
+        annual_config_data = UnitTestAnnualCroplandFactory.build()
 
         # Extract the configuration data for API calls
         config_data = {
@@ -619,7 +619,7 @@ class AnnualToGrasslandTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the grassland module using unit test factories.
         """
         # Use factory to get reliable configuration data
-        grassland_config_data = factories.GrasslandFactory.build()
+        grassland_config_data = UnitTestGrasslandFactory.build()
 
         # Extract the configuration data for API calls
         config_data = {

@@ -108,6 +108,35 @@ The worker itself is `python manage.py run_async_job --job-id <N>`
    left `running` forever by a code path that forgets to update status (short of the
    process being killed outright, which is exactly what the reconciler below exists for).
 
+## Computation job image: which pipeline deploys it
+
+The worker runs whatever code was baked into the job's image, not the code of the
+service that enqueued the job. A job image older than its service fails in ways that
+look like application bugs (for example `TemplateDoesNotExist: reports/ifad_en.html`
+for a report template added after the image was built). Each environment therefore
+rebuilds its job from the same commit as its service:
+
+| Environment | Service | Job | Deployed by |
+|---|---|---|---|
+| develop | `exact-api-dev` | `exact-computation-job-dev` | `deploy-cloudrun-develop.yaml` (image and full env) |
+| review | `exact-api` | `exact-computation-job` | `deploy-cloudrun.yaml` (image, `BACKEND_BASE_URL`, `SECRET_KEY`) |
+| production | App Engine | `exact-computation-job` (production project) | `deploy.yaml` (image and full env) |
+
+Develop and review share the `fao-exact-review` project and database but not the job:
+sharing it meant one image could match only one of the two services.
+
+Images are tagged with the commit SHA. To see which code a job runs:
+
+```bash
+gcloud run jobs describe exact-computation-job --region=europe-west1 \
+  --project=fao-exact-review \
+  --format="value(spec.template.spec.template.spec.containers[0].image)"
+```
+
+Known gap: the review job's full env is still only written by `deploy.yaml`, which no
+longer triggers on `review`. A new env var the worker needs must be added to the review
+job by hand (`gcloud run jobs update --update-env-vars`) until that is automated.
+
 ## Report output and download
 
 `api/services/report_jobs.py::run` reproduces what the synchronous `template()` /

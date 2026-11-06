@@ -18,6 +18,7 @@ from admin_scripts.excel_export import build_scenarios_workbook
 from admin_scripts.fra_carbon_stock import fetch_data, fetch_years, parse_payload, replace_carbon_stock
 from admin_scripts.gap_detector import detect_gap
 from admin_scripts.job_dispatcher import cancel_job, enqueue_for_test_run, enqueue_or_join
+from admin_scripts.luc_permutations import display_value
 from admin_scripts.models import ComputationJob, ModuleTestRun
 from admin_scripts.scenario_utils import stats_for_scenario
 from admin_scripts.test_planner import _resolve_value_source, plan_module_tests
@@ -461,15 +462,16 @@ def htmx_values(request):
     else:
         values = []
 
-    # Both from and to share the same value pool
-    from_values = values
-    to_values = values
+    # LUC values are preset identifiers ("<ClassName>#<idx>"): they stay the
+    # submitted value because ChangeRecord and the runner key on them, and
+    # only the visible text is swapped for a descriptive label.
+    options = [(v, display_value(v)) for v in values]
 
     return render(request, "admin_scripts/partials/value_options.html", {
         "index": index,
         "prefix": prefix,
-        "from_values": from_values,
-        "to_values": to_values,
+        "from_values": options,
+        "to_values": options,
     })
 
 

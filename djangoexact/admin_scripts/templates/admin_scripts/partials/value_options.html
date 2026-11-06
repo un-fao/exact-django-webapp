@@ -3,8 +3,8 @@
     <select name="{{ prefix }}from_value" required
             class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
         <option value="">Select from value...</option>
-        {% for val in from_values %}
-        <option value="{{ val }}">{{ val }}</option>
+        {% for val, label in from_values %}
+        <option value="{{ val }}">{{ label }}</option>
         {% endfor %}
     </select>
 </div>
@@ -13,8 +13,8 @@
     <select name="{{ prefix }}to_value" required
             class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
         <option value="">Select to value...</option>
-        {% for val in to_values %}
-        <option value="{{ val }}">{{ val }}</option>
+        {% for val, label in to_values %}
+        <option value="{{ val }}">{{ label }}</option>
         {% endfor %}
     </select>
 </div>

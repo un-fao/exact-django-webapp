@@ -65,6 +65,9 @@ ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", _default_hosts).s
 # CORS: allow-all only in development; production deployments must set CORS_ALLOWED_ORIGINS explicitly.
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 CORS_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
+# The frontend downloads reports with fetch() from another origin and names the
+# blob from this header; without the expose, JS reads it as null.
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
 
 # Behind the App Engine / Cloud Run TLS-terminating proxy the container is
 # reached over plain http with the original scheme in X-Forwarded-Proto. Trust

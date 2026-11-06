@@ -151,8 +151,8 @@
       "moisture": 1,
       "land_use_type": 155,
       "value": 10.7,
-      "value_min": 6.5,
-      "value_max": 14.8
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -187,8 +187,8 @@
       "moisture": 2,
       "land_use_type": 155,
       "value": 10.7,
-      "value_min": 6.5,
-      "value_max": 14.8
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -223,8 +223,8 @@
       "moisture": 1,
       "land_use_type": 155,
       "value": 10.7,
-      "value_min": 6.5,
-      "value_max": 14.8
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -259,8 +259,8 @@
       "moisture": 2,
       "land_use_type": 155,
       "value": 10.7,
-      "value_min": 6.5,
-      "value_max": 14.8
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -295,8 +295,8 @@
       "moisture": 4,
       "land_use_type": 155,
       "value": 10.7,
-      "value_min": 6.5,
-      "value_max": 14.8
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -331,8 +331,8 @@
       "moisture": 1,
       "land_use_type": 155,
       "value": 10.7,
-      "value_min": 6.5,
-      "value_max": 14.8
+      "value_min": null,
+      "value_max": null
     }
   },
   {

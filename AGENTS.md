@@ -2,6 +2,10 @@
 
 ## Quick Reference
 
+## Important Rules
+
+- Before doing any work, always endure that you're in the right branch relative to the work you're about to perform
+
 ## Non-Interactive Shell Commands
 
 **ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.

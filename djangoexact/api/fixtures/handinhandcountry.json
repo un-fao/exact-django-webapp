@@ -73,11 +73,56 @@
   },
   {
     "model": "api.handinhandcountry",
-    "pk": 31,
+    "pk": 40,
+    "fields": {
+      "region": 1,
+      "name": "Ghana",
+      "iso_code": "GH"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 34,
     "fields": {
       "region": 1,
       "name": "Liberia",
       "iso_code": "LR"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 31,
+    "fields": {
+      "region": 1,
+      "name": "Madagascar",
+      "iso_code": "MG"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 35,
+    "fields": {
+      "region": 1,
+      "name": "Mozambique",
+      "iso_code": "MZ"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 36,
+    "fields": {
+      "region": 1,
+      "name": "Nigeria",
+      "iso_code": "NG"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 37,
+    "fields": {
+      "region": 1,
+      "name": "Sierra Leone",
+      "iso_code": "SL"
     }
   },
   {
@@ -127,6 +172,24 @@
   },
   {
     "model": "api.handinhandcountry",
+    "pk": 32,
+    "fields": {
+      "region": 2,
+      "name": "Bhutan",
+      "iso_code": "BT"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 33,
+    "fields": {
+      "region": 2,
+      "name": "Fiji",
+      "iso_code": "FJ"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
     "pk": 14,
     "fields": {
       "region": 2,
@@ -145,11 +208,11 @@
   },
   {
     "model": "api.handinhandcountry",
-    "pk": 16,
+    "pk": 38,
     "fields": {
       "region": 2,
-      "name": "Nepal",
-      "iso_code": "NP"
+      "name": "Pakistan",
+      "iso_code": "PK"
     }
   },
   {
@@ -168,6 +231,15 @@
       "region": 2,
       "name": "Philippines",
       "iso_code": "PH"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 39,
+    "fields": {
+      "region": 2,
+      "name": "Tonga",
+      "iso_code": "TO"
     }
   },
   {
@@ -267,6 +339,15 @@
       "region": 5,
       "name": "Iraq",
       "iso_code": "IQ"
+    }
+  },
+  {
+    "model": "api.handinhandcountry",
+    "pk": 41,
+    "fields": {
+      "region": 5,
+      "name": "Jordan",
+      "iso_code": "JO"
     }
   },
   {

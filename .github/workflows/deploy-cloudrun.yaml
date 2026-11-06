@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/id-responses
       - review
 
 concurrency:
@@ -241,6 +240,33 @@ jobs:
           docker push "$TAG"
           docker push "$TAG_LATEST"
 
+      - name: Build and deploy computation job image
+        # exact-computation-job runs async reports and project copies for this
+        # service, so it must run the same commit. deploy.yaml used to be the
+        # only thing that rebuilt it, and it stopped triggering on review on
+        # 2026-07-30: the job then ran that day's code for months while the
+        # service moved on, and every report template added since failed with
+        # TemplateDoesNotExist. Image only: the job's env is owned by deploy.yaml
+        # and the two sync steps at the end of this workflow.
+        #
+        # Runs after migrate (the new code may need the new schema) and before
+        # the service deploy (the service must not enqueue work the job cannot
+        # run yet). Tagged by commit so `gcloud run jobs describe` answers
+        # "which code is this job running" directly.
+        env:
+          DOCKER_BUILDKIT: '1'
+          SHA: ${{ github.sha }}
+        run: |
+          set -eu
+          job="exact-computation-job"
+          image="$CLOUD_RUN_REGION-docker.pkg.dev/$PROJECT_ID/$IMAGE_REPO/$job:$SHA"
+          docker build -f deploy/Dockerfile.computation_job -t "$image" .
+          docker push "$image"
+          gcloud run jobs update "$job" \
+            --region="$CLOUD_RUN_REGION" --project="$PROJECT_ID" \
+            --image="$image" --quiet
+          echo "Computation job $job updated to $image" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Render Cloud Run service manifest
         run: |
           set -eu
@@ -403,8 +429,8 @@ jobs:
         # emailed link therefore comes from this job's BACKEND_BASE_URL, not
         # from the service deployed above.
         #
-        # deploy.yaml is the job's only deployer and it now triggers on main
-        # only, so a push to review could never correct the job's environment.
+        # deploy.yaml is the only place the job's full env is written and it now
+        # triggers on main only, so a push to review could never correct it.
         # That is how the job kept emailing a disabled App Engine hostname for
         # weeks after review moved to Cloud Run. This step closes that gap:
         # every review deploy re-asserts the sender's base URL.
@@ -412,7 +438,7 @@ jobs:
         # Requires REPORT_BASE_URL_VERIFIED from the gate above, which is only
         # set once the base URL is known to name a host this deployment serves.
         # An unverified value is left out of the sender entirely rather than
-        # propagated on hope. Env only. The job image stays owned by deploy.yaml.
+        # propagated on hope.
         if: env.CLOUDRUN_BACKEND_BASE_URL != '' && env.REPORT_BASE_URL_VERIFIED == 'true'
         run: |
           set -eu

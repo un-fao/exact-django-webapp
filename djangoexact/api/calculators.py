@@ -98,7 +98,7 @@ from math_model.no_time_dependency_final.not_cultivated_land import (
     NotCultivatedLand as MathNotCultivatedLand,
 )
 
-from api.utilities import FOSSIL_METHANE_FUELS, getattr_or_default
+from api.utilities import getattr_or_default
 from api import reference_cache
 
 from . import utilities as utils
@@ -3076,7 +3076,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.bgb_t_c_ha,
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
@@ -3124,7 +3124,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.bgb_t_c_ha,
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
@@ -3175,7 +3175,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_w,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.bgb_t_c_ha,
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_w,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_w,
@@ -3226,7 +3226,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_wo,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.bgb_t_c_ha,
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_wo,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_wo,
@@ -4024,17 +4024,6 @@ class EnergyEntryCalculator(BaseCalculator):
         self.energy_ef_default_w = ipcc.EnergyDefaultEmissionFactor()
         self.energy_ef_default_wo = ipcc.EnergyDefaultEmissionFactor()
 
-        self.methane_constant_start = 0
-        self.methane_constant_w = 0
-        self.methane_constant_wo = 0
-
-        for scenario in utils.ScenarioTypes:
-            fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}", None)
-            if fuel_type and fuel_type.name_en.casefold() in utils.FOSSIL_METHANE_FUELS:
-                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4_fossil)
-            else:
-                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
-
         self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
         self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
         self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
@@ -4138,7 +4127,7 @@ class EnergyEntryCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_start,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_start),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -4179,7 +4168,7 @@ class EnergyEntryCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_w,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_w),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -4219,7 +4208,7 @@ class EnergyEntryCalculator(BaseCalculator):
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_wo,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_wo),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -4363,17 +4352,6 @@ class FuelCalculator(BaseCalculator):
         self.energy_ef_default_w = ipcc.EnergyDefaultEmissionFactor()
         self.energy_ef_default_wo = ipcc.EnergyDefaultEmissionFactor()
 
-        self.methane_constant_start = 0
-        self.methane_constant_w = 0
-        self.methane_constant_wo = 0
-
-        for scenario in utils.ScenarioTypes:
-            fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}", None)
-            if fuel_type and fuel_type.name_en.casefold() in utils.FOSSIL_METHANE_FUELS:
-                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4_fossil)
-            else:
-                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
-
         self.is_fuel_start = self.module.fuel_type_start is not None and self.module.fuel_type_start.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
         self.is_fuel_w = self.module.fuel_type_w is not None and self.module.fuel_type_w.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
         self.is_fuel_wo = self.module.fuel_type_wo is not None and self.module.fuel_type_wo.name_en.casefold() not in utils.ELECTRIC_FUEL_TYPES
@@ -4431,17 +4409,17 @@ class FuelCalculator(BaseCalculator):
         if self.module.is_with() and self.is_fuel_w:
             inputs_w = {
                 "emissions_factor_co2": self.energy_ef_default_w.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_w,
                 "emissions_factor_ch4": self.energy_ef_default_w.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_w,
                 "emissions_factor_n2o": self.energy_ef_default_w.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_w,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_w,
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_w,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_w),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -4453,17 +4431,17 @@ class FuelCalculator(BaseCalculator):
         if self.module.is_without() and self.is_fuel_wo:
             inputs_wo = {
                 "emissions_factor_co2": self.energy_ef_default_wo.co2,
-                "specific_factor_co2": self.module.energy_ef_co2_t2_start,
+                "specific_factor_co2": self.module.energy_ef_co2_t2_wo,
                 "emissions_factor_ch4": self.energy_ef_default_wo.ch4,
-                "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
+                "specific_factor_ch4": self.module.energy_ef_ch4_t2_wo,
                 "emissions_factor_n2o": self.energy_ef_default_wo.n2o,
-                "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
+                "specific_factor_n2o": self.module.energy_ef_n2o_t2_wo,
                 "mwh_start": self.module.quantity_consumed_per_year_start,
                 "mwh_end": self.module.quantity_consumed_per_year_wo,
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "methane_constant": self.methane_constant_wo,
+                "methane_constant": utils.methane_gwp(self.project.gwp, self.module.fuel_type_wo),
                 "nitrous_constant": self.project.gwp.n2o,
                 "delay": self.activity.delay,
             }
@@ -6241,8 +6219,11 @@ class CoastalWetlandCalculator(BaseCalculator):
             self.salinity_type = self.module.avg_salinity_t2
 
         self.soil_type_name = "Mineral"
+        self.soil_type_filter = {"soil_type__name": "Mineral"}
         if self.module.soil_type_t2:
             self.soil_type_name = self.module.soil_type_t2.name
+            # .name is translated; filter by instance so the lookup does not depend on the active language.
+            self.soil_type_filter = {"soil_type": self.module.soil_type_t2}
 
         self.agb_default = ipcc.CoastalAGB()
         self.bgb_default = ipcc.CoastalBGB()
@@ -6289,7 +6270,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 raise ValueError(f"Deadwood for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=self.module.land_use_type, soil_type__name=self.soil_type_name)
+            self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=self.module.land_use_type, **self.soil_type_filter)
         except ipcc.DefaultSoilCarbonStock.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "soc_t2")
             if missing_scenarios:
@@ -6310,7 +6291,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 raise ValueError(f"Percentage C Lost After Excavation is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=self.module.land_use_type, soil_type__name=self.soil_type_name)
+            self.rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=self.module.land_use_type, **self.soil_type_filter)
         except ipcc.RewettingCarbonFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "co2_rewetting_t2")
             if missing_scenarios:
@@ -6358,9 +6339,8 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "percentage_c_lost_excavation_tier_2": self.module.pc_c_lost_after_excavation_t2_w,
                 "ef_rewetting_carbon_default": self.rewetting_c.value,
                 "ef_rewetting_methane_default": self.rewetting_ch4.value,
-                "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_start,
+                "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_w,
                 "ef_rewetting_methane_tier_2": self.module.ch4_rewetting_t2_w,
-                "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
                 "mangrove_factor": utils.MANGROVE_FACTOR if "mangrove" in self.module.land_use_type.name_en.casefold() else utils.NON_MANGROVE_FACTOR,
@@ -6399,7 +6379,6 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "ef_rewetting_methane_default": self.rewetting_ch4.value,
                 "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_wo,
                 "ef_rewetting_methane_tier_2": self.module.ch4_rewetting_t2_wo,
-                "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
                 "mangrove_factor": utils.MANGROVE_FACTOR if "mangrove" in self.module.land_use_type.name_en.casefold() else utils.NON_MANGROVE_FACTOR,
@@ -6611,13 +6590,16 @@ class OrganicSoilCalculator(BaseCalculator):
         project: Project = module.activity.project
         luc: LandUseChange = module.land_use_change
 
+        # Filter EFs by ModuleType instance: .name is translated, but module_type__name hits the English column.
         if luc:
-            module_type_start = luc.module_type_start.name
-            module_type_w = luc.module_type_w.name
-            module_type_wo = luc.module_type_wo.name
+            mt_start, mt_w, mt_wo = luc.module_type_start, luc.module_type_w, luc.module_type_wo
+            module_type_start = mt_start.name
+            module_type_w = mt_w.name
+            module_type_wo = mt_wo.name
             self.area_affected_by_module = luc.area
         else:
             parent_module, parent_module_type = utils.find_organic_soil_parent_module(module)
+            mt_start = mt_w = mt_wo = parent_module_type
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
 
             self.area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
@@ -6634,7 +6616,7 @@ class OrganicSoilCalculator(BaseCalculator):
             raise ValueError(f"Could not find Fire Reference for {self.climate}, {self.moisture}")
 
         try:
-            self.ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="On-Site")
+            self.ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_start, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.ef_onsite_start.co2 is None and module.onsite_co2_drainage_t2_start is None:
                 raise ValueError(f"Could not find CO2 value of EF On-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_start.ch4 is None and module.onsite_ch4_drainage_t2_start is None:
@@ -6642,23 +6624,21 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.ef_onsite_start.n2o is None and module.onsite_n2o_drainage_t2_start is None:
                 raise ValueError(f"Could not find N2O value of EF On-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_start, module.onsite_ch4_drainage_t2_start, module.onsite_n2o_drainage_t2_start])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_drainage_t2_start, module.onsite_ch4_drainage_t2_start, module.onsite_n2o_drainage_t2_start]):
                 raise ValueError(f"Could not find EF On-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            self.ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_start, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.ef_offsite_start.doc is None and module.offsite_doc_drainage_t2_start is None:
                 raise ValueError(f"Could not find DOC value of EF Off-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_offsite_start.ch4 is None and module.offsite_ch4_drainage_t2_start is None:
                 raise ValueError(f"Could not find CH4 value of EF Off-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_start, module.offsite_ch4_drainage_t2_start])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_drainage_t2_start, module.offsite_ch4_drainage_t2_start]):
                 raise ValueError(f"Could not find EF Off-Site Drainage Start for {module_type_start}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_start)
+            self.rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type=mt_start)
             if self.rewetting_start.co2 is None and module.onsite_co2_rewetting_t2_start is None:
                 raise ValueError(f"Could not find CO2 value of Rewetting Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_start.ch4 is None and module.onsite_ch4_rewetting_t2_start is None:
@@ -6668,12 +6648,11 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.rewetting_start.doc is None and module.offsite_doc_rewetting_t2_start is None:
                 raise ValueError(f"Could not find DOC value of Rewetting Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_rewetting_t2_start, module.onsite_ch4_rewetting_t2_start, module.onsite_n2o_rewetting_t2_start, module.offsite_doc_rewetting_t2_start])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_rewetting_t2_start, module.onsite_ch4_rewetting_t2_start, module.onsite_n2o_rewetting_t2_start, module.offsite_doc_rewetting_t2_start]):
                 raise ValueError(f"Could not find Rewetting EF Start for {module.peat_type}, {module_type_start}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="On-Site")
+            self.ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_w, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.ef_onsite_w.co2 is None and module.onsite_co2_drainage_t2_w is None:
                 raise ValueError(f"Could not find CO2 value of EF On-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_w.ch4 is None and module.onsite_ch4_drainage_t2_w is None:
@@ -6681,19 +6660,17 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.ef_onsite_w.n2o is None and module.onsite_n2o_drainage_t2_w is None:
                 raise ValueError(f"Could not find N2O value of EF On-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_w, module.onsite_ch4_drainage_t2_w, module.onsite_n2o_drainage_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_drainage_t2_w, module.onsite_ch4_drainage_t2_w, module.onsite_n2o_drainage_t2_w]):
                 raise ValueError(f"Could not find EF On-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            self.ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_w, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.ef_offsite_w.doc is None and module.offsite_doc_drainage_t2_w is None:
                 raise ValueError(f"Could not find DOC value of EF Off-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_offsite_w.ch4 is None and module.offsite_ch4_drainage_t2_w is None:
                 raise ValueError(f"Could not find CH4 value of EF Off-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_w, module.offsite_ch4_drainage_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_drainage_t2_w, module.offsite_ch4_drainage_t2_w]):
                 raise ValueError(f"Could not find EF Off-Site Drainage W for {module_type_w}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         self.is_fire_used_w = module.fire_type_w is not None
@@ -6704,7 +6681,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 if self.module.mean_dry_matter_t2_w is None:
                     raise ValueError(f"Could not find Dry Matter W for {module.fire_type_w.name}, {self.climate}, {self.moisture}")
         try:
-            self.rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_w)
+            self.rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type=mt_w)
             if self.rewetting_w.co2 is None and module.onsite_co2_rewetting_t2_w is None:
                 raise ValueError(f"Could not find CO2 value of Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_w.ch4 is None and module.onsite_ch4_rewetting_t2_w is None:
@@ -6714,8 +6691,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.rewetting_w.doc is None and module.offsite_doc_rewetting_t2_w is None:
                 raise ValueError(f"Could not find DOC value of Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_rewetting_t2_w, module.onsite_ch4_rewetting_t2_w, module.onsite_n2o_rewetting_t2_w, module.offsite_doc_rewetting_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_rewetting_t2_w, module.onsite_ch4_rewetting_t2_w, module.onsite_n2o_rewetting_t2_w, module.offsite_doc_rewetting_t2_w]):
                 raise ValueError(f"Could not find Rewetting W for {module.peat_type}, {module_type_w}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6725,8 +6701,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.onsite_ef_w.n2o is None and module.onsite_n2o_peat_t2_w is None:
                 raise ValueError(f"Could not find N2O value of On-Site Peat Extraction W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_peat_t2_w, module.onsite_n2o_peat_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_peat_t2_w, module.onsite_ch4_peat_t2_w, module.onsite_n2o_peat_t2_w]):
                 raise ValueError(f"Could not find On-Site Peat Extraction W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6736,8 +6711,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.offsite_ef_w.ch4 is None and module.offsite_ch4_peat_t2_w is None:
                 raise ValueError(f"Could not find CH4 value of Off-Site Peat Extraction W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_peat_t2_w, module.offsite_ch4_peat_t2_w])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_peat_t2_w, module.offsite_ch4_peat_t2_w]):
                 raise ValueError(f"Could not find Off-Site Peat Extraction W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6747,7 +6721,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 raise ValueError(f"Could not find Peat Extraction Conversion Factor W for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="On-Site")
+            self.ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_wo, peat_type=module.peat_type, site_location_type__name="On-Site")
             if self.ef_onsite_wo.co2 is None and module.onsite_co2_drainage_t2_wo is None:
                 raise ValueError(f"Could not find CO2 value of EF On-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_onsite_wo.ch4 is None and module.onsite_ch4_drainage_t2_wo is None:
@@ -6755,19 +6729,17 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.ef_onsite_wo.n2o is None and module.onsite_n2o_drainage_t2_wo is None:
                 raise ValueError(f"Could not find N2O value of EF On-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_drainage_t2_wo, module.onsite_ch4_drainage_t2_wo, module.onsite_n2o_drainage_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_drainage_t2_wo, module.onsite_ch4_drainage_t2_wo, module.onsite_n2o_drainage_t2_wo]):
                 raise ValueError(f"Could not find EF On-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
-            self.ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            self.ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type=mt_wo, peat_type=module.peat_type, site_location_type__name="Off-Site")
             if self.ef_offsite_wo.doc is None and module.offsite_doc_drainage_t2_wo is None:
                 raise ValueError(f"Could not find DOC value of EF Off-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.ef_offsite_wo.ch4 is None and module.offsite_ch4_drainage_t2_wo is None:
                 raise ValueError(f"Could not find CH4 value of EF Off-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_drainage_t2_wo, module.offsite_ch4_drainage_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_drainage_t2_wo, module.offsite_ch4_drainage_t2_wo]):
                 raise ValueError(f"Could not find EF Off-Site Drainage WO for {module_type_wo}, {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         self.is_fire_used_wo = module.fire_type_wo is not None
@@ -6779,7 +6751,7 @@ class OrganicSoilCalculator(BaseCalculator):
                     raise ValueError(f"Could not find Dry Matter WO for {module.fire_type_wo.name}, {self.climate}, {self.moisture}")
 
         try:
-            self.rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_wo)
+            self.rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type=mt_wo)
             if self.rewetting_wo.co2 is None and module.onsite_co2_rewetting_t2_wo is None:
                 raise ValueError(f"Could not find CO2 value of Rewetting WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
             if self.rewetting_wo.ch4 is None and module.onsite_ch4_rewetting_t2_wo is None:
@@ -6789,8 +6761,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.rewetting_wo.doc is None and module.offsite_doc_rewetting_t2_wo is None:
                 raise ValueError(f"Could not find DOC value of Rewetting WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_rewetting_t2_wo, module.onsite_ch4_rewetting_t2_wo, module.onsite_n2o_rewetting_t2_wo, module.offsite_doc_rewetting_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_rewetting_t2_wo, module.onsite_ch4_rewetting_t2_wo, module.onsite_n2o_rewetting_t2_wo, module.offsite_doc_rewetting_t2_wo]):
                 raise ValueError(f"Could not find Rewetting EF WO for {module.peat_type}, {module_type_wo}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         ##### Peat Extraction Inputs #####
@@ -6803,8 +6774,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.onsite_ef_wo.n2o is None and module.onsite_n2o_peat_t2_wo is None:
                 raise ValueError(f"Could not find N2O value of On-Site Peat Extraction WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.onsite_co2_peat_t2_wo, module.onsite_ch4_peat_t2_wo, module.onsite_n2o_peat_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.onsite_co2_peat_t2_wo, module.onsite_ch4_peat_t2_wo, module.onsite_n2o_peat_t2_wo]):
                 raise ValueError(f"Could not find On-Site Peat Extraction WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -6814,8 +6784,7 @@ class OrganicSoilCalculator(BaseCalculator):
             if self.offsite_ef_wo.ch4 is None and module.offsite_ch4_peat_t2_wo is None:
                 raise ValueError(f"Could not find CH4 value of Off-Site Peat Extraction WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
         except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            missing_t2_gases = filter(lambda x: x is None, [module.offsite_doc_peat_t2_wo, module.offsite_ch4_peat_t2_wo])
-            if missing_t2_gases:
+            if any(v is None for v in [module.offsite_doc_peat_t2_wo, module.offsite_ch4_peat_t2_wo]):
                 raise ValueError(f"Could not find Off-Site Peat Extraction WO for {module.peat_type}, {self.climate}, {self.moisture}. Please provide tier 2 values.")
 
         try:
@@ -8183,19 +8152,6 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         super().__init__(input)
 
         self.module: ProcessingEntry
-
-        self.methane_constant_start = self.project.gwp.ch4
-        self.methane_constant_w = self.project.gwp.ch4
-        self.methane_constant_wo = self.project.gwp.ch4
-
-        if self.module.fuel_type_start and self.module.fuel_type_start.name_en.casefold() in FOSSIL_METHANE_FUELS:
-            self.methane_constant_start = self.project.gwp.ch4_fossil
-
-        if self.module.fuel_type_w and self.module.fuel_type_w.name_en.casefold() in FOSSIL_METHANE_FUELS:
-            self.methane_constant_w = self.project.gwp.ch4_fossil
-
-        if self.module.fuel_type_wo and self.module.fuel_type_wo.name_en.casefold() in FOSSIL_METHANE_FUELS:
-            self.methane_constant_wo = self.project.gwp.ch4_fossil
 
     def get_defaults(self, calculate=False) -> dict:
         return super().get_defaults(calculate)

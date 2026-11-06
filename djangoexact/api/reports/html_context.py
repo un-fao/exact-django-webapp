@@ -7,15 +7,9 @@ instead of API calls.
 from __future__ import annotations
 
 import base64
-import io
 import os
 from datetime import datetime
 from itertools import zip_longest
-
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
 
 import ipcc.models as ipcc_models
 from django.conf import settings
@@ -26,6 +20,7 @@ import api.models as api_models
 
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
+from .charts import chart_gases_w_wo, chart_project_balance
 from .data_types import ProjectResult
 from .extractors import extract_emissions
 
@@ -59,65 +54,6 @@ def _gas_totals(result: ProjectResult, es_attr: str) -> dict[str, float]:
                     extract_emissions(es, gas_type=gas_type, duration=dur)
                 )
     return totals
-
-
-def _chart_gases_w_wo(data_w: dict, data_wo: dict) -> str:
-    """Stacked bar chart (with / without / balance) by gas type. Returns base64 SVG."""
-    gas_names = ["CO2", "CH4", "N2O", "CO", "DOC", "OTHER"]
-    colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
-    labels = ["With", "Without", "Balance"]
-
-    data_arrays = np.array([
-        [data_w[g], data_wo[g], data_w[g] - data_wo[g]]
-        for g in gas_names
-    ])
-
-    x = np.arange(len(labels))
-    width = 0.6
-    fig, ax = plt.subplots(figsize=(6.5, 4))
-    bottom = np.zeros(len(labels))
-
-    for idx, row in enumerate(data_arrays):
-        ax.bar(x, row, width, bottom=bottom, color=colors[idx], label=gas_names[idx])
-        bottom += row
-
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels)
-    ax.ticklabel_format(style="plain", axis="y", useOffset=False)
-    ax.set_ylabel("Emissions (tonnes)")
-    ax.set_title("")
-    ax.legend()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format="svg")
-    buf.seek(0)
-    chart_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-    plt.close(fig)
-    plt.clf()
-    buf.close()
-    return chart_b64
-
-
-def _chart_project_balance(total_w: float, total_wo: float, total_balance: float) -> str:
-    """Horizontal bar chart: with / without / balance. Returns base64 SVG."""
-    fig, ax = plt.subplots(figsize=(6.5, 4))
-    labels = ["With", "Without", "Balance"]
-    emissions = [total_w, total_wo, total_balance]
-    ax.barh(labels, emissions, color=["#1f77b4", "#ff7f0e", "#2ca02c"])
-    for i, v in enumerate(emissions):
-        ax.text(0 if v > 0 else v, i, f"{v:,.2f}", va="center")
-    ax.text(0.5, 1.1, "tCO2e", ha="center", va="bottom", transform=ax.transAxes)
-    ax.ticklabel_format(style="plain", axis="x", useOffset=False)
-    ax.grid(True, axis="x", linestyle="--", alpha=0.7)
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format="svg")
-    buf.seek(0)
-    chart_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-    plt.close(fig)
-    plt.clf()
-    buf.close()
-    return chart_b64
 
 
 def _compute_gas_totals(result: ProjectResult, total_balance: float) -> dict:
@@ -209,6 +145,7 @@ def _compute_activity_contexts(
             secondary_impacts.append(_("agricultural inputs use"))
 
         db_activity.main_impact = main_impact
+        db_activity.t2_overrides = ar.t2_overrides
         db_activity.secondary_impacts = ", ".join(secondary_impacts) if secondary_impacts else None
         processed_activities.append(db_activity)
 
@@ -237,8 +174,8 @@ def _compute_indicator_aggregates(activities_by_name: dict, project) -> dict:
         {"name": ft.name, "value_w": 0, "value_wo": 0}
         for ft in api_models.FisheryType.objects.all()
     ]
-    large_fishery_data = {"name": "Large Fisheries", "value_w": 0, "value_wo": 0}
-    aquaculture_data = {"name": "Aquaculture", "value_w": 0, "value_wo": 0}
+    large_fishery_data = {"name": _("Large fisheries"), "value_w": 0, "value_wo": 0}
+    aquaculture_data = {"name": _("Aquaculture"), "value_w": 0, "value_wo": 0}
     land_types = [
         {"name": lt.name, "value_w": 0, "value_wo": 0}
         for lt in api_models.ModuleType.objects.filter(is_luc=True).all()
@@ -323,8 +260,8 @@ def _build_chart_data(
     gas_totals_wo: dict,
 ) -> tuple[str, str]:
     """Generate both charts and return (project_chart_base64, gases_chart_base64)."""
-    project_chart_base64 = _chart_project_balance(total_w, total_wo, total_balance)
-    project_gases_chart_base64 = _chart_gases_w_wo(gas_totals_w, gas_totals_wo)
+    project_chart_base64 = chart_project_balance(total_w, total_wo, total_balance)
+    project_gases_chart_base64 = chart_gases_w_wo(gas_totals_w, gas_totals_wo)
     return project_chart_base64, project_gases_chart_base64
 
 
@@ -332,7 +269,10 @@ def _load_fao_logo(lang: str) -> str:
     """Load the FAO logo SVG for the given language and return it as base64."""
     lang_path = os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg")
     fallback_path = os.path.join(settings.BASE_DIR, "media", "faologo.svg")
-    logo_path = lang_path if os.path.exists(lang_path) else fallback_path
+    # A separator in lang escapes media/ ("/../../etc/passwd" -> BASE_DIR/etc/
+    # passwd.svg, whose bytes would be base64'd into the PDF). Worker jobs replay
+    # lang from stored params, so this cannot assume a view validated it.
+    logo_path = lang_path if lang.isalpha() and os.path.exists(lang_path) else fallback_path
     with open(logo_path, "rb") as faologo:
         faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
     return faologo_base64
@@ -342,7 +282,9 @@ def _load_fao_logo(lang: str) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-def build_template_context(result: ProjectResult, request=None, lang: str = "en") -> dict:
+def build_template_context(
+    result: ProjectResult, request=None, lang: str = "en", *, content=None, additional_sources=None,
+) -> dict:
     """Return the full context dict for the PDF HTML template.
 
     ``request`` is accepted for backward compatibility with the synchronous
@@ -350,6 +292,12 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
     function; all i18n is driven by ``lang`` via ``activate(lang)``. It may
     be omitted (or ``None``) when calling from a non-request context, such
     as the async report worker.
+
+    ``content`` is the analyst HTML returned by
+    ``api.reports.narrative.clean_content``, and so is ``additional_sources``.
+    Both are keyword-only so that no
+    positional caller can be broken by them. Pass nothing else: a plain string
+    is escaped by the template, so it would render as visible tags.
     """
     activate(lang)
     project = result.project
@@ -359,8 +307,34 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
     total_wo = float(sum(result.aggregated.yearly_balance_wo))
     total_balance = total_w - total_wo
 
+    # Rebuilt from the w/wo pair rather than sliced off aggregated.yearly_balance:
+    # that property sums the unsuffixed field set, which is not the same quantity
+    # as total_balance, so slicing it yields halves that silently fail to add up.
+    yearly_bal = [
+        w - wo
+        for w, wo in zip_longest(
+            result.aggregated.yearly_balance_w,
+            result.aggregated.yearly_balance_wo,
+            fillvalue=0.0,
+        )
+    ]
+    impl_years = project.implementation_years or 0
+    balance_during_implementation = float(sum(yearly_bal[:impl_years]))
+    balance_after_implementation = float(sum(yearly_bal[impl_years:]))
+
     # Gas-level totals and GHG ranking
     gas_data = _compute_gas_totals(result, total_balance)
+
+    # Django templates cannot subtract, so the per-gas balance column is built here.
+    ghg_rows = [
+        {
+            "gas": gas,
+            "w": gas_data["gas_totals_w"][gas],
+            "wo": gas_data["gas_totals_wo"][gas],
+            "balance": gas_data["gas_totals_w"][gas] - gas_data["gas_totals_wo"][gas],
+        }
+        for gas in ("CO2", "CH4", "N2O")
+    ]
 
     # Direction helper uses locale-aware strings (activated above)
     INCREASES = _("increases")
@@ -379,8 +353,35 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         activities_by_name[a.name] = a
     processed_activities = _compute_activity_contexts(result, activities_by_name, total_balance)
 
-    # Indicator aggregates
-    indicators = _compute_indicator_aggregates(activities_by_name, project)
+    # Ranked by absolute contribution: the largest driver of the balance may be
+    # a net sink, which the sign-ordered sort above would put last.
+    largest_contributing_activity = max(
+        processed_activities,
+        key=lambda a: abs(a.results["balance"]),
+        default=None,
+    )
+    modules_used = sorted({
+        module["name"]
+        for activity in processed_activities
+        for module in activity.modules_emissions
+    })
+    # Activity-level Tier 2 overrides, which the Excel report already shows and
+    # the IFAD annex asked the analyst to retype. An empty list does NOT mean
+    # "not applicable": only these seven parameters are detectable, and a module
+    # that overrode its own parameters is invisible here.
+    tier2_parameters = sorted({
+        override.label
+        for activity in processed_activities
+        for override in activity.t2_overrides
+    })
+
+    # Indicator aggregates: frozen at finalization for a finalized project (SOC already a value).
+    if result.frozen_indicators is not None:
+        indicators = result.frozen_indicators
+        soc_value = indicators["soc"]
+    else:
+        indicators = _compute_indicator_aggregates(activities_by_name, project)
+        soc_value = indicators["soc"].value if indicators["soc"] is not None else None
 
     # Charts
     project_chart_base64, project_gases_chart_base64 = _build_chart_data(
@@ -403,10 +404,13 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         "total_carbon_balance": total_balance,
         "project_emissions_w": total_w,
         "project_emissions_wo": total_wo,
+        "balance_during_implementation": balance_during_implementation,
+        "balance_after_implementation": balance_after_implementation,
+        "capitalization_years": project.capitalization_years,
         "total_area": indicators["total_area"],
         "total_heads": indicators["total_heads"],
         "total_tonnes_of_catch": indicators["total_tonnes_of_catch"],
-        "soc": indicators["soc"].value if indicators["soc"] is not None else None,
+        "soc": soc_value,
         "project_primary_ghg": gas_data["primary_ghg"],
         "project_primary_ghg_emissions": gas_data["primary_ghg_emissions"],
         "project_primary_ghg_direction": _direction(gas_data["primary_ghg_emissions"]),
@@ -417,6 +421,10 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         "project_tertiary_ghg_emissions": gas_data["tertiary_ghg_emissions"],
         "project_tertiary_ghg_direction": _direction(gas_data["tertiary_ghg_emissions"]),
         "activities_total": processed_activities,
+        "largest_contributing_activity": largest_contributing_activity,
+        "modules_used": modules_used,
+        "tier2_parameters": tier2_parameters,
+        "ghg_rows": ghg_rows,
         "project_chart_base64": project_chart_base64,
         "project_gases_chart_base64": project_gases_chart_base64,
         "faologo_base64": faologo_base64,
@@ -426,4 +434,6 @@ def build_template_context(result: ProjectResult, request=None, lang: str = "en"
         "aquaculture_data": indicators["aquaculture_data"],
         "land_types": indicators["land_types"],
         "download_date_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "content": content or "",
+        "additional_sources": additional_sources or "",
     }

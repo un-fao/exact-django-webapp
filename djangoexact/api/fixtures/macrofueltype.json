@@ -5,7 +5,7 @@
     "fields": {
       "name": "Liquid or gaseous (m3)",
       "name_en": "Liquid or gaseous (m3)",
-      "name_fr": "Liquide ou gazeux (m3)\n",
+      "name_fr": "Liquide ou gazeux (m3)",
       "name_es": "Líquido o gaseoso (m3)",
       "name_ru": "Жидкость или газ (м3)"
     }
@@ -16,7 +16,7 @@
     "fields": {
       "name": "Solid (tdm)",
       "name_en": "Solid (tdm)",
-      "name_fr": "Solide (tms)\n",
+      "name_fr": "Solide (tms)",
       "name_es": "Sólido (tdm)",
       "name_ru": "Твёрдый (тонн сухого вещества)"
     }

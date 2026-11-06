@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EX-ACT</title>
+    {# Tailwind Play CDN is dynamically generated per-request, so SRI is not applicable. #}
+    {# nosemgrep: html.security.audit.missing-integrity.missing-integrity #}
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="flex flex-col justify-center items-center h-screen space-y-4">
+        <div class="text-center">
+            <h1 class="text-3xl font-bold">Project invitation</h1>
+            <p class="text-lg">You have been invited to <b>{{ project_name }}</b> with the role of <b>{{ group }}</b>.</p>
+        </div>
+        {# Accepting needs this POST: link scanners only issue GETs, so they can't accept on the user's behalf. #}
+        <form method="post" class="text-center">
+            <button type="submit"
+                class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Accept invitation</button>
+        </form>
+    </div>
+</body>
+
+</html>

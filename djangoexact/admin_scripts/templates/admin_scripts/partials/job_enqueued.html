@@ -1,5 +1,5 @@
-<li class="text-green-700">
-    {{ job.module_type }} / {{ job.attribute }}: {{ job.from_value }} → {{ job.to_value }}
+{% load luc_labels %}<li class="text-green-700">
+    {{ job.module_type }} / {{ job.attribute }}: {{ job.from_value|luc_label }} → {{ job.to_value|luc_label }}
     — <span class="font-medium">Job #{{ job.pk }} enqueued</span>
     <span hx-get="{% url 'admin_scripts:htmx-job-status' %}?job_id={{ job.pk }}"
           hx-trigger="every 5s [this.textContent.indexOf('Completed') === -1 && this.textContent.indexOf('Failed') === -1 && this.textContent.indexOf('Cancelled') === -1]"

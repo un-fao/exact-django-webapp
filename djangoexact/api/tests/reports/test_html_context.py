@@ -50,6 +50,7 @@ def _make_project_result(project=None):
     aggregated.yearly_balance_wo = [5.0, 10.0]
 
     result = Mock()
+    result.frozen_indicators = None  # an open project: indicators computed live
     result.project = project
     result.aggregated = aggregated
     result.activity_results = []
@@ -325,8 +326,9 @@ class TestLoadFaoLogo(unittest.TestCase):
         ):
             self._call("en")
 
-        # mock_open's handle has a close() that is called by the context manager
-        m().close.assert_called()
+        # mock_open never calls close() on its handle; __exit__ is the only
+        # evidence available that the read happened inside a with block.
+        m.return_value.__exit__.assert_called_once()
 
     def test_file_handle_is_closed_on_read_error(self):
         """The context-manager ensures close() is called even when read() raises."""
@@ -344,8 +346,11 @@ class TestLoadFaoLogo(unittest.TestCase):
         m.return_value.__exit__.assert_called_once()
 
     def test_raises_when_neither_lang_nor_fallback_file_exists(self):
-        """_load_fao_logo raises FileNotFoundError when no file path exists."""
-        with patch("os.path.exists", return_value=False):
+        """A missing logo propagates instead of yielding a report with a blank one."""
+        with (
+            patch("os.path.exists", return_value=False),
+            patch("builtins.open", side_effect=FileNotFoundError),
+        ):
             with self.assertRaises(FileNotFoundError):
                 self._call("fr")
 
@@ -397,6 +402,31 @@ class TestLoadFaoLogo(unittest.TestCase):
             msg=f"Expected fallback path to be opened, got: {opened_paths}",
         )
 
+    def test_separator_in_lang_never_reaches_open(self):
+        """A separator in lang leaves media/ altogether: faologo_/../../etc/passwd.svg
+        resolves to BASE_DIR/etc/passwd.svg, and those bytes would be base64'd into
+        the PDF. exists() answers True for every path here, so the isalpha() guard is
+        the only thing standing between lang and open()."""
+        opened_paths: list[str] = []
+
+        def fake_open(path, mode="r", *args, **kwargs):
+            opened_paths.append(path)
+            return mock_open(read_data=b"<svg/>")()
+
+        with (
+            patch("os.path.exists", return_value=True),
+            patch("builtins.open", side_effect=fake_open),
+        ):
+            self._call("/../../etc/passwd")
+
+        self.assertEqual(len(opened_paths), 1, msg=f"opened: {opened_paths}")
+        opened = opened_paths[0]
+        self.assertTrue(
+            opened.endswith("faologo.svg") and "faologo_" not in opened,
+            msg=f"lang escaped media/ and was opened: {opened}",
+        )
+        self.assertNotIn("passwd", opened)
+
 
 # ---------------------------------------------------------------------------
 # Fix 4 — Generic error message in views
@@ -412,9 +442,11 @@ class TestPublicProjectViewSetTemplateErrorHandling(unittest.TestCase):
         vs.format_kwarg = None
         return vs
 
-    def _make_request(self, template_name="report", lang="en"):
+    def _make_request(self, template_name="fao", lang="en"):
         request = Mock()
         request.query_params = {"template": template_name, "lang": lang}
+        # A bare Mock's .data.get() is truthy, which reads as a request body.
+        request.data = {}
         if hasattr(request, "LANGUAGE_CODE"):
             del request.LANGUAGE_CODE  # avoid the hasattr branch overriding lang
         return request
@@ -427,7 +459,6 @@ class TestPublicProjectViewSetTemplateErrorHandling(unittest.TestCase):
         secret_message = "internal db credentials leaked here"
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=RuntimeError(secret_message)),
             patch("api.models.Project") as mock_project_cls,
             patch("public.views.get_object_or_404") as mock_get_obj,
@@ -450,7 +481,6 @@ class TestPublicProjectViewSetTemplateErrorHandling(unittest.TestCase):
         exc = RuntimeError("boom")
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=exc),
             patch("public.views.get_object_or_404", return_value=Mock()),
             patch("public.views.log") as mock_log,
@@ -465,7 +495,6 @@ class TestPublicProjectViewSetTemplateErrorHandling(unittest.TestCase):
         request = self._make_request()
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=RuntimeError("crash")),
             patch("public.views.get_object_or_404", return_value=Mock()),
             patch("public.views.log"),
@@ -490,9 +519,14 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
         vs.get_object = Mock(return_value=project)
         return vs
 
-    def _make_request(self, template_name="report", lang="en"):
+    def _make_request(self, template_name="fao", lang="en", data=None):
         request = Mock()
         request.query_params = {"template": template_name, "lang": lang}
+        # A DRF request always has a dict-like .data; a bare Mock would make
+        # request.data.get("narrative") return a truthy Mock.
+        request.data = data or {}
+        if hasattr(request, "LANGUAGE_CODE"):
+            del request.LANGUAGE_CODE  # avoid the hasattr branch overriding lang
         return request
 
     def test_returns_generic_error_message_not_raw_exception_text(self):
@@ -503,9 +537,8 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
         secret_message = "secret db password exposed"
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=RuntimeError(secret_message)),
-            patch("api.views.log", create=True) as mock_log,
+            patch("api.views.logger") as mock_log,
         ):
             response = viewset.template(request, pk=1)
 
@@ -519,9 +552,8 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
         request = self._make_request()
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=RuntimeError("crash")),
-            patch("api.views.log", create=True),
+            patch("api.views.logger"),
         ):
             response = viewset.template(request, pk=1)
 
@@ -534,10 +566,36 @@ class TestApiProjectViewSetTemplateErrorHandling(unittest.TestCase):
         exc = RuntimeError("boom")
 
         with (
-            patch("os.path.exists", return_value=True),
             patch("api.reports.compute_project_result", side_effect=exc),
-            patch("api.views.log", create=True) as mock_log,
+            patch("api.views.logger") as mock_log,
         ):
             viewset.template(request, pk=1)
 
         mock_log.exception.assert_called_once_with(exc)
+
+
+class TestIndicatorLabelsFollowReportLanguage(unittest.TestCase):
+    """The large-fishery and aquaculture rows of the units table were English literals."""
+
+    def test_labels_are_translated(self):
+        import api.models as api_models
+        from django.utils.translation import override
+
+        from api.reports.html_context import _compute_indicator_aggregates
+
+        large = Mock(spec=api_models.LargeFishery, total_catch_yr_w=1, total_catch_yr_wo=0)
+        aqua = Mock(spec=api_models.Aquaculture, annual_production_w=1, annual_production_wo=0)
+        activity = Mock(area=0, modules=[large, aqua])
+        with (
+            patch("api.models.LivestockCategoryType") as _lct,
+            patch("api.models.FisheryType") as _ft,
+            patch("api.models.ModuleType") as _mt,
+            override("es"),
+        ):
+            _lct.objects.all.return_value = []
+            _ft.objects.all.return_value = []
+            _mt.objects.filter.return_value.all.return_value = []
+            result = _compute_indicator_aggregates({"a": activity}, _make_project())
+
+        self.assertEqual(result["large_fishery_data"]["name"], "Pesca industrial")
+        self.assertEqual(result["aquaculture_data"]["name"], "Acuicultura")

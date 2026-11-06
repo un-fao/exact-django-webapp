@@ -21,7 +21,7 @@
                             {% if activity.is_livestock %}
                                 Impact: {{ activity.heads }} heads of livestock
                             {% elif activity.is_fishery %}
-                                Impact: {{ activity.catch|floatformat:2|intcomma }} {{ activity.main_impact }}
+                                Impact: {{ activity.catch|floatformat:"2g" }} {{ activity.main_impact }}
                                 .
                             {% else %}
                                 Impact: {{ activity.area }} {{ activity.main_impact }}
@@ -30,11 +30,11 @@
                             {% if activity.secondary_impacts %}, plus emissions from {{ activity.secondary_impacts }}{% endif %}
                         </p>
                         <p>
-                            Carbon balance: <b>{{ activity.results.balance|floatformat:2|intcomma }} tCO2-e</b>.
+                            Carbon balance: <b>{{ activity.results.balance|floatformat:"2g" }} tCO2-e</b>.
                         </p>
                         <p>Interventions include:</p>
                         <ol>
-                            {% for m in activity.modules_emissions %}<li>{{ m.name }} ({{ m.balance|floatformat:2|intcomma }} tCO2-e)</li>{% endfor %}
+                            {% for m in activity.modules_emissions %}<li>{{ m.name }} ({{ m.balance|floatformat:"2g" }} tCO2-e)</li>{% endfor %}
                         </ol>
                     </div>
                 </div>

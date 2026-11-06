@@ -7,8 +7,8 @@
       "moisture": 2,
       "organic_input_type": 8,
       "value": 0.92,
-      "value_min": 0.7912,
-      "value_max": 1.0488
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -19,8 +19,8 @@
       "moisture": 1,
       "organic_input_type": 8,
       "value": 0.95,
-      "value_min": 0.8265,
-      "value_max": 1.0735
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -31,8 +31,8 @@
       "moisture": 1,
       "organic_input_type": 8,
       "value": 0.95,
-      "value_min": 0.8265,
-      "value_max": 1.0735
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -43,8 +43,8 @@
       "moisture": 2,
       "organic_input_type": 8,
       "value": 0.92,
-      "value_min": 0.7912,
-      "value_max": 1.0488
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -55,8 +55,8 @@
       "moisture": 1,
       "organic_input_type": 8,
       "value": 0.95,
-      "value_min": 0.8265,
-      "value_max": 1.0735
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -67,8 +67,8 @@
       "moisture": 2,
       "organic_input_type": 8,
       "value": 0.92,
-      "value_min": 0.7912,
-      "value_max": 1.0488
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -79,8 +79,8 @@
       "moisture": 1,
       "organic_input_type": 8,
       "value": 0.95,
-      "value_min": 0.8265,
-      "value_max": 1.0735
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -91,8 +91,8 @@
       "moisture": 2,
       "organic_input_type": 8,
       "value": 0.92,
-      "value_min": 0.7912,
-      "value_max": 1.0488
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -103,8 +103,8 @@
       "moisture": 4,
       "organic_input_type": 8,
       "value": 0.92,
-      "value_min": 0.7912,
-      "value_max": 1.0488
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -223,8 +223,8 @@
       "moisture": 2,
       "organic_input_type": 10,
       "value": 1.11,
-      "value_min": 1.221,
-      "value_max": 0.999
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -235,8 +235,8 @@
       "moisture": 1,
       "organic_input_type": 10,
       "value": 1.04,
-      "value_min": 1.1752,
-      "value_max": 0.9048
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -247,8 +247,8 @@
       "moisture": 1,
       "organic_input_type": 10,
       "value": 1.04,
-      "value_min": 1.1752,
-      "value_max": 0.9048
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -259,8 +259,8 @@
       "moisture": 2,
       "organic_input_type": 10,
       "value": 1.11,
-      "value_min": 1.221,
-      "value_max": 0.999
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -271,8 +271,8 @@
       "moisture": 1,
       "organic_input_type": 10,
       "value": 1.04,
-      "value_min": 1.1752,
-      "value_max": 0.9048
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -283,8 +283,8 @@
       "moisture": 2,
       "organic_input_type": 10,
       "value": 1.11,
-      "value_min": 1.221,
-      "value_max": 0.999
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -295,8 +295,8 @@
       "moisture": 1,
       "organic_input_type": 10,
       "value": 1.04,
-      "value_min": 1.1752,
-      "value_max": 0.9048
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -307,8 +307,8 @@
       "moisture": 2,
       "organic_input_type": 10,
       "value": 1.11,
-      "value_min": 1.221,
-      "value_max": 0.999
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -319,8 +319,8 @@
       "moisture": 4,
       "organic_input_type": 10,
       "value": 1.11,
-      "value_min": 1.221,
-      "value_max": 0.999
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -331,8 +331,8 @@
       "moisture": 2,
       "organic_input_type": 11,
       "value": 1.44,
-      "value_min": 1.2528,
-      "value_max": 1.6272
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -343,8 +343,8 @@
       "moisture": 1,
       "organic_input_type": 11,
       "value": 1.37,
-      "value_min": 1.2056,
-      "value_max": 1.5344
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -355,8 +355,8 @@
       "moisture": 1,
       "organic_input_type": 11,
       "value": 1.37,
-      "value_min": 1.2056,
-      "value_max": 1.5344
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -367,8 +367,8 @@
       "moisture": 2,
       "organic_input_type": 11,
       "value": 1.44,
-      "value_min": 1.2528,
-      "value_max": 1.6272
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -379,8 +379,8 @@
       "moisture": 1,
       "organic_input_type": 11,
       "value": 1.37,
-      "value_min": 1.2056,
-      "value_max": 1.5344
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -391,8 +391,8 @@
       "moisture": 2,
       "organic_input_type": 11,
       "value": 1.44,
-      "value_min": 1.2528,
-      "value_max": 1.6272
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -403,8 +403,8 @@
       "moisture": 1,
       "organic_input_type": 11,
       "value": 1.37,
-      "value_min": 1.2056,
-      "value_max": 1.5344
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -415,8 +415,8 @@
       "moisture": 2,
       "organic_input_type": 11,
       "value": 1.44,
-      "value_min": 1.2528,
-      "value_max": 1.6272
+      "value_min": null,
+      "value_max": null
     }
   },
   {
@@ -427,8 +427,8 @@
       "moisture": 4,
       "organic_input_type": 11,
       "value": 1.44,
-      "value_min": 1.2528,
-      "value_max": 1.6272
+      "value_min": null,
+      "value_max": null
     }
   }
 ]

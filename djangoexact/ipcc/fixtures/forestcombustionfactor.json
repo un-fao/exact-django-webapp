@@ -1,7 +1,7 @@
 [
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 109,
+    "pk": 73,
     "fields": {
       "climate": 3,
       "forest_type": 1,
@@ -22,7 +22,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 110,
+    "pk": 74,
     "fields": {
       "climate": 3,
       "forest_type": 1,
@@ -43,7 +43,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 111,
+    "pk": 75,
     "fields": {
       "climate": 3,
       "forest_type": 1,
@@ -64,7 +64,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 112,
+    "pk": 76,
     "fields": {
       "climate": 3,
       "forest_type": 1,
@@ -85,7 +85,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 113,
+    "pk": 77,
     "fields": {
       "climate": 3,
       "forest_type": 1,
@@ -106,7 +106,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 114,
+    "pk": 78,
     "fields": {
       "climate": 3,
       "forest_type": 2,
@@ -127,7 +127,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 115,
+    "pk": 79,
     "fields": {
       "climate": 3,
       "forest_type": 2,
@@ -148,7 +148,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 116,
+    "pk": 80,
     "fields": {
       "climate": 3,
       "forest_type": 2,
@@ -169,7 +169,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 117,
+    "pk": 81,
     "fields": {
       "climate": 3,
       "forest_type": 2,
@@ -190,7 +190,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 118,
+    "pk": 82,
     "fields": {
       "climate": 2,
       "forest_type": 1,
@@ -211,7 +211,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 119,
+    "pk": 83,
     "fields": {
       "climate": 2,
       "forest_type": 1,
@@ -232,7 +232,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 120,
+    "pk": 84,
     "fields": {
       "climate": 2,
       "forest_type": 1,
@@ -253,7 +253,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 121,
+    "pk": 85,
     "fields": {
       "climate": 2,
       "forest_type": 1,
@@ -274,7 +274,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 122,
+    "pk": 86,
     "fields": {
       "climate": 2,
       "forest_type": 2,
@@ -295,7 +295,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 123,
+    "pk": 87,
     "fields": {
       "climate": 2,
       "forest_type": 2,
@@ -316,7 +316,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 124,
+    "pk": 88,
     "fields": {
       "climate": 2,
       "forest_type": 2,
@@ -337,7 +337,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 125,
+    "pk": 89,
     "fields": {
       "climate": 2,
       "forest_type": 2,
@@ -358,7 +358,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 126,
+    "pk": 90,
     "fields": {
       "climate": 2,
       "forest_type": 1,
@@ -379,7 +379,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 127,
+    "pk": 91,
     "fields": {
       "climate": 1,
       "forest_type": 1,
@@ -400,7 +400,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 128,
+    "pk": 92,
     "fields": {
       "climate": 1,
       "forest_type": 1,
@@ -421,7 +421,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 129,
+    "pk": 93,
     "fields": {
       "climate": 1,
       "forest_type": 1,
@@ -442,7 +442,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 130,
+    "pk": 94,
     "fields": {
       "climate": 1,
       "forest_type": 1,
@@ -463,7 +463,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 131,
+    "pk": 95,
     "fields": {
       "climate": 1,
       "forest_type": 1,
@@ -484,7 +484,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 132,
+    "pk": 96,
     "fields": {
       "climate": 1,
       "forest_type": 2,
@@ -505,7 +505,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 133,
+    "pk": 97,
     "fields": {
       "climate": 1,
       "forest_type": 2,
@@ -526,7 +526,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 134,
+    "pk": 98,
     "fields": {
       "climate": 1,
       "forest_type": 2,
@@ -547,7 +547,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 135,
+    "pk": 99,
     "fields": {
       "climate": 1,
       "forest_type": 2,
@@ -568,7 +568,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 136,
+    "pk": 100,
     "fields": {
       "climate": 1,
       "forest_type": 2,
@@ -589,7 +589,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 137,
+    "pk": 101,
     "fields": {
       "climate": 4,
       "forest_type": 1,
@@ -610,7 +610,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 138,
+    "pk": 102,
     "fields": {
       "climate": 4,
       "forest_type": 1,
@@ -631,7 +631,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 139,
+    "pk": 103,
     "fields": {
       "climate": 4,
       "forest_type": 1,
@@ -652,7 +652,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 140,
+    "pk": 104,
     "fields": {
       "climate": 4,
       "forest_type": 2,
@@ -673,7 +673,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 141,
+    "pk": 105,
     "fields": {
       "climate": 4,
       "forest_type": 2,
@@ -694,7 +694,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 142,
+    "pk": 106,
     "fields": {
       "climate": 4,
       "forest_type": 2,
@@ -715,7 +715,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 143,
+    "pk": 107,
     "fields": {
       "climate": 20,
       "forest_type": 1,
@@ -736,7 +736,7 @@
   },
   {
     "model": "ipcc.forestcombustionfactor",
-    "pk": 144,
+    "pk": 108,
     "fields": {
       "climate": 20,
       "forest_type": 2,

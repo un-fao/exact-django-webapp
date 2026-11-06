@@ -3479,9 +3479,16 @@ for i, row in enumerate(df_dict):
         ch4_fossil,
     )
 
-    # Look for existing GWP containing the name
-
-    gwp = GlobalWarmingPotential.objects.filter(name__icontains=filter_name).first()
+    # Both AR5 rows share the "(AR5)" token; without this split both CSV rows
+    # updated the same DB row and the other kept a NULL ch4_fossil.
+    matches = GlobalWarmingPotential.objects.filter(name__icontains=filter_name)
+    if "without" in name.lower():
+        matches = matches.filter(name__icontains="without")
+    else:
+        matches = matches.exclude(name__icontains="without")
+    if matches.count() > 1:
+        raise ValueError(f"GWP CSV row '{name}' matches several rows: {list(matches.values_list('name', flat=True))}")
+    gwp = matches.first()
 
     if gwp:
         print(f"Updating {gwp.name}")
@@ -3821,16 +3828,16 @@ for i, row in df.iterrows():
     moisture = Moisture.objects.get(name__iexact=row["moisture"])
     agb_t_dm_ha = parse_csv_number(row["agb_t_dm_ha"])
     agb_t_c_ha = parse_csv_number(row["agb_t_c_ha"])
-    bgb_t_dm_ha = parse_csv_number(row["bgb_t_dm_ha"])
-    bgb_t_c_ha = parse_csv_number(row["bgb_t_c_ha"])
+    total_biomass_t_dm_ha = parse_csv_number(row["total_biomass_t_dm_ha"])
+    total_biomass_t_c_ha = parse_csv_number(row["total_biomass_t_c_ha"])
 
     print(
         climate,
         moisture,
         agb_t_dm_ha,
         agb_t_c_ha,
-        bgb_t_dm_ha,
-        bgb_t_c_ha,
+        total_biomass_t_dm_ha,
+        total_biomass_t_c_ha,
     )
 
     ipcc.GrasslandBiomass.objects.create(
@@ -3838,8 +3845,8 @@ for i, row in df.iterrows():
         moisture=moisture,
         agb_t_dm_ha=agb_t_dm_ha,
         agb_t_c_ha=agb_t_c_ha,
-        bgb_t_dm_ha=bgb_t_dm_ha,
-        bgb_t_c_ha=bgb_t_c_ha,
+        total_biomass_t_dm_ha=total_biomass_t_dm_ha,
+        total_biomass_t_c_ha=total_biomass_t_c_ha,
     )
 
 """
@@ -5211,9 +5218,10 @@ def update_crop_types_annuals_perennials():
 
     Reads the "Annualsperennials" sheet of FAOSTAT_Crop_Types_20260813.xlsx and,
     for every item that matches an existing LandUseType by name, adds the
-    AnnualCropland / PerennialCropland module type when the column is marked YES
-    and removes it when the column is marked NO. Items with no matching
-    LandUseType are skipped, no new LandUseType is created.
+    AnnualCropland module type when ANNUALS is marked YES and removes it when
+    marked NO. PerennialCropland is always removed, whatever the PERENNIALS
+    column says: FAOSTAT crops do not belong to the Perennial Cropland module.
+    Items with no matching LandUseType are skipped, no new LandUseType is created.
     """
     from api.models import LandUseType, ModuleType
 
@@ -5241,19 +5249,16 @@ def update_crop_types_annuals_perennials():
             print(f"Skipping row {i}: no LandUseType named '{name}'")
             continue
 
-        for column, module_type in (
-            ("ANNUALS", annual_module_type),
-            ("PERENNIALS", perennial_module_type),
-        ):
-            value = row[column]
-            keep = not pd.isna(value) and str(value).strip().upper() == "YES"
+        value = row["ANNUALS"]
+        if not pd.isna(value) and str(value).strip().upper() == "YES":
+            land_use_type.module_types.add(annual_module_type)
+            print(f"Kept {annual_module_type} on {land_use_type}")
+        else:
+            land_use_type.module_types.remove(annual_module_type)
+            print(f"Removed {annual_module_type} from {land_use_type}")
 
-            if keep:
-                land_use_type.module_types.add(module_type)
-                print(f"Kept {module_type} on {land_use_type}")
-            else:
-                land_use_type.module_types.remove(module_type)
-                print(f"Removed {module_type} from {land_use_type}")
+        land_use_type.module_types.remove(perennial_module_type)
+        print(f"Removed {perennial_module_type} from {land_use_type}")
 
 def delete_and_import_set_aside_organic_soil_rewetting_emission_factors():
     """
@@ -5376,10 +5381,10 @@ def run():
         # add_fmg_data_for_all_grassland_management_types()
         # delete_and_import_total_biomass_after_defo()
         # delete_and_import_forest_total_biomass()
-        update_crop_types_annuals_perennials()
+        # update_crop_types_annuals_perennials()
+        # import_fra_carbon_stock_data_2025()
         delete_and_import_set_aside_organic_soil_rewetting_emission_factors()
         delete_and_import_set_aside_organic_soil_drainage_emission_factors()
-        import_fra_carbon_stock_data_2025()
         pass
 
     if app_mode == "review":

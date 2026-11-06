@@ -16,7 +16,7 @@
     "fields": {
       "name": "High-Productivity",
       "name_en": "High-Productivity",
-      "name_fr": "Haute productivité\n",
+      "name_fr": "Haute productivité",
       "name_es": "Alta Productividad",
       "name_ru": "Высокая производительность"
     }
@@ -27,7 +27,7 @@
     "fields": {
       "name": "Low-Productivity",
       "name_en": "Low-Productivity",
-      "name_fr": "Faible productivité\n",
+      "name_fr": "Faible productivité",
       "name_es": "Baja Productividad",
       "name_ru": "Низкая продуктивность"
     }

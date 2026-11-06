@@ -1,4 +1,4 @@
-<div data-scenario-result='{{ result_json|default:""|escape }}'
+{% load luc_labels %}<div data-scenario-result='{{ result_json|default:""|escape }}'
      data-scenario-index='{{ scenario_index|default:"" }}'>
 
     {% if statistics %}
@@ -34,7 +34,7 @@
         <ul class="mt-2 list-disc list-inside">
             {% for gap in gaps %}
             <li>
-                {{ gap.module_type }} / {{ gap.field }}: {{ gap.from_value }} &rarr; {{ gap.to_value }}
+                {{ gap.module_type }} / {{ gap.field }}: {{ gap.from_value|luc_label }} &rarr; {{ gap.to_value|luc_label }}
                 <button type="button"
                         hx-post="{% url 'admin_scripts:htmx-enqueue-job' %}"
                         hx-vals='{"module_type": "{{ gap.module_type }}", "attribute": "{{ gap.field }}", "from_value": "{{ gap.from_value }}", "to_value": "{{ gap.to_value }}"}'

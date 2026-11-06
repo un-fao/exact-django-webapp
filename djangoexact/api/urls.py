@@ -185,6 +185,7 @@ router.register(r"data-sources", views.public_generic_viewset(models.DataSource)
 router.register(r"hih-assessments", views.HandInHandAssessmentViewSet, basename="handinhandassessment")
 
 router.register(r"async-jobs", views.AsyncJobViewSet, basename="async-job")
+router.register(r"report-templates", views.ReportTemplateViewSet, basename="report-templates")
 
 urlpatterns = [
     path("health/", views.APIHealthView.as_view(), name="api-health"),

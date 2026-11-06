@@ -1,6 +1,5 @@
 import logging as log
 from enum import Enum
-import uuid
 
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission
@@ -22,6 +21,7 @@ from api.models import CustomUser as User
 from django.utils.text import slugify
 
 from . import labels
+from .models import guided_step_format
 from .models import (
     Module,
     Submodule,
@@ -274,7 +274,8 @@ class YearlyGasEmissionSerializer(serializers.Serializer):
 
 
 class YearlyActivityEmissionSerializer(serializers.Serializer):
-    year = serializers.IntegerField()
+    # Report caches written before year was stored lack the key; the module GET reads them too.
+    year = serializers.IntegerField(default=0)
     gas_type = get_model_serializer(GasType)(many=False, read_only=True)
     emissions = EmissionSerializer(many=True)
     activity = serializers.CharField()
@@ -368,14 +369,13 @@ class ProjectTagSerializer(serializers.ModelSerializer):
 
 class ProjectSummarySerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(read_only=True)
-    country = serializers.StringRelatedField(many=False, read_only=True, source="country.name")
     tags = ProjectTagSerializer(many=True, read_only=True)
     activity_count = serializers.SerializerMethodField(read_only=True)
     module_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "activity_count", "module_count"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized", "finalized_at", "activity_count", "module_count", "guided_step"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -407,13 +407,6 @@ class ProjectResultSerializer(serializers.Serializer):
 
 
 class ReadProjectSerializer(serializers.ModelSerializer):
-    climate = get_model_serializer(Climate)(many=False, read_only=True)
-    country = CountrySerializer(many=False, read_only=True)
-    moisture = get_model_serializer(Moisture)(many=False, read_only=True)
-    soil_type = get_model_serializer(SoilType)(many=False, read_only=True)
-    gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False, read_only=True)
-    status = get_model_serializer(ProjectStatus)(many=False, required=False, read_only=True)
-    owner = UserReadSerializer(many=False, read_only=True)
     role = serializers.SerializerMethodField()
     total_hectares = serializers.SerializerMethodField()
     total_catch = serializers.SerializerMethodField()
@@ -496,10 +489,14 @@ class WriteProjectSerializer(serializers.ModelSerializer):
     moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=False, allow_null=True, write_only=True)
     soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False, allow_null=True, write_only=True)
     gw_potential = serializers.PrimaryKeyRelatedField(queryset=GlobalWarmingPotential.objects.all(), required=True, write_only=True)
+    # Declared explicitly: the model field is blank=True (for the admin), which would make DRF
+    # accept "" and skip the validators, breaking "guided if and only if not null".
+    guided_step = serializers.CharField(max_length=64, allow_null=True, required=False, validators=[guided_step_format])
 
     class Meta:
         model = Project
         exclude = ["owner"]
+        read_only_fields = ["finalized_at"]
         ref_name = "Project"
 
     def sanitize_soc_ref_t2(self, data):
@@ -536,8 +533,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Archived projects cannot be modified")
 
             is_only_public_change = is_public is not None and set(data.keys()) <= {"is_public"}
+            # The tour must be able to advance or end after the project has been finalized.
+            is_only_guided_step_change = set(data.keys()) == {"guided_step"}
 
-            if project.is_finalized and is_finalized is not False and not is_only_public_change:
+            if project.is_finalized and is_finalized is not False and not is_only_public_change and not is_only_guided_step_change:
                 raise serializers.ValidationError("Finalized projects cannot be modified except for their publication status")
 
             if not project.is_archived and is_archived:
@@ -616,6 +615,14 @@ class WriteProjectSerializer(serializers.ModelSerializer):
         self.sanitize_soc_ref_t2(self.initial_data)
         return super().is_valid(raise_exception=raise_exception)
 
+    def update(self, instance, validated_data):
+        from api.services.finalization import FinalizationError
+
+        try:
+            return super().update(instance, validated_data)
+        except FinalizationError as e:
+            raise serializers.ValidationError({"is_finalized": f"The project cannot be finalized. {e}"}) from e
+
 
 class ModuleExportSerializer(serializers.Serializer):
     """Generic serializer for exporting any module type."""
@@ -662,7 +669,7 @@ class ModuleExportSerializer(serializers.Serializer):
         # last_cached_at against it, so re-stamping it at import time would
         # silently invalidate every restored result.
         excluded_fields = (
-            'id', 'activity', 'data_source', 'note',
+            'id', 'activity', 'note',
             'history', 'parent'
         )
         for field in instance._meta.get_fields():
@@ -735,7 +742,7 @@ class ProjectExportSerializer(serializers.ModelSerializer):
         model = Project
         exclude = ['id', 'owner', 'created_at', 'updated_at', 'locked_at',
                    'lock_updated_at', 'locked_by', 'is_locked', 'export_id',
-                   'last_recap_sent_at']
+                   'last_recap_sent_at', 'guided_step']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -782,6 +789,21 @@ class ActivitySummarySerializer(serializers.ModelSerializer):
         fields = ["id", "name", "module_types", "completion_percentage", "is_b_intact"]
         ref_name = "Activity"
 
+class ProjectTotalHectaresSerializer(serializers.Serializer):
+    total_hectares = serializers.FloatField()
+
+
+class ProjectTotalCatchSerializer(serializers.Serializer):
+    start = serializers.FloatField()
+    w = serializers.FloatField()
+    wo = serializers.FloatField()
+
+
+class ProjectTotalLivestockSerializer(serializers.Serializer):
+    start = serializers.IntegerField()
+    w = serializers.IntegerField()
+    wo = serializers.IntegerField()
+
 
 class ActivityResultSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
@@ -790,17 +812,6 @@ class ActivityResultSerializer(serializers.Serializer):
 
 
 class ActivitySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=255, read_only=True)
-    project = ReadProjectSerializer(many=False, read_only=True)
-    user = UserReadSerializer(many=False, read_only=True)
-    change_rate = get_model_serializer(ChangeRate)(many=False, read_only=True)
-    climate_t2 = get_model_serializer(Climate)(read_only=True)
-    moisture_t2 = get_model_serializer(Moisture)(read_only=True)
-    soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
-    module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
-    owner = UserReadSerializer(many=False, read_only=True)
-
-    status = get_model_serializer(StatusType)(many=False, read_only=True)
     completion_percentage = serializers.FloatField(read_only=True)
 
     class Meta:
@@ -809,11 +820,52 @@ class ActivitySerializer(serializers.ModelSerializer):
         ref_name = "Activity"
 
 
+class ModuleTypeIdModuleIdAreaSerializer(serializers.Serializer):
+    module_type = serializers.PrimaryKeyRelatedField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
+    endpoint_url = serializers.SerializerMethodField(read_only=True)
+    status = serializers.SerializerMethodField(read_only=True)
+    area = serializers.FloatField(read_only=True)
+
+    def get_status(self, obj):
+        return obj.status.pk if obj.status else None
+
+    def get_endpoint_url(self, obj):
+        """
+        Returns the API endpoint URL for this module type by dynamically
+        looking up the URL pattern from the router configuration
+        """
+        if not hasattr(obj, "module_type") or not obj.module_type:
+            return None
+
+        module_type = obj.module_type
+        class_name = module_type.class_name
+
+        try:
+            from api.urls import router
+            from django.apps import apps
+
+            try:
+                model_class = apps.get_model("api", class_name)
+            except LookupError:
+                return None
+
+            for prefix, viewset_class, basename in router.registry:
+                if hasattr(viewset_class, "queryset") and viewset_class.queryset is not None:
+                    if viewset_class.queryset.model == model_class:
+                        return f"api/{prefix}/"
+
+        except (ImportError, AttributeError):
+            pass
+
+        return None
+
+
 class ActivitySerializerWithModules(ActivitySerializer):
     modules = serializers.SerializerMethodField(read_only=True)
 
     def get_modules(self, obj: Activity):
-        return [get_module_serializer(module.__class__)(module, many=False).data for module in obj.modules]
+        return ModuleTypeIdModuleIdAreaSerializer(obj.modules, many=True).data
 
 
 class WriteActivitySerializer(serializers.ModelSerializer):
@@ -1021,7 +1073,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         module_types = activity.module_types.all()
 
-        if any(issubclass(apps.get_model("api", module_type.class_name), (Module, Submodule)) for module_type in module_types):
+        if any(issubclass(apps.get_model("api", module_type.class_name).__class__, (Module, Submodule)) for module_type in module_types):
             climate = activity.climate_t2 or project.climate
             moisture = activity.moisture_t2 or project.moisture
             soil_type = activity.soil_type_t2 or project.soil_type
@@ -1035,11 +1087,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 missing_fields.append("soil_type")
 
             if missing_fields:
-                raise serializers.ValidationError(
-                    f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} "
-                    f"required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} "
-                    f"on the activity or {', '.join(missing_fields)} on the project."
-                )
+                raise serializers.ValidationError(f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} on the activity or {', '.join(missing_fields)} on the project.")
 
         for module_type in module_types:
             if module_type.class_name in ["LandUseChange", "OrganicSoil"]:
@@ -1345,10 +1393,6 @@ class CommentThreadSerializer(serializers.ModelSerializer):
 
 
 class LandUseTypeSerializer(serializers.ModelSerializer):
-    module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
-    climate = get_model_serializer(Climate)(many=False, read_only=True)
-    moisture = get_model_serializer(Moisture)(many=False, read_only=True)
-
     class Meta:
         model = LandUseType
         fields = "__all__"
@@ -1375,9 +1419,6 @@ class ModuleResultSerializer(serializers.Serializer):
 
 
 class BaseGenericModuleSerializer(serializers.ModelSerializer):
-    # activity = ActivitySerializer(many=False, read_only=True)
-    module_type = serializers.SerializerMethodField()
-    status = get_model_serializer(StatusType)(read_only=True)
     note = serializers.SerializerMethodField()
 
     last_cached_at = serializers.SerializerMethodField()
@@ -1386,39 +1427,24 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
     cached_results_by_gas = serializers.SerializerMethodField()
     cached_results_by_activity_by_gas = serializers.SerializerMethodField()
 
-    class Meta:
-        extra_fields = ["module_type"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if not hasattr(self.Meta, "ref_name") or not hasattr(self.Meta, "mandatory_fields"):
-            raise ValueError(f"Meta class of {self.__class__.__name__} must have a ref_name and a mandatory_fields attribute")
-
     def get_last_cached_at(self, obj):
         return None
 
     def get_cached_results_total(self, obj):
         # NOTE: This is hidden for now. Could be returned as a field in the future.
-        # return DynamicResultSerializer(obj.cached_results_total, aggregate_by=BreakdownTypes.TOTAL).data if obj.cached_results_total else None
-        return None
+        return DynamicResultSerializer(obj.cached_results_total, aggregate_by=BreakdownTypes.TOTAL).data if obj.cached_results_total else None
 
     def get_cached_results_by_activity(self, obj):
         # NOTE: This is hidden for now. Could be returned as a field in the future.
-        # return DynamicResultSerializer(obj.cached_results_by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data if obj.cached_results_by_activity else None
-        return None
+        return DynamicResultSerializer(obj.cached_results_by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data if obj.cached_results_by_activity else None
 
     def get_cached_results_by_gas(self, obj):
         # NOTE: This is hidden for now. Could be returned as a field in the future.
-        # return DynamicResultSerializer(obj.cached_results_by_gas, aggregate_by=BreakdownTypes.GAS).data if obj.cached_results_by_gas else None
-        return None
+        return DynamicResultSerializer(obj.cached_results_by_gas, aggregate_by=BreakdownTypes.GAS).data if obj.cached_results_by_gas else None
 
     def get_cached_results_by_activity_by_gas(self, obj):
         # NOTE: This is hidden for now. Could be returned as a field in the future.
-        # return DynamicResultSerializer(obj.cached_results_by_activity_by_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data if obj.cached_results_by_activity_by_gas else None
-        return None
-
-    def get_module_type(self, obj):
-        return get_model_serializer(ModuleType)(ModuleType.objects.get(class_name=self.Meta.ref_name), many=False).data
+        return DynamicResultSerializer(obj.cached_results_by_activity_by_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data if obj.cached_results_by_activity_by_gas else None
 
     def get_note(self, obj):
         return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
@@ -1497,11 +1523,7 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
                 missing_fields.append("soil_type")
 
             if missing_fields:
-                raise serializers.ValidationError(
-                    f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} "
-                    f"required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} "
-                    f"on the activity or {', '.join(missing_fields)} on the project."
-                )
+                raise serializers.ValidationError(f"{', '.join(missing_fields).title()} {'is' if len(missing_fields) == 1 else 'are'} required for this module type. Please set {'/'.join([f'{f}_t2' for f in missing_fields])} on the activity or {', '.join(missing_fields)} on the project.")
 
         if project.is_archived:
             log.error("Modules belonging to archived projects cannot be modified")
@@ -1688,10 +1710,6 @@ class ScenarioSubmoduleSerializer(BaseSubmoduleSerializer, ScenarioBaseSerialize
 
 
 class LandModuleSeralizer(ScenarioModuleSerializer):
-    # activity = ActivitySerializer(many=False, read_only=True)
-    land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
-    status = get_model_serializer(StatusType)(many=False, read_only=True)
-
     class Meta:
         model = None
         fields = "__all__"
@@ -3249,21 +3267,16 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
 
 
 class ProjectMembershipReadSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    project = ProjectNameIdSerializer(many=False, read_only=True)
-    user = UserReadSerializer(many=False, read_only=True)
-    group = GroupSerializer(many=False, read_only=True)
+    # Clients can't look up other members via /users/{id}/ (own user only), so the email rides along here.
+    user_email = serializers.EmailField(source="user.email", read_only=True)
 
     class Meta:
         model = ProjectMembership
-        fields = "__all__"
+        fields = ["id", "project", "user", "user_email", "group"]
         ref_name = "ProjectMembership"
 
 
 class ProjectNotificationPreferenceReadSerializer(serializers.ModelSerializer):
-    project = ProjectNameIdSerializer(many=False, read_only=True)
-    user = UserReadSerializer(many=False, read_only=True)
-
     class Meta:
         model = ProjectNotificationPreference
         fields = ["id", "project", "user", "is_subscribed", "created_at", "updated_at"]
@@ -3584,29 +3597,6 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
         return data
 
 
-class ProjectInvitationAcceptSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectInvitation
-        fields = ["status"]
-        ref_name = "ProjectInvitation"
-
-    def validate(self, data):
-        super().validate(data)
-
-        if uuid.UUID(self.context.get("token", None)) != self.instance.token:
-            raise serializers.ValidationError("Invalid token")
-
-        if self.instance.status.name_en != utils.InvitationStatus.PENDING.value and (data.get("status", None) and data.get("status", None).name_en == utils.InvitationStatus.ACCEPTED.value):
-            raise serializers.ValidationError("Cannot accept an invitation that is not pending")
-
-        return data
-
-    def save(self, **kwargs):
-        self.instance.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.ACCEPTED.value)
-        self.instance.save()
-        return self.instance
-
-
 class NewNoteSerializer(serializers.ModelSerializer):
     content = serializers.CharField(required=True)
     module_type_id = serializers.IntegerField(required=False)
@@ -3658,10 +3648,16 @@ class NoteSerializer(serializers.ModelSerializer):
     module_id = serializers.SerializerMethodField(read_only=True)
 
     def get_module_type(self, obj):
+        # BUG: Some Notes have None content_object
+        if obj.content_object is None:
+            return None
         module_type = ModuleType.objects.get(class_name=obj.content_object.__class__.__name__)
         return get_model_serializer(ModuleType)(module_type, many=False).data
 
     def get_module_id(self, obj):
+        # BUG: Some Notes have None content_object
+        if obj.content_object is None:
+            return None
         return obj.content_object.id
 
     def validate(self, data):

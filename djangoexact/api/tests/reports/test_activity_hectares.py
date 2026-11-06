@@ -29,6 +29,7 @@ def _module_result(units_w, units_wo, duration):
         title="Land",
         metadata_section_title="Land",
         result_rows=[],
+        metadata_writes=[],
         total_emissions=[0.0] * duration,
         units_breakdown_w=units_w,
         units_breakdown_wo=units_wo,
@@ -64,6 +65,8 @@ class _FakeReport:
     def compute(self):
         return self._module._result
 
+    compute_with_scenarios = compute
+
 
 def _activity(modules):
     activity = MagicMock(
@@ -77,6 +80,10 @@ def _activity(modules):
         soc_t2=None,
     )
     activity.name = "Act"
+    # BaseActivityReport iterates cache_modules(), not .modules. On a bare
+    # MagicMock that call returns an empty iterator and every total silently
+    # comes back zero.
+    activity.cache_modules.return_value = modules
     return activity
 
 
@@ -84,7 +91,7 @@ class TestActivityHectaresNoDoubleCount(unittest.TestCase):
     DURATION = 3
 
     def _compute(self, modules):
-        project_report = MagicMock(duration=self.DURATION)
+        project_report = MagicMock(duration=self.DURATION, frozen=None)  # an open project: live report path
         activity = _activity(modules)
         report = BaseActivityReport(project_report=project_report, activity=activity)
         with patch("api.reports.registry.get_report_class", return_value=_FakeReport):

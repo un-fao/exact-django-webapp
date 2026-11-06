@@ -1,4 +1,4 @@
-<div id="results-body"
+{% load luc_labels %}<div id="results-body"
      {% if not is_complete %}hx-get="{% url 'admin_scripts:test-modules-status' run.pk %}"
      hx-trigger="every 3s"
      hx-swap="outerHTML"{% endif %}
@@ -51,9 +51,9 @@
                 <tr>
                     <td class="px-4 py-2 font-mono text-xs text-gray-800">{{ row.job.attribute }}</td>
                     <td class="px-4 py-2 text-xs text-gray-600">
-                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ row.job.from_value }}</span>
+                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ row.job.from_value|luc_label }}</span>
                         <span class="mx-1 text-gray-400">&rarr;</span>
-                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ row.job.to_value }}</span>
+                        <span class="font-mono bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5">{{ row.job.to_value|luc_label }}</span>
                     </td>
                     <td class="px-4 py-2">
                         {% if row.job.status == "pending" %}

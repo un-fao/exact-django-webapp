@@ -5,7 +5,7 @@
     "fields": {
       "name": "Off-Site",
       "name_en": "Off-Site",
-      "name_fr": "Hors site\n",
+      "name_fr": "Hors site",
       "name_es": "Fuera del Sitio",
       "name_ru": "Вне участка"
     }
@@ -16,7 +16,7 @@
     "fields": {
       "name": "On-Site",
       "name_en": "On-Site",
-      "name_fr": "Sur site\n",
+      "name_fr": "Sur site",
       "name_es": "In Situ",
       "name_ru": "на месте, локальный"
     }

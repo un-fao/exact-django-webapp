@@ -26,6 +26,7 @@ alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric c
 letters_only = validators.RegexValidator(r"^[a-zA-Z]*$", "Only letters are allowed.")
 capitalized = validators.RegexValidator(r"[A-Z][a-z]*(\s[A-Z][a-z]*)*", "Only capitalized words are allowed.")
 pc_as_float = validators.RegexValidator(r"^[0-1]*\.?[0-9]*$", "Only correctly formatted percentages are allowed.")
+guided_step_format = validators.RegexValidator(r"^[A-Za-z_]+(\.[A-Za-z_]+)*$", "Only dot-separated identifiers of letters and underscores are allowed.")
 
 RICE_CULTIVATION_DAYS = 113
 
@@ -285,7 +286,7 @@ class ChangeRate(models.Model):
 
 
 class ProjectStatus(models.Model):
-    name = models.CharField(max_length=25)
+    name = models.CharField(max_length=100)
     value = models.IntegerField(unique=True)
 
     class Meta:
@@ -719,6 +720,11 @@ class Project(Historical, DirtyFieldsMixin):
 
     is_public = models.BooleanField(default=False, verbose_name="is_public")
     is_finalized = models.BooleanField(default=False, verbose_name="is_finalized")
+    finalized_at = models.DateTimeField(null=True, blank=True, verbose_name="finalized_at")
+
+    # Frontend tour checkpoint. The project is a guided project if and only if this is not null.
+    # Values are deliberately not an enum, so new tour steps need no backend release.
+    guided_step = models.CharField(max_length=64, null=True, blank=True, default=None, validators=[guided_step_format], verbose_name="guided_step")
 
     @property
     def capitalization_years(self) -> int:
@@ -761,19 +767,39 @@ class Project(Historical, DirtyFieldsMixin):
                 # thousands), exhausting connections and timing the request out (finalize failure).
                 exclude_fields = [
                     "is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at",
-                    "is_finalized", "is_public", "is_archived", "archived_at",
+                    "is_finalized", "finalized_at", "is_public", "is_archived", "archived_at",
                     # export_id is assigned lazily by the export endpoint on the
                     # first download. It identifies the file, never the science,
                     # so invalidating on it would wipe the cached results of the
                     # project being exported and guarantee the exported file
                     # carries no results at all.
                     "export_id",
+                    # Tour progress is written on every tour step and never affects the science.
+                    "guided_step",
                 ]
 
                 if any(field not in exclude_fields for field in dirty_fields):
                     invalidate_module_caches(project=self)
 
-        super().save(*args, **kwargs)
+        # Only an existing project can be finalized: a new one has no modules to freeze yet.
+        is_finalizing = self.is_finalized and bool(self.pk) and self.get_dirty_fields().get("is_finalized") is False
+        if is_finalizing:
+            self.finalized_at = timezone.now()
+        elif not self.is_finalized:
+            self.finalized_at = None
+
+        if not is_finalizing:
+            super().save(*args, **kwargs)
+            return
+
+        # Saving the flag and freezing the results in one transaction is what makes "finalized"
+        # imply "has frozen results": a project can never be finalized without its snapshot.
+        from django.db import transaction
+        from api.services.finalization import freeze_project
+
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            freeze_project(self)
 
     def clean(self):
         """Validate that climate, moisture, and soil_type are present if activities exist."""
@@ -928,6 +954,9 @@ class ProjectMembership(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="members")
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["user", "project"], name="unique_project_membership")]
+
     def __str__(self):
         return f"({self.pk}) {self.project.name} - {self.user.email} - {self.group.name}"
 
@@ -989,6 +1018,91 @@ class Note(Historical):
 
     def __str__(self):
         return f"({self.pk}) {self.author.email}: {self.content[:40]}..."
+
+
+class FinalizedModuleResult(models.Model):
+    """Results of one module or submodule, frozen when its project was finalized.
+
+    Finalized projects read their results only from here, never from the live cache and never
+    from a fresh calculation, so a calculator or reference-data change cannot move them. Rows are
+    append-only: a database trigger (migration 0297) rejects UPDATE and DELETE, and removes a
+    project's rows only when the project itself is deleted. Re-finalizing an un-finalized
+    project adds a new set of rows keyed by the new ``finalized_at``; older sets stay as an
+    audit trail.
+    """
+
+    class Source(models.TextChoices):
+        FINALIZE = "finalize", "Frozen at finalization"
+        LIVE_CACHE = "restored_from_live_cache", "Restored from the cache as it was at finalization"
+        HISTORY = "restored_from_history", "Restored from module history as of finalization"
+        RETROACTIVE = "frozen_retroactively", "No results existed at finalization; calculated when frozen"
+
+    # DO_NOTHING plus no DB constraint: Django's delete collector must never touch this table.
+    # The project's AFTER DELETE trigger purges the rows instead.
+    project = models.ForeignKey(Project, on_delete=models.DO_NOTHING, db_constraint=False, related_name="finalized_results")
+    finalized_at = models.DateTimeField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    object_id = models.PositiveIntegerField()
+    module = GenericForeignKey("content_type", "object_id")
+
+    results_total = models.JSONField(null=True)
+    results_by_activity = models.JSONField(null=True)
+    results_by_gas = models.JSONField(null=True)
+    results_by_activity_by_gas = models.JSONField(null=True)
+    units_breakdown = models.JSONField(null=True)
+
+    computed_at = models.DateTimeField(null=True, help_text="When these numbers were calculated")
+    app_version = models.CharField(max_length=32, null=True, help_text="Backend version that calculated them, when known")
+    source = models.CharField(max_length=32, choices=Source.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["content_type", "object_id", "finalized_at"], name="unique_frozen_result_per_finalization"),
+        ]
+        indexes = [models.Index(fields=["project", "finalized_at"])]
+
+    def results(self, by: BreakdownTypes):
+        return {
+            BreakdownTypes.TOTAL: self.results_total,
+            BreakdownTypes.ACTIVITY: self.results_by_activity,
+            BreakdownTypes.GAS: self.results_by_gas,
+            BreakdownTypes.ACTIVITY_GAS: self.results_by_activity_by_gas,
+        }[by]
+
+    def provenance(self) -> dict:
+        return {
+            "finalized_at": self.finalized_at,
+            "computed_at": self.computed_at,
+            "app_version": self.app_version,
+            "source": self.source,
+        }
+
+
+class FinalizedReportData(models.Model):
+    """Report data of a finalized project, frozen next to its results.
+
+    One row per module (its ``ModuleResult``), per activity (its tier 2 overrides) and one per
+    project (shadow prices, indicators, SOC), keyed by the object's content type. Module and
+    activity data, and the project indicators, are stored per language because reference names
+    are translated at compute time. ``data`` is versioned (``schema``) and decoded by
+    ``api.reports.frozen``. Append-only under the same triggers as ``FinalizedModuleResult``.
+    """
+
+    project = models.ForeignKey(Project, on_delete=models.DO_NOTHING, db_constraint=False, related_name="finalized_report_data")
+    finalized_at = models.DateTimeField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    object_id = models.PositiveIntegerField()
+    data = models.JSONField()
+    app_version = models.CharField(max_length=32, null=True)
+    source = models.CharField(max_length=32, choices=FinalizedModuleResult.Source.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["content_type", "object_id", "finalized_at"], name="unique_frozen_report_data_per_finalization"),
+        ]
+        indexes = [models.Index(fields=["project", "finalized_at"])]
 
 
 class NoteMixin(models.Model):
@@ -2237,6 +2351,31 @@ class Grassland(LandModuleFixed, AboveBelowGroundBiomassModule):
     combustion_factor_t2_start = models.FloatField(null=True, blank=True, verbose_name="combustion_factor_t2_start")
     combustion_factor_t2_w = models.FloatField(null=True, blank=True, verbose_name="combustion_factor_t2_w")
     combustion_factor_t2_wo = models.FloatField(null=True, blank=True, verbose_name="combustion_factor_t2_wo")
+
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+        """Tier 2 total biomass stock (AGB + BGB) used by land-use change.
+
+        The Tier 2 AGB value also drives fire, so users often enter only AGB. Summing it alone
+        would understate the stock 2.6x to 5.7x, so a missing half falls back to IPCC 2006
+        Table 6.4 (BGB = total - AGB). With neither entered, land-use change uses its own table.
+        """
+        agb_t2 = getattr(self, f"agb_t2_{scenario.value}")
+        bgb_t2 = getattr(self, f"bgb_t2_{scenario.value}")
+        if agb_t2 is None and bgb_t2 is None:
+            return None
+
+        if agb_t2 is None or bgb_t2 is None:
+            reference = ipcc.GrasslandBiomass.objects.filter(
+                climate=self.activity.climate_t2 or self.activity.project.climate,
+                moisture=self.activity.moisture_t2 or self.activity.project.moisture,
+            ).first()
+            if reference is not None:
+                if agb_t2 is None:
+                    agb_t2 = reference.agb_t_c_ha
+                else:
+                    bgb_t2 = reference.total_biomass_t_c_ha - reference.agb_t_c_ha
+
+        return (agb_t2 or 0) + (bgb_t2 or 0)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:

@@ -22,6 +22,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
+from admin_scripts.luc_permutations import display_value
 from admin_scripts.scenario_utils import _build_single_change_q, stats_for_scenario
 from minitool.models import ChangeRecord
 
@@ -234,8 +235,8 @@ def _write_detail_sheet(ws, scenario: dict, stats: dict, global_filters: dict) -
             i,
             change.get("module_type", ""),
             (change.get("start") or {}).get("field", ""),
-            (change.get("start") or {}).get("value", ""),
-            (change.get("end") or {}).get("value", ""),
+            display_value((change.get("start") or {}).get("value", "")),
+            display_value((change.get("end") or {}).get("value", "")),
             change.get("unit", "") or "",
             _matched_record_count(change, global_filters),
             _format_filter_value(filters.get("climate")),

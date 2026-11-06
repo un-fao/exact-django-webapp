@@ -25,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 from dataclasses import dataclass
 from django.db import transaction
 import api.security as security
+import api.concurrency as concurrency
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -41,6 +42,19 @@ INCLUDE_RELATED = "include_related"
 
 FOSSIL_METHANE_FUELS = ["peat", "charcoal"]
 ELECTRIC_FUEL_TYPES = ["electricity", "renewable"]
+
+
+def methane_gwp(gwp: "ipcc_models.GlobalWarmingPotential", fuel_type: "api_models.FuelType | None") -> float:
+    """Return the CH4 GWP for burning ``fuel_type``: ``ch4_fossil`` for fossil-methane fuels, else ``ch4``.
+
+    Raises ValueError when the fossil value is not configured, because a None
+    here otherwise surfaces deep in the math as an opaque TypeError.
+    """
+    if fuel_type is None or fuel_type.name_en.casefold() not in FOSSIL_METHANE_FUELS:
+        return gwp.ch4
+    if gwp.ch4_fossil is None:
+        raise ValueError(f"Fossil CH4 global warming potential is not configured for '{gwp.name}'. Please contact an administrator.")
+    return gwp.ch4_fossil
 
 
 class ManureManagementTypes(Enum):
@@ -122,6 +136,39 @@ def get_query_param_or_validation_error(request, param_name):
     if param is None:
         raise exceptions.ValidationError(f"{param_name} is required")
     return param
+
+
+def requested_activity_ids(request):
+    """Activity ids named by ?activities=, or [] when the parameter is absent.
+
+    Non-numeric entries are dropped silently rather than rejected. That is the
+    behaviour of the five hand-rolled copies this replaces, kept deliberately:
+    changing it is a separate decision from removing the duplication.
+    """
+    raw = request.query_params.get("activities", "")
+    return [pk.strip() for pk in raw.split(",") if pk.strip().isdigit()]
+
+
+def requested_language(request):
+    """Language named by ?lang=, then the Accept-Language header, then "en".
+
+    Raises ValidationError when the value is not a configured language. The
+    result is interpolated into template paths and into the logo filename that
+    _load_fao_logo opens, where a separator escapes the directory outright:
+    "/../../etc/passwd" resolves to BASE_DIR/etc/passwd.svg. Until ?lang= was
+    honoured, LocaleMiddleware's validated LANGUAGE_CODE overwrote it on every
+    request and stood in for this check by accident.
+
+    The message does not echo the submitted value back: it reaches both the
+    response body and the logs.
+    """
+    lang = request.query_params.get("lang") or getattr(request, "LANGUAGE_CODE", "en")
+    configured = dict(settings.LANGUAGES)
+    if lang not in configured:
+        raise exceptions.ValidationError(
+            f"Unsupported language. Available: {', '.join(sorted(configured))}"
+        )
+    return lang
 
 
 def get_url_name(model_name):
@@ -245,7 +292,20 @@ def create_project_shell(project, owner):
     project_copy.name = get_unique_name(project_copy, project_copy.name)
     project_copy._state.adding = True
     project_copy.is_finalized = False
+    project_copy.finalized_at = None
     project_copy.is_public = False
+    project_copy.export_id = None
+    project_copy.guided_step = None
+    # A copy inheriting the source's lock would be held by a user who may not be a
+    # member of it, and the new owner cannot release someone else's lock.
+    project_copy.is_locked = False
+    project_copy.locked_at = None
+    project_copy.lock_updated_at = None
+    project_copy.locked_by = None
+    project_copy.is_archived = False
+    project_copy.archived_at = None
+    # None makes the daily sweep start the clock instead of mailing the copy operation itself.
+    project_copy.last_recap_sent_at = None
     project_copy.owner = owner
     project_copy.save()
 
@@ -563,27 +623,29 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
         ValueError: If the parent module or module type cannot be found.
     """
 
-    parent_module = None
-    module_type = None
+    activity = organic_soil.activity
+    # The bare M2M has no ordering, so Postgres (online) and SQLite (offline,
+    # index order by moduletype_id) used to pick different parents. Through-table
+    # pk is insertion order, the closest match to what Postgres returns today.
+    links = activity.module_types.through.objects.filter(activity=activity).select_related("moduletype").order_by("id")
+    module_types = [link.moduletype for link in links]
 
-    for mt in organic_soil.activity.module_types.all():
-        if mt.is_luc:
-            parent_module = getattr(organic_soil.activity, mt.class_name.lower()).first()
-            module_type = mt
-            break
-        else:
-            potential_parent = getattr(organic_soil.activity, mt.class_name.lower(), None)
-            if potential_parent:
-                parent = potential_parent.first()
-                if parent and getattr(parent, "organic_soil", None) == organic_soil:
-                    parent_module = parent
-                    module_type = mt
-                    break
+    for mt in module_types:
+        modules = getattr(activity, (mt.class_name or "").lower(), None)
+        if hasattr(getattr(modules, "model", None), "organic_soil"):
+            owner = modules.filter(organic_soil=organic_soil).first()
+            if owner:
+                return owner, mt
+
+    # Legacy fallback: many existing soils have no owning module, so keep picking
+    # the first LUC type's first module instead of raising for them.
+    luc_type = next((mt for mt in module_types if mt.is_luc), None)
+    parent_module = getattr(activity, luc_type.class_name.lower()).first() if luc_type else None
 
     if parent_module is None:
         raise ValueError("Organic Soil must be associated either with a Land Use Change or an independent Land Module")
 
-    return parent_module, module_type
+    return parent_module, luc_type
 
 
 class ChangeLog:
@@ -619,6 +681,7 @@ def get_changes(records: list[HistoricalRecords], exclude_fields: list[str] = No
             "last_modified",
             "status",
             "map_data",
+            "guided_step",
         ] + (exclude_fields or [])
         # ModelDelta is a frozen dataclass since django-simple-history 3.5, so the
         # filtering has to happen inside diff_against, not on the returned delta.
@@ -916,3 +979,44 @@ def send_due_recaps() -> int:
             # One broken project must not stop the recaps of the others.
             log.exception(e)
     return sent
+
+
+def paginated_parallel_response(queryset, request, process_function=None, paginator_class=None, serializer_class=None, serializer_kwargs=None):
+    """
+    Paginate ``queryset`` and build each page item on the bounded serialization pool.
+
+    Args:
+        queryset: Django queryset (or list) to paginate and process
+        request: Django request object
+        process_function: Function applied to each item (optional if serializer_class provided)
+        paginator_class: Pagination class to use (defaults to DefaultPagination)
+        serializer_class: Serializer class to use instead of process_function
+        serializer_kwargs: Additional kwargs to pass to serializer
+
+    Returns:
+        Response: Paginated response with processed data
+    """
+    if paginator_class is None:
+        # Imported here because api.views imports this module.
+        from api.views import DefaultPagination
+
+        paginator_class = DefaultPagination
+
+    serializer_kwargs = serializer_kwargs or {}
+    if process_function is None:
+        if serializer_class is None:
+            raise ValueError("Either process_function or serializer_class must be provided")
+
+        def process_function(item):
+            return serializer_class(item, **serializer_kwargs).data
+
+    paginator = paginator_class()
+    page = paginator.paginate_queryset(queryset, request)
+    if page is not None:
+        # Each worker thread opens its own DB connection, so the fan-out width
+        # has to stay inside the budget documented in api/concurrency.py.
+        return paginator.get_paginated_response(concurrency.map_in_bounded_threads(process_function, page))
+
+    if serializer_class is not None:
+        return Response(data=serializer_class(queryset, many=True, **serializer_kwargs).data)
+    return Response(data=[process_function(item) for item in queryset])
