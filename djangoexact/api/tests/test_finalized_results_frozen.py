@@ -14,10 +14,10 @@ from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from api import utilities as utils
-from api.models import Climate, FinalizedModuleResult, Group, Input, ModuleType, Project, SoilType
+from api.models import Climate, FinalizedModuleResult, ForestDisturbance, ForestManagement, Group, Input, ModuleType, Project, SoilType
 from api.reports.cache import load_emissions_from_cache
 from api.services import finalization
-from api.tests.factories import ActivityFactory, InputFactory, ProjectFactory, UserFactory
+from api.tests.factories import READY, ActivityFactory, ForestManagementFactory, InputFactory, ProjectFactory, UserFactory
 from api.tests.test_project_guided_step import pick_country
 from djangoexact import __version__
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
@@ -35,6 +35,11 @@ def add_input_module(activity) -> Input:
     # Activity.modules lists modules through activity.module_types, as the frontend sets them.
     activity.module_types.add(ModuleType.objects.get(class_name="Input"))
     return InputFactory(activity=activity)
+
+
+def add_forest_management_module(activity) -> ForestManagement:
+    activity.module_types.add(ModuleType.objects.get(class_name="ForestManagement"))
+    return ForestManagementFactory(activity=activity)
 
 
 def calculable_project(owner) -> Project:
@@ -234,6 +239,25 @@ class RestoreFrozenResultsTestCase(FrozenProjectTestCase):
         row = FinalizedModuleResult.objects.get(project=self.project)
         self.assertEqual(row.app_version, __version__)
         self.assertEqual(row.results_total["balance"], 5.0)
+
+    def test_submodules_calculated_only_by_their_parent_are_not_frozen_on_their_own(self):
+        # Production 1.22.0: ten finalized projects failed to freeze with "No calculator found
+        # for ForestDisturbance", because the disturbance was sent to the calculator factory alone.
+        forest = add_forest_management_module(self.activity)
+        ForestDisturbance.objects.create(parent=forest, status=READY)
+        self.finalize_legacy(timezone.now())
+
+        def compute(module):
+            if isinstance(module, ForestDisturbance):
+                raise AssertionError("a disturbance is calculated by its Forest Management parent")
+            return payload(5.0)
+
+        with mock.patch(COMPUTE, side_effect=compute):
+            counts = finalization.restore_frozen_results(self.project, dry_run=False)
+
+        self.assertEqual(counts[FinalizedModuleResult.Source.RETROACTIVE], 2)  # the Input and the Forest Management
+        frozen_types = set(FinalizedModuleResult.objects.values_list("content_type__model", flat=True))
+        self.assertEqual(frozen_types, {"input", "forestmanagement"})
 
     def test_dry_run_writes_nothing_and_rerun_is_idempotent(self):
         self.cache(1.0)
