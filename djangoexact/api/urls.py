@@ -44,6 +44,8 @@ router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
 router.register(r"notes", views.NoteViewSet, basename="notes")
 
 router.register(r"statuses", views.public_generic_viewset(models.ProjectStatus), basename="statuses")
+router.register(r"analysis-purposes", views.public_generic_viewset(models.AnalysisPurpose), basename="analysispurposes")
+router.register(r"project-phases", views.public_generic_viewset(models.ProjectPhase), basename="projectphases")
 router.register(r"regions", views.public_generic_viewset(models.Region), basename="regions")
 router.register(r"countries", views.CountryViewSet, basename="countries")
 router.register(r"global-warming-potentials", views.public_generic_viewset(GlobalWarmingPotential), basename="globalwarmingpotentials")
@@ -136,6 +138,7 @@ router.register(r"forest-disturbances", views.generic_module_viewset(models.Fore
 
 # Waterbodies
 router.register(r"waterbodies", views.generic_module_viewset(models.Waterbody), basename="waterbody")
+router.register(r"solid-waste", views.generic_module_viewset(models.SolidWaste), basename="solidwaste")
 router.register(r"waterbody-types", views.public_generic_viewset(models.WaterbodyType), basename="waterbodytypes")
 router.register(r"trophic-types", views.public_generic_viewset(models.TrophicType), basename="trophictypes")
 
@@ -158,6 +161,7 @@ router.register(r"emission-factor-sources", views.public_generic_viewset(models.
 # Fuel
 router.register(r"macro-fuel-types", views.public_generic_viewset(models.MacroFuelType), basename="macrofueltypes")
 router.register(r"fuel-types", views.FuelTypeViewSet, basename="fueltypes")
+router.register(r"value-chain-stages", views.public_generic_viewset(models.ValueChainStage), basename="valuechainstages")
 router.register(r"fuel-use-types", views.public_generic_viewset(models.FuelUseType), basename="fuelusetypes")
 
 # Organic Soil

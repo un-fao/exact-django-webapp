@@ -17,12 +17,16 @@ from abc import ABC, abstractmethod
 
 import api.calculators as calcs
 import api.utilities as utils
+from api.services.organic_soil_peat import water_table_class_applies
 from api.models import CustomUser as User
 from django.utils.text import slugify
 
 from . import labels
 from .models import guided_step_format
 from .models import (
+    SOLID_WASTE_CROP_MODULES,
+    SOLID_WASTE_ROUTES,
+    SolidWaste,
     Module,
     Submodule,
     Activity,
@@ -110,6 +114,7 @@ from .models import (
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
 import api.security as security
+from api.services.forest_stock_difference import STOCK_DIFFERENCE_LUC_ERROR, supports_stock_difference
 from django.conf import settings
 
 
@@ -786,7 +791,7 @@ class ProjectImportSerializer(serializers.Serializer):
 class ActivitySummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ["id", "name", "module_types", "completion_percentage", "is_b_intact"]
+        fields = ["id", "name", "module_types", "completion_percentage", "is_b_intact", "conditionality"]
         ref_name = "Activity"
 
 class ProjectTotalHectaresSerializer(serializers.Serializer):
@@ -806,9 +811,10 @@ class ProjectTotalLivestockSerializer(serializers.Serializer):
 
 
 class ActivityResultSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(read_only=True)
     cost = serializers.FloatField(read_only=True)
-    pass
+    conditionality = serializers.CharField(read_only=True, allow_null=True)
 
 
 class ActivitySerializer(serializers.ModelSerializer):
@@ -1426,6 +1432,10 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
     cached_results_by_activity = serializers.SerializerMethodField()
     cached_results_by_gas = serializers.SerializerMethodField()
     cached_results_by_activity_by_gas = serializers.SerializerMethodField()
+    # Server-owned: a client that PUTs back a GET payload would otherwise overwrite the
+    # edit stamp written by CachedResultMixin.save(), so the stale cache keeps validating.
+    last_modified = serializers.DateTimeField(read_only=True)
+    cached_units_breakdown = serializers.JSONField(read_only=True)
 
     def get_last_cached_at(self, obj):
         return None
@@ -2117,12 +2127,14 @@ class OrganicSoilReadSerializer(LandModuleSeralizer):
         luc: LandUseChange = self.instance.land_use_change
 
         if luc:
+            self.parent_module_types = (luc.module_type_start, luc.module_type_w, luc.module_type_wo)
             self.parent_land_use_type_start = luc.module_type_start.id if luc.module_type_start else None
             self.parent_land_use_type_w = luc.module_type_w.id if luc.module_type_w else None
             self.parent_land_use_type_wo = luc.module_type_wo.id if luc.module_type_wo else None
         else:
             parent_module, parent_module_type = utils.find_organic_soil_parent_module(self.instance)
 
+            self.parent_module_types = (parent_module_type,) * 3
             self.parent_land_use_type_start = parent_module_type.id if parent_module_type else None
             self.parent_land_use_type_w = parent_module_type.id
             self.parent_land_use_type_wo = parent_module_type.id
@@ -2132,6 +2144,9 @@ class OrganicSoilReadSerializer(LandModuleSeralizer):
         representation["parent_land_use_type_start"] = self.parent_land_use_type_start
         representation["parent_land_use_type_w"] = self.parent_land_use_type_w
         representation["parent_land_use_type_wo"] = self.parent_land_use_type_wo
+        climate = instance.activity.climate_t2 or instance.activity.project.climate
+        for scenario, module_type in zip(("start", "w", "wo"), self.parent_module_types):
+            representation[f"water_table_class_applicable_{scenario}"] = water_table_class_applies(module_type, climate, instance.peat_type)
         return representation
 
 
@@ -2889,6 +2904,15 @@ class WaterbodySerializer(LandModuleSeralizer):
             },
         }
 
+    def is_ready(self, data, mandatory_fields, instance=None):
+        is_ready, errors = super().is_ready(data, mandatory_fields, instance=instance)
+        combined_data = self.merge_instance_data(data, instance=instance)
+        waterbody_type = combined_data.get("waterbody_type")
+        if waterbody_type and waterbody_type.is_reservoir and combined_data.get("reservoir_age_start") is None:
+            errors.setdefault("start", []).append("Missing mandatory fields: reservoir_age_start")
+            return False, errors
+        return is_ready, errors
+
 
 class WaterbodyWriteSerializer(WaterbodySerializer):
     pass
@@ -3043,10 +3067,19 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
             if pc_biomass_destruction_w > max_pc:
                 errors += [serializers.ValidationError("Total percentage of biomass destruction (with) cannot be greater than 100%")]
 
+        is_stock_difference = data.get("approach") == ForestManagement.APPROACH_STOCK_DIFFERENCE
+        if is_stock_difference and instance and not supports_stock_difference(instance):
+            errors.append(STOCK_DIFFERENCE_LUC_ERROR)
+
         if errors:
             raise serializers.ValidationError(errors)
 
-        if any([not d.is_ready() for d in instance.disturbances.all()]):
+        if is_stock_difference:
+            # Gain-loss inputs and disturbances are ignored, so only the 12 stocks decide readiness.
+            stock_fields = [f"stock_{pool}_{scenario}" for pool in ForestManagement.STOCK_DIFFERENCE_POOLS for scenario in ("start", "w", "wo")]
+            if any(data.get(field) is None for field in stock_fields):
+                data["status"] = StatusType.objects.get(name_en="EMPTY")
+        elif any([not d.is_ready() for d in instance.disturbances.all()]):
             data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         return data
@@ -3170,6 +3203,13 @@ class DynamicResultSerializer(serializers.Serializer):
 
     def get_inventory(self, obj):
         return obj.get("inventory")
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Module-specific blocks a calculator adds next to the emissions (CalculatorFactory results_extra).
+        if isinstance(instance, dict) and "solid_waste" in instance:
+            data["solid_waste"] = instance["solid_waste"]
+        return data
 
     def _serialize_data(self, data):
         match self.aggregate_by:
@@ -3539,6 +3579,62 @@ class ForestDisturbanceReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "ForestDisturbance"
         mandatory_fields = ForestDisturbanceWriteSerializer.Meta.mandatory_fields
+
+
+# Solid waste
+
+SOLID_WASTE_ROUTE_TOLERANCE = 0.001
+
+
+def _solid_waste_route_sum(data: dict, scenario: str) -> float:
+    return sum(data.get(f"route_{route}_{scenario}") or 0.0 for route in SOLID_WASTE_ROUTES)
+
+
+def _solid_waste_inputs(data: dict, scenario: str, crop_keys) -> list:
+    return [data.get(f"amount_{scenario}"), *(data.get(f"crop_waste_{key}_{scenario}") for key in crop_keys)]
+
+
+class SolidWasteWriteSerializer(ScenarioModuleSerializer):
+    class Meta:
+        model = SolidWaste
+        fields = "__all__"
+        ref_name = "SolidWaste"
+        # The amount is optional when a crop module of the activity supplies the food waste; is_ready checks either.
+        mandatory_fields = {"start": {"mandatory": []}, "with": {"mandatory": []}, "without": {"mandatory": []}}
+
+    def is_ready(self, data, mandatory_fields, instance=None):
+        is_ready, errors = super().is_ready(data, mandatory_fields, instance=instance)
+        merged = self.merge_instance_data(data, instance=instance)
+        activity = merged.get("activity") or (instance.activity if instance else None)
+        present = {type(module).__name__ for module in activity.modules} if activity else set()
+        crop_keys = [key for key, class_name in SOLID_WASTE_CROP_MODULES.items() if class_name in present]
+        for scenario in utils.ScenarioTypes:
+            inputs = _solid_waste_inputs(merged, scenario.value, crop_keys)
+            if all(value is None for value in inputs):
+                errors.setdefault(scenario.verbose_name, []).append("Enter the food waste amount or a share of crop production wasted")
+            elif any(inputs) and abs(_solid_waste_route_sum(merged, scenario.value) - 1) > SOLID_WASTE_ROUTE_TOLERANCE:
+                errors.setdefault(scenario.verbose_name, []).append("Management route shares must add up to 100%")
+        return not errors, errors
+
+    def validate(self, data):
+        merged = self.merge_instance_data(data, instance=self.instance)
+        errors = [
+            f"Solid waste: management route shares cannot add up to more than 100% in the {scenario.verbose_name} scenario"
+            for scenario in utils.ScenarioTypes
+            if _solid_waste_route_sum(merged, scenario.value) > 1 + SOLID_WASTE_ROUTE_TOLERANCE
+        ]
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return super().validate(data)
+
+
+class SolidWasteReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = SolidWaste
+        fields = "__all__"
+        ref_name = "SolidWaste"
+        mandatory_fields = SolidWasteWriteSerializer.Meta.mandatory_fields
 
 
 class ChangeSerializer(serializers.Serializer):

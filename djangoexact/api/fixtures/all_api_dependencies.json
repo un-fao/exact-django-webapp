@@ -3019,6 +3019,21 @@
     }
   },
   {
+    "model": "api.moduletype",
+    "pk": 65,
+    "fields": {
+      "name": "Solid Waste",
+      "name_en": "Solid Waste",
+      "name_fr": "Déchets solides",
+      "name_es": "Residuos sólidos",
+      "name_ru": "Твёрдые отходы",
+      "class_name": "SolidWaste",
+      "is_luc": false,
+      "is_submodule": false,
+      "is_container": false
+    }
+  },
+  {
     "model": "api.gleamregion",
     "pk": 2,
     "fields": {
@@ -3968,17 +3983,6 @@
       "name_en": "Nutrient Poor",
       "name_fr": null,
       "name_es": "Pobre en Nutrientes",
-      "name_ru": null
-    }
-  },
-  {
-    "model": "api.waterbodytype",
-    "pk": 5,
-    "fields": {
-      "name": "﻿Freshwater Pond",
-      "name_en": "﻿Freshwater Pond",
-      "name_fr": null,
-      "name_es": null,
       "name_ru": null
     }
   },

@@ -1,0 +1,56 @@
+{% load i18n %}
+<section>
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>{% translate "Indicators" %}</h3>
+        </div>
+        <div class="card-body">
+            {% for group in indicators.groups %}
+                {% if group.available %}
+                    <h5>{{ group.label }}</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>{% translate "Unit" %}</th>
+                                <th>{% translate "Without Project" %}</th>
+                                <th>{% translate "With Project" %}</th>
+                                <th>{% translate "Value" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in group.indicators %}
+                                <tr>
+                                    <td>{{ item.label }}</td>
+                                    <td>{{ item.unit }}</td>
+                                    <td>{{ item.without|floatformat:2|default:"" }}</td>
+                                    <td>{{ item.with|floatformat:2|default:"" }}</td>
+                                    <td>{{ item.value|floatformat:2|default:"" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if group.id == "land_use_change_matrix" %}
+                        <p><b>{% translate "With Project" %}</b> ({% translate "ha, from row to column" %})</p>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for category in group.data.categories %}<th>{{ category.label }}</th>{% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in group.data.with %}
+                                    <tr>
+                                        {% for category in group.data.categories %}{% if forloop.counter0 == forloop.parentloop.counter0 %}<td>{{ category.label }}</td>{% endif %}{% endfor %}
+                                        {% for value in row %}<td>{{ value|floatformat:2 }}</td>{% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
