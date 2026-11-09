@@ -827,6 +827,9 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 
 class ModuleTypeIdModuleIdAreaSerializer(serializers.Serializer):
+    urls_module = "api.urls"
+    url_prefix = "api"
+
     module_type = serializers.PrimaryKeyRelatedField(read_only=True)
     id = serializers.IntegerField(read_only=True)
     endpoint_url = serializers.SerializerMethodField(read_only=True)
@@ -848,8 +851,10 @@ class ModuleTypeIdModuleIdAreaSerializer(serializers.Serializer):
         class_name = module_type.class_name
 
         try:
-            from api.urls import router
+            from importlib import import_module
             from django.apps import apps
+
+            router = import_module(self.urls_module).router
 
             try:
                 model_class = apps.get_model("api", class_name)
@@ -859,7 +864,7 @@ class ModuleTypeIdModuleIdAreaSerializer(serializers.Serializer):
             for prefix, viewset_class, basename in router.registry:
                 if hasattr(viewset_class, "queryset") and viewset_class.queryset is not None:
                     if viewset_class.queryset.model == model_class:
-                        return f"api/{prefix}/"
+                        return f"{self.url_prefix}/{prefix}/"
 
         except (ImportError, AttributeError):
             pass

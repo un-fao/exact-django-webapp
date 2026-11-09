@@ -31,17 +31,6 @@ import matplotlib.pyplot as plt
 from django.shortcuts import render
 
 
-def get_modules(activity: api_models.Activity, serialized=True) -> list:
-    modules = activity.modules
-    module_serializers_list = []
-
-    for module in modules:
-        module_dict = public_serializers.get_public_module_serializer(module.__class__)(module).data
-        module_serializers_list.append(module_dict)
-
-    return module_serializers_list if serialized else modules
-
-
 class DefaultPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = "page_size"
@@ -309,7 +298,7 @@ class PublicActivityViewSet(viewsets.ReadOnlyModelViewSet):
 
         activity = get_object_or_404(self.queryset, pk=pk)
 
-        modules = get_modules(activity, serialized=True)
+        modules = public_serializers.PublicModuleSummarySerializer(activity.modules, many=True).data
 
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(modules, request)
