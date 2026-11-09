@@ -22,11 +22,9 @@ def serial_map(func, items, **kwargs):
     return [func(item) for item in items]
 
 
-# Both stand-ins keep every request inside the test transaction. Worker threads open
-# their own connections, which cannot see uncommitted rows, and DatabaseConnectionMiddleware
-# closes all connections after each response, ending the transaction for the next test.
+# Worker threads open their own connections, which cannot see the rows of the test
+# transaction, and close them on exit.
 @mock.patch("api.concurrency.map_in_bounded_threads", serial_map)
-@override_settings(MIDDLEWARE=[m for m in settings.MIDDLEWARE if m != "minitool.middleware.DatabaseConnectionMiddleware"])
 class PublicApiShapeTestCase(APITestCase):
     def setUp(self):
         Group.objects.get_or_create(name="Admin")
