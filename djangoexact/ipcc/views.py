@@ -27,7 +27,7 @@ def generic_viewset(_model: Model):
             model = _model
             fields = "__all__"
 
-    class GenericViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    class GenericViewSet(viewsets.ReadOnlyModelViewSet, AuthenticatedViewSet):
         queryset = _model.objects.all()
         serializer_class = get_model_serializer(_model)
         filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
@@ -51,7 +51,7 @@ def generic_viewset(_model: Model):
     return GenericViewSet
 
 
-class CropYieldStatViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class CropYieldStatViewSet(viewsets.ReadOnlyModelViewSet, AuthenticatedViewSet):
     class CropYieldStatFilterSet(django_filters.FilterSet):
         class Meta:
             model = ipcc_models.CropYieldStat
