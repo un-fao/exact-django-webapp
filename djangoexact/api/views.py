@@ -116,7 +116,6 @@ from .serializers import (
     ActivitySerializerWithModules,
     ResetPasswordSerializer,
     FieldDefinitionResponseSerializer,
-    FieldDefinitionSerializer,
     ProjectResultSerializer,
     ActivityResultSerializer,
     ProjectSummarySerializer,
@@ -490,9 +489,9 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(UserReadSerializer(request.user).data, status=http_status.HTTP_200_OK)
 
 
-class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
+class LandUseTypeViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows land use types to be viewed or edited.
+    API endpoint that allows land use types to be viewed.
     """
 
     queryset = LandUseType.objects.all()
@@ -2673,6 +2672,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 class CommentThreadViewSet(viewsets.ModelViewSet):
     queryset = CommentThread.objects.all()
     serializer_class = CommentThreadSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     @action(detail=True, methods=["get"])
     def comments(self, request, pk=None):
@@ -2760,6 +2760,7 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -2789,9 +2790,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-class ModuleTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
+class ModuleTypeViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows module types to be viewed or edited.
+    API endpoint that allows module types to be viewed.
     """
 
     queryset = ModuleType.objects.all()
@@ -2819,9 +2820,9 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-class CountryViewSet(viewsets.ModelViewSet, PublicViewSet):
+class CountryViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows countries to be viewed or edited.
+    API endpoint that allows countries to be viewed.
     """
 
     queryset = Country.objects.all()
@@ -2841,9 +2842,9 @@ class CountryViewSet(viewsets.ModelViewSet, PublicViewSet):
         return super().list(request)
 
 
-class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class InputTypeViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows input types to be viewed or edited.
+    API endpoint that allows input types to be viewed.
     """
 
     queryset = InputType.objects.all()
@@ -3155,7 +3156,7 @@ def generic_viewset(model: Model):
 
 
 def public_generic_viewset(model: Model):
-    class PublicGenericViewSet(viewsets.ModelViewSet, PublicViewSet):
+    class PublicGenericViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
         filterset_class = api_filters.get_model_filter(model)
@@ -3165,21 +3166,6 @@ def public_generic_viewset(model: Model):
 
 
 class FieldDefinitionViewSet(viewsets.ViewSet):
-    @swagger_auto_schema(
-        request_body=FieldDefinitionSerializer,
-        responses={400: "Bad request", 201: FieldDefinitionSerializer},
-    )
-    def create(self, request, *args, **kwargs):
-        serializer = FieldDefinitionSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-
-        return Response(serializer.data, status=http_status.HTTP_201_CREATED)
-
-    # Custom action for listing field definitions
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter("module_type_id", openapi.IN_QUERY, description="Module type id", type=openapi.TYPE_INTEGER)],
         responses={400: "Model name not provided", 404: "Model not found", 200: FieldDefinitionResponseSerializer},
@@ -3428,12 +3414,12 @@ class APIHealthView(views.APIView):
         return Response(serializer.data, status=status)
 
 
-class FuelTypeViewSet(viewsets.ModelViewSet, PublicViewSet, DynamicFilterViewSet):
+class FuelTypeViewSet(PublicViewSet, DynamicFilterViewSet):
     queryset = FuelType.objects.all()
     serializer_class = FuelTypeSerializer
 
 
-class SoilTypeViewset(viewsets.ModelViewSet, PublicViewSet):
+class SoilTypeViewset(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     queryset = SoilType.objects.all()
     serializer_class = get_model_serializer(SoilType)
     filter_backends = [DjangoFilterBackend]
@@ -3487,9 +3473,9 @@ class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(serializer.data, status=http_status.HTTP_201_CREATED)
 
 
-class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
+class HandInHandAssessmentViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows Hand in Hand assessments to be viewed or edited.
+    API endpoint that allows Hand in Hand assessments to be viewed.
     """
 
     queryset = HandInHandAssessment.objects.all()
