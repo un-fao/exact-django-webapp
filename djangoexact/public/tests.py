@@ -93,6 +93,18 @@ class PublicApiShapeTestCase(APITestCase):
         self.assertEqual(data["modules"][0]["id"], self.module.pk)
         self.assertEqual(data["modules"][0]["results"]["balance"], 4.0)
 
+    def test_module_defaults_do_not_write_the_module(self):
+        updated_at = self.module.updated_at
+        history_count = self.module.history.count()
+
+        with mock.patch("api.defaults.DefaultsFactory.get_defaults", return_value={"value": 1}):
+            data = self.get(f"/api/public/inputs/{self.module.pk}/defaults/")
+
+        self.assertEqual(data, {"value": 1})
+        self.module.refresh_from_db()
+        self.assertEqual(self.module.updated_at, updated_at)
+        self.assertEqual(self.module.history.count(), history_count)
+
     def test_private_project_stays_hidden(self):
         self.project.is_public = False
         self.project.save()

@@ -463,10 +463,6 @@ def generic_public_module_viewset(model: api_models.Module):
 
             module: api_models.Module | api_models.Submodule = get_object_or_404(self.queryset, pk=pk)
 
-            serializer = public_serializers.get_public_module_serializer(model)(data={}, instance=module, partial=True, context={"request": request})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-
             try:
                 defaults: types.SimpleNamespace = api_defaults.DefaultsFactory.get_defaults(module, calculate=True)
 
