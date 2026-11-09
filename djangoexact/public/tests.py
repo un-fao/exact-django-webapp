@@ -8,8 +8,6 @@ on the "Activity complete" page.
 
 from unittest import mock
 
-from django.conf import settings
-from django.test import override_settings
 from rest_framework.test import APITestCase
 
 from api.models import Group, ModuleType
