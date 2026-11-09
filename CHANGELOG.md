@@ -1,3 +1,9 @@
+## 1.22.2 (2026-11-09)
+
+### Fix
+
+- **api**: return the private payload shape from the public API
+
 ## 1.22.1 (2026-11-06)
 
 ### Fix
