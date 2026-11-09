@@ -24,11 +24,7 @@ from api.tests.factories import ActivityFactory, ProjectFactory, UserFactory
 
 
 def call(user, method, path, data=None):
-    """Dispatch straight to the view.
-
-    The test client would run minitool's DatabaseConnectionMiddleware, which closes
-    every connection after each response and breaks the next query in a TestCase.
-    """
+    """Dispatch straight to the resolved view, without the test client's middleware stack."""
     request = getattr(APIRequestFactory(), method)(path, data, format="json")
     force_authenticate(request, user=user)
     match = resolve(path.split("?")[0])
