@@ -7111,6 +7111,23 @@ class ForestManagementCalculator(LandModuleCalculator):
 
         land_use_type = self.module.land_use_type_start
 
+        # The lookup error messages below format these names, so a missing one would surface as
+        # an AttributeError on None instead of telling the analyst what to fill in.
+        missing = [
+            label
+            for label, value in (
+                ("land use type (start)", land_use_type),
+                ("land use type (with project)", self.module.land_use_type_w),
+                ("land use type (without project)", self.module.land_use_type_wo),
+                ("forest type", self.forest.forest_type),
+                ("project climate", self.climate),
+                ("project region", self.region),
+            )
+            if value is None
+        ]
+        if missing:
+            raise ValueError(f"Forest Management cannot be calculated: missing {', '.join(missing)}.")
+
         self.is_afforestation_w = self.luc and self.luc.module_type_w.class_name == "ForestManagement" and self.luc.module_type_start.class_name != "ForestManagement"
         self.is_afforestation_wo = self.luc and self.luc.module_type_wo.class_name == "ForestManagement" and self.luc.module_type_start.class_name != "ForestManagement"
 
