@@ -124,6 +124,17 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("balance" in response.data)
 
+    def test_missing_land_use_type_names_the_field_instead_of_crashing(self):
+        # Production 1.22.0, project 1054: a ready module with no start land use type raised
+        # "'NoneType' object has no attribute 'name'" while formatting a lookup error message.
+        from api.calculators import ForestManagementCalculator
+
+        models.ForestManagement.objects.filter(pk=self.module.pk).update(land_use_type_start=None)
+        module = models.ForestManagement.objects.get(pk=self.module.pk)
+
+        with self.assertRaisesMessage(ValueError, "missing land use type (start)"):
+            ForestManagementCalculator(module).get_defaults()
+
     def test_get_defaults(self):
         response = self.get_module_defaults(self.module, self.user)
         print(response.data)
