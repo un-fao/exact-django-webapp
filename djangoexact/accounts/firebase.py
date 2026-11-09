@@ -2,8 +2,16 @@ from api.models import CustomUser as User
 from firebase_admin import auth as firebase_admin_auth
 from rest_framework import authentication, exceptions
 
+WWW_AUTHENTICATE = 'Bearer realm="api"'
+
+
 class FirebaseAuthentication(authentication.BaseAuthentication):
     keyword = "Bearer"
+
+    def authenticate_header(self, request):
+        # Without this DRF answers authentication failures with 403, which clients
+        # cannot tell apart from "signed in but not allowed" (#415).
+        return WWW_AUTHENTICATE
 
     def authenticate(self, request):
         token = request.META.get("HTTP_AUTHORIZATION")
@@ -32,7 +40,10 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             user = User.objects.get(firebase_uid=uid)
         except firebase_admin_auth.ExpiredIdTokenError:
             raise exceptions.AuthenticationFailed("The authentication token has expired")
-        except Exception as e:
+        # Only a rejected token or an unknown user is an authentication failure. Anything
+        # else (a certificate fetch failure, a database error) must surface as a server
+        # error, not tell the client to sign in again.
+        except (firebase_admin_auth.InvalidIdTokenError, ValueError, User.DoesNotExist) as e:
             raise exceptions.AuthenticationFailed(str(e))
 
         return (user, None)
