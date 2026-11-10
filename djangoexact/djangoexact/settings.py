@@ -27,7 +27,8 @@ if app_mode:
     print(f"Running in {app_mode} mode")
     dotenv_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "djangoexact", f".env.{app_mode}")
     load_dotenv(dotenv_file)
-    FRONTEND_URL = "https://exact.review.fao.org" if app_mode == "review" else "https://exact.apps.fao.org"
+    # Only production may link to the live frontend; local modes (development, test, ...) share review's.
+    FRONTEND_URL = "https://exact.apps.fao.org" if app_mode == "production" else "https://exact.review.fao.org"
 else:
     FRONTEND_URL = "https://exact.review.fao.org" if os.getenv("BRANCH_NAME") == "review" else "https://exact.apps.fao.org"
 
