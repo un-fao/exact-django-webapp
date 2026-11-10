@@ -38,7 +38,11 @@ class FirebaseAuthError(FirebaseError):
 
 
 class FirebaseUnavailableError(FirebaseError):
-    """Firebase could not be reached: DNS, connection, TLS or timeout failure."""
+    """Firebase could not be reached (DNS, connection, TLS, timeout) or answered with a 5xx.
+
+    Both mean the request may succeed later, so clients must not treat it as a
+    rejected credential.
+    """
 
     default_code = "FIREBASE_UNAVAILABLE"
 
@@ -142,5 +146,10 @@ class FirebaseAuth:
                 response.status_code,
                 response.text,
             )
+
+        if response.status_code >= 500:
+            # Google's 5xx bodies carry a human sentence in error.message, not a
+            # Firebase code; echoing it as a 400 made the frontend sign users out.
+            raise FirebaseUnavailableError(payload=payload, status_code=response.status_code)
 
         raise FirebaseAuthError(code=code, payload=payload, status_code=response.status_code)
