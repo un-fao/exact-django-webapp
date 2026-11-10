@@ -287,7 +287,7 @@ class ForestManagement(BaseModule):
         self.bgb_matrix = bgb_matrix
 
     def calculate_emissions(self):
-        # Harvested AGB not used for energy, counted once (calculate_rotation books the HWP lines twice).
+        # Harvested AGB not used for energy; reset here so a recalculation does not add to the previous one.
         self.hwp_inflow_co2 = np.zeros(self.hectares_for_rot_log_dis.shape[1])
 
         def calculate_rotation():
