@@ -28,6 +28,10 @@ from .ghg_inventory_class import InventoryPerGasPerActivity
 
 @dataclass(kw_only=True)
 class OtherLandUseChanges(BaseModule):
+    # Wood harvested before the conversion is subtracted from the cleared biomass and never emitted.
+    HWP_INFLOW_ALREADY_EMITTED = False
+    # The dry matter harvested before conversion goes to carbon with conversion_factor_dry_matter.
+    HWP_INFLOW_CARBON_FRACTION = 0.47
 
     # NOTE: I can't utilize LandModule for this as it does not have area_start and area_end. Maybe we could change LandModule? Not worth it I think
     initial_lu_biomass: float
@@ -108,6 +112,7 @@ class OtherLandUseChanges(BaseModule):
                 total = delta_c_biomass * self.area
 
                 yearly_biomass_emissions = breakdown_proportionally_to_values(total, self.hectare_variation_yearly)
+                self.hwp_inflow_co2 = breakdown_proportionally_to_values(self.dry_matter_end * conversion_factor_dry_matter * (44 / 12) * self.area, self.hectare_variation_yearly)
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(
                         year=0,

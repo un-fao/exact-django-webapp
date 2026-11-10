@@ -34,6 +34,7 @@ def _build_registry() -> dict[type, type]:
     from .modules import (
         AquacultureReport,
         EnergyReport,
+        HarvestedWoodProductsReport,
         InputReport,
         IrrigationReport,
         LargeFisheryReport,
@@ -73,6 +74,7 @@ def _build_registry() -> dict[type, type]:
         api_models.Processing: ProcessingReport,
         api_models.Storage: StorageReport,
         api_models.SolidWaste: SolidWasteReport,
+        api_models.HarvestedWoodProducts: HarvestedWoodProductsReport,
     }
 
 

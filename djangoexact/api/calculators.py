@@ -834,9 +834,10 @@ class LandUseChangeCalculator(BaseCalculator):
 
     def luc_based_calculation(self, module_start: LandModule | SingleBiomassModule, module_end: LandModule | SingleBiomassModule, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         if isinstance(module_start, ForestManagement):
-            return DeforestationCalculator(module_start).calculate()
-
-        return OtherLandUseCalculator(module_end).calculate()
+            self.luc_calculator = DeforestationCalculator(module_start)
+        else:
+            self.luc_calculator = OtherLandUseCalculator(module_end)
+        return self.luc_calculator.calculate()
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         """
@@ -1149,6 +1150,9 @@ class DeforestationCalculator(BaseCalculator):
             math_wo = MathDeforestation(**self.inputs_wo)
             math_wo.calculate_emissions()
 
+        # Read by the harvested wood products module; not math_w / math_wo, which would add to this calculator's inventory.
+        self.hwp_math = {"w": math_w, "wo": math_wo}
+
         res_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         res_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
@@ -1352,7 +1356,7 @@ class OtherLandUseCalculator(BaseCalculator):
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
-                "dry_matter_end": luc.dry_matter_w,
+                "dry_matter_end": luc.dry_matter_w if luc.harvests_wood_before_conversion() else 0,
                 "delay": self.activity.delay,
             }
 
@@ -1395,12 +1399,14 @@ class OtherLandUseCalculator(BaseCalculator):
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
-                "dry_matter_end": luc.dry_matter_wo,
+                "dry_matter_end": luc.dry_matter_wo if luc.harvests_wood_before_conversion() else 0,
                 "delay": self.activity.delay,
             }
 
             self.results_wo = MathOtherLandUseChanges(**inputs_wo)
             self.results_wo.calculate_emissions()
+
+        self.hwp_math = {"w": self.results_w, "wo": self.results_wo}
 
         res_w = self.results_w.result if self.results_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         res_wo = self.results_wo.result if self.results_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
@@ -2179,6 +2185,10 @@ class PerennialCropCalculator(LandModuleCalculator):
         module_end_is_perennial = self._is_scenario_perennial(scenario_type_end)
 
         is_complete_renewal = self._is_complete_renewal(scenario_type_start, scenario_type_end)
+        # Read by the inputs built right after this call. Complete renewal and change of system clear the start trees
+        # (perennial_to_luc below). A conversion to other land is left out on purpose: this module computes no biomass
+        # for that scenario (calculate_biomass is False), the land use change module does and feeds its trees.
+        self.hwp_woody_loss = module_start_is_perennial and module_end_is_perennial and (has_change_in_system or is_complete_renewal)
 
         self.agb_start = copy.deepcopy(agb_start)
         self.agb_end = copy.deepcopy(agb_end)
@@ -2346,6 +2356,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_end_tier_2": self.module.agb_t2_w,
                 "bgb_end_tier_2": self.module.bgb_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
+                "hwp_woody_loss": self.hwp_woody_loss,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
@@ -2414,6 +2425,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_end_tier_2": self.module.agb_t2_wo,
                 "bgb_end_tier_2": self.module.bgb_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
+                "hwp_woody_loss": self.hwp_woody_loss,
                 "agb_maximum_c_tier_2": self.agb_max_t2_start,
             }
             log.debug("Input start wo: %s", self.inputs_start_wo)
@@ -2486,6 +2498,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_end_tier_2": self.module.agb_t2_w,
                 "bgb_end_tier_2": self.module.bgb_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
+                "hwp_woody_loss": self.hwp_woody_loss,
                 "agb_maximum_c_tier_2": self.agb_max_t2_w,
             }
             log.debug("Inputs w: %s", self.inputs_w)
@@ -2557,6 +2570,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_end_tier_2": self.module.agb_t2_wo,
                 "bgb_end_tier_2": self.module.bgb_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
+                "hwp_woody_loss": self.hwp_woody_loss,
                 "agb_maximum_c_tier_2": self.agb_max_t2_wo,
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
@@ -8401,3 +8415,7 @@ class TransportEntryCalculator(BaseValueChainCalculator):
 
 # Kept in api/services to keep this file from growing; imported here so CalculatorFactory finds it by name.
 from api.services.solid_waste import SolidWasteCalculator  # noqa: E402,F401
+
+
+# Kept in its own module to keep this file from growing; imported here so CalculatorFactory finds it by name.
+from api.hwp_calculator import HarvestedWoodProductsCalculator  # noqa: E402,F401
