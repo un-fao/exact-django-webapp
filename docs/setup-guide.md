@@ -534,7 +534,7 @@ Set the `APP_MODE` environment variable before running the server. The exact syn
 
 The three database modes are:
 
-- `APP_MODE=development` - **dev** GCP project (`fao-exact-dev`).
+- `APP_MODE=development` - **dev** database `exact_dev`, a copy of the review database living on the review instance (`fao-exact-review`). Safe to break; see [§4.2](#42-available-database-environments).
 - `APP_MODE=review` - **review** GCP project (`fao-exact-review`). Use before merging to production.
 - `APP_MODE=production` - **live** data. Read-only by convention; see [§4.4](#44-making-production-actually-read-only) for how to actually enforce it.
 
@@ -570,7 +570,7 @@ gcloud auth application-default login      # writes credentials the proxy will r
 
 This opens a browser window for authentication. Make sure you log in with your FAO Google account that has access to the GCP projects.
 
-> **Don't have access yet?** Request it from your project lead or the FAO CSI Information Office (see [Who to ask for what](#who-to-ask-for-what)). You need at least the **Cloud SQL Client** role on each project you intend to reach (`fao-exact-dev`, `fao-exact-review`, and - only if you genuinely need it - `fao-exact`) before the proxy will connect.
+> **Don't have access yet?** Request it from your project lead or the FAO CSI Information Office (see [Who to ask for what](#who-to-ask-for-what)). You need at least the **Cloud SQL Client** role on each project you intend to reach (`fao-exact-review`, which also hosts the dev database, and - only if you genuinely need it - `fao-exact`) before the proxy will connect.
 
 The second command writes an **Application Default Credentials** file at:
 
@@ -585,21 +585,32 @@ The Cloud SQL Proxy reads that file at startup. If you ever see `could not find 
 
 | Environment | GCP Project | Instance Connection | Use Case |
 |-------------|-------------|---------------------|----------|
-| **Dev** | `fao-exact-dev` | `fao-exact-dev:europe-west1:fao-exact-dev-postgres` | Day-to-day development |
+| **Dev** | `fao-exact-review` | `fao-exact-review:europe-west1:fao-exact-review-postgres` (database `exact_dev`) | Day-to-day development |
 | **Review** | `fao-exact-review` | `fao-exact-review:europe-west1:fao-exact-review-postgres` | Testing before production |
 | **Production** | `fao-exact` | `fao-exact:europe-west1:fao-exact-postgres` | Live data (be careful!) |
+
+There is no separate dev instance. `exact_dev` is a point-in-time copy of review `exact`, owned by `exact_dev_user`. It drifts from review over time; to refresh it, with the review proxy running (PostgreSQL 14+ client tools):
+
+```bash
+pg_dump -h 127.0.0.1 -U exact_user -d exact -Fc --no-owner --no-acl -f exact_review.dump
+psql -h 127.0.0.1 -U exact_dev_user -d postgres -c "CREATE DATABASE exact_dev_new OWNER exact_dev_user TEMPLATE template0"
+pg_restore -h 127.0.0.1 -U exact_dev_user -d exact_dev_new --no-owner --no-acl -j 4 exact_review.dump
+# the instance pools connections, so idle pooled backends (including pg_restore's) linger after
+# the clients exit: terminate them, or RENAME fails with "being accessed by other users"
+psql -h 127.0.0.1 -U exact_dev_user -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname IN ('exact_dev','exact_dev_new') AND pid <> pg_backend_pid()"
+psql -h 127.0.0.1 -U exact_dev_user -d postgres -c "DROP DATABASE exact_dev WITH (FORCE)" -c "ALTER DATABASE exact_dev_new RENAME TO exact_dev"
+rm exact_review.dump  # contains real user data
+```
+
+> **Pooling gotcha:** the review instance has Cloud SQL managed connection pooling (transaction mode). A session-level `SET` sticks to the pooled server connection and leaks into the next client that gets it. `pg_restore` sets `search_path` to empty this way, so right after a restore, queries fail with `relation "django_migrations" does not exist` until the backend is terminated (the step above) or idles out after 10 minutes.
+
+Both users are members of `cloudsqlsuperuser`, so dev credentials can still reach the review database: the copy protects review from mistakes, not from misuse.
 
 ### 4.3 Running the Proxy
 
 The proxy binds to `localhost:5432`, making the remote database appear as a local PostgreSQL instance.
 
-**Dev environment:**
-
-```bash
-~/Developer/cloud-sql-proxy -p 5432 fao-exact-dev:europe-west1:fao-exact-dev-postgres
-```
-
-**Review environment:**
+**Dev and review environments** (same instance; `APP_MODE` picks the database, `exact_dev` or `exact`):
 
 ```bash
 ~/Developer/cloud-sql-proxy fao-exact-review:europe-west1:fao-exact-review-postgres --port=5432
