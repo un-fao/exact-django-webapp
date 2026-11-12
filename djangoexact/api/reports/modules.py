@@ -235,8 +235,8 @@ class SolidWasteReport(BaseModuleReport):
         m = self.module
         totals = food_waste(m, crop_sources(m))
         rows = (
-            ("Food waste, total (t wet weight/yr)", lambda s: totals[s]),
-            ("Food waste not from crop modules (t wet weight/yr)", lambda s: getattr(m, f"amount_{s}")),
+            ("Food loss and waste, total (t wet weight/yr)", lambda s: totals[s]),
+            ("Food loss and waste not from crop modules (t wet weight/yr)", lambda s: getattr(m, f"amount_{s}")),
             ("Disposal sites and open dumping (%)", lambda s: sum(m.routes(s)[r] for r in SWDS_ROUTES) * 100),
             ("Composting (%)", lambda s: m.routes(s)["composting"] * 100),
             ("Anaerobic digestion (%)", lambda s: m.routes(s)["anaerobic_digestion"] * 100),
@@ -250,7 +250,7 @@ class SolidWasteReport(BaseModuleReport):
 
         return ModuleResult(
             title=m.module_type.name,
-            metadata_section_title="Solid Waste",
+            metadata_section_title="Food Loss and Waste",
             result_rows=[ResultRow(label, self._extract(self.emissions_set, activity, gas)) for label, activity, gas in SOLID_WASTE_RESULT_ROWS],
             metadata_writes=mw,
             total_emissions=self._balance_total(),

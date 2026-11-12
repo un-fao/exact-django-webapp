@@ -39,7 +39,7 @@ def food_waste_blocks(ctx: IndicatorContext) -> list[dict]:
     ]
 
 
-@register_group("food_waste", _("Food waste"), order=60)
+@register_group("food_waste", _("Food loss and waste"), order=60)
 def food_waste(ctx: IndicatorContext) -> dict | None:
     blocks = food_waste_blocks(ctx)
     if not blocks:
@@ -57,28 +57,28 @@ def food_waste(ctx: IndicatorContext) -> dict | None:
     return {
         "indicators": [
             indicator(
-                "food_waste_reference", _("Total food waste generated, reference"), UNIT,
+                "food_waste_reference", _("Total food loss and waste generated, reference"), UNIT,
                 without=last("generated_wo"), series=series("generated_w", "generated_wo"),
             ),
             indicator(
-                "food_waste_target", _("Total food waste generated, target"), UNIT,
+                "food_waste_target", _("Total food loss and waste generated, target"), UNIT,
                 with_=last("generated_w"),
             ),
             indicator(
-                "food_waste_reduction", _("Reduction of food waste"), UNIT,
+                "food_waste_reduction", _("Reduction of food loss and waste"), UNIT,
                 value=last("reduction"),
             ),
             indicator(
-                "food_waste_landfill_reduction", _("Reduction of food waste to landfill"), UNIT,
+                "food_waste_landfill_reduction", _("Reduction of food loss and waste to landfill"), UNIT,
                 value=last("landfill_reduction"), series=series("landfill_w", "landfill_wo"),
             ),
             indicator(
-                "food_waste_composting", _("Food waste valorised by composting"), UNIT,
+                "food_waste_composting", _("Food loss and waste valorised by composting"), UNIT,
                 with_=last("composting_w"), without=last("composting_wo"),
                 series=series("composting_w", "composting_wo"),
             ),
             indicator(
-                "food_waste_anaerobic_digestion", _("Food waste valorised by anaerobic digestion"), UNIT,
+                "food_waste_anaerobic_digestion", _("Food loss and waste valorised by anaerobic digestion"), UNIT,
                 with_=last("anaerobic_digestion_w"), without=last("anaerobic_digestion_wo"),
                 series=series("anaerobic_digestion_w", "anaerobic_digestion_wo"),
             ),

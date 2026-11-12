@@ -155,7 +155,7 @@ class SolidWasteCalculator(BaseCalculator):
         module: SolidWaste = self.module
         zone = climate_zone(self.climate, self.moisture)
         if zone is None:
-            raise ValueError("Solid waste needs the climate and moisture of the project or activity to pick the decay rates.")
+            raise ValueError("Food loss and waste needs the climate and moisture of the project or activity to pick the decay rates.")
         components = self._components(zone)
         sites = {row.code: row for row in ipcc.SolidWasteDisposalSiteType.objects.filter(code__in=SWDS_ROUTES)}
         treatments = treatment_defaults()

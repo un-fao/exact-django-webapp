@@ -142,7 +142,7 @@ class ExcelSheetTests(SimpleTestCase):
         data = {"groups": [
             {"id": "land_use_change_matrix", "label": "Land use change matrix", "available": True, "data": None,
              "indicators": [indicators.indicator("converted_area", "Area changing land use", "ha", with_=10, without=0)]},
-            {"id": "food_waste", "label": "Food waste", "available": False, "data": None, "indicators": []},
+            {"id": "food_waste", "label": "Food loss and waste", "available": False, "data": None, "indicators": []},
         ]}
         renderer = ExcelRenderer(SimpleNamespace(indicators=data))
         wb = renderer._manager.get_workbook()

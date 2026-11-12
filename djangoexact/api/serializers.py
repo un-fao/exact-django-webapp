@@ -3627,7 +3627,7 @@ class SolidWasteWriteSerializer(ScenarioModuleSerializer):
         for scenario in utils.ScenarioTypes:
             inputs = _solid_waste_inputs(merged, scenario.value, crop_keys)
             if all(value is None for value in inputs):
-                errors.setdefault(scenario.verbose_name, []).append("Enter the food waste amount or a share of crop production wasted")
+                errors.setdefault(scenario.verbose_name, []).append("Enter the food loss and waste amount or a share of crop production wasted")
             elif any(inputs) and abs(_solid_waste_route_sum(merged, scenario.value) - 1) > SOLID_WASTE_ROUTE_TOLERANCE:
                 errors.setdefault(scenario.verbose_name, []).append("Management route shares must add up to 100%")
         return not errors, errors
@@ -3635,7 +3635,7 @@ class SolidWasteWriteSerializer(ScenarioModuleSerializer):
     def validate(self, data):
         merged = self.merge_instance_data(data, instance=self.instance)
         errors = [
-            f"Solid waste: management route shares cannot add up to more than 100% in the {scenario.verbose_name} scenario"
+            f"Food loss and waste: management route shares cannot add up to more than 100% in the {scenario.verbose_name} scenario"
             for scenario in utils.ScenarioTypes
             if _solid_waste_route_sum(merged, scenario.value) > 1 + SOLID_WASTE_ROUTE_TOLERANCE
         ]
