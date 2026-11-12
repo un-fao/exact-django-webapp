@@ -23,7 +23,6 @@ import api.calculators as calculators
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
 from .base import BaseModuleReport, NotReadyError
-from .cache import submodule_balance_emissions
 from .data_types import InventoryItem, MetadataWrite, ModuleResult, ResultRow
 from .extractors import _add, extract_emissions
 
@@ -517,9 +516,8 @@ class EnergyReport(BaseModuleReport):
         solid_fuel_n2o = _zeros(dur)
 
         for submodule in m.submodules:
-            calculator = calculators.EnergyEntryCalculator(submodule)
             try:
-                sub_es = submodule_balance_emissions(submodule, calculator)
+                sub_es = self._submodule_set(submodule, calculators.EnergyEntryCalculator)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
@@ -617,9 +615,8 @@ class InputReport(BaseModuleReport):
         feed_co2_eq = _zeros(dur)
 
         for submodule in m.submodules:
-            calculator = calculators.InputEntryCalculator(submodule)
             try:
-                sub_es = submodule_balance_emissions(submodule, calculator)
+                sub_es = self._submodule_set(submodule, calculators.InputEntryCalculator)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
@@ -711,9 +708,8 @@ class IrrigationReport(BaseModuleReport):
             CalculatorClass = (calculators.IrrigationPhaseCalculator
                                if isinstance(submodule, api_models.IrrigationPhase)
                                else calculators.IrrigationSystemCalculator)
-            calculator = CalculatorClass(submodule)
             try:
-                sub_es = submodule_balance_emissions(submodule, calculator)
+                sub_es = self._submodule_set(submodule, CalculatorClass)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
@@ -955,7 +951,7 @@ class TransportReport(BaseModuleReport):
         electricity_co2 = _zeros(dur)
 
         for submodule in m.submodules:
-            cached = (submodule.cached_results_by_activity_by_gas["balance"]
+            cached = (submodule.cached_results_by_activity_by_gas[self.scenario]
                       if submodule.cached_results_by_activity_by_gas is not None else None)
             if cached is not None:
                 fuel_co2 = _add(fuel_co2, extract_emissions(cached, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2, duration=dur))
@@ -964,9 +960,8 @@ class TransportReport(BaseModuleReport):
                 electricity_co2 = _add(electricity_co2, extract_emissions(cached, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
                 continue
 
-            calculator = calculators.TransportEntryCalculator(submodule)
             try:
-                sub_es = submodule_balance_emissions(submodule, calculator)
+                sub_es = self._submodule_set(submodule, calculators.TransportEntryCalculator)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
@@ -1018,7 +1013,7 @@ class ProcessingReport(BaseModuleReport):
         water_use = _zeros(dur)
 
         for submodule in m.submodules:
-            cached = (submodule.cached_results_by_activity_by_gas["balance"]
+            cached = (submodule.cached_results_by_activity_by_gas[self.scenario]
                       if submodule.cached_results_by_activity_by_gas is not None else None)
             if cached is not None:
                 fuel_co2 = _add(fuel_co2, extract_emissions(cached, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2, duration=dur))
@@ -1028,9 +1023,8 @@ class ProcessingReport(BaseModuleReport):
                 water_use = _add(water_use, extract_emissions(cached, math_utils.ActivityTypes.PROCESSING, math_utils.GasTypes.CO2, duration=dur))
                 continue
 
-            calculator = calculators.ProcessingEntryCalculator(submodule)
             try:
-                sub_es = submodule_balance_emissions(submodule, calculator)
+                sub_es = self._submodule_set(submodule, calculators.ProcessingEntryCalculator)
             except Exception as e:
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name}: {e}")
