@@ -301,26 +301,6 @@ class ProjectStatus(models.Model):
         return self.name
 
 
-class AnalysisPurpose(models.Model):
-    """Why the appraisal is run, from farm-level project to NDC or LT-LEDS."""
-
-    name = models.CharField(max_length=100)
-    value = models.IntegerField(unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class ProjectPhase(models.Model):
-    """Project cycle stage the appraisal belongs to."""
-
-    name = models.CharField(max_length=100)
-    value = models.IntegerField(unique=True)
-
-    def __str__(self):
-        return self.name
-
-
 class Region(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -713,8 +693,6 @@ class Project(Historical, DirtyFieldsMixin):
     funding_agency = models.CharField(max_length=100, null=True, blank=True, verbose_name="funding_agency")
     executing_agency = models.CharField(max_length=100, null=True, blank=True, verbose_name="executing_agency")
     status = models.ForeignKey(ProjectStatus, on_delete=models.CASCADE, null=True, blank=True, verbose_name="status")
-    analysis_purpose = models.ForeignKey(AnalysisPurpose, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="analysis_purpose")
-    project_phase = models.ForeignKey(ProjectPhase, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="project_phase")
     note = GenericRelation("api.Note", related_name="projects")
 
     implementation_years = models.IntegerField(verbose_name="implementation_years")
@@ -814,8 +792,6 @@ class Project(Historical, DirtyFieldsMixin):
                     "export_id",
                     # Tour progress is written on every tour step and never affects the science.
                     "guided_step",
-                    "analysis_purpose",
-                    "project_phase",
                 ]
 
                 if any(field not in exclude_fields for field in dirty_fields):

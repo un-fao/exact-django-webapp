@@ -25,8 +25,6 @@ from .constants import (
     META_COL_TIER2,
     META_COL_WITH,
     META_COL_WITHOUT,
-    META_ROW_ANALYSIS_PURPOSE,
-    META_ROW_PROJECT_PHASE,
     ROW_CUMULATIVE_BALANCE,
     ROW_CUMULATIVE_HECTARES,
     ROW_CUMULATIVE_HEADS,
@@ -154,10 +152,6 @@ class ExcelRenderer:
         ws_meta.cell(row=13, column=2, value=proj.gwp.ch4)
         ws_meta.cell(row=14, column=2, value=proj.gwp.n2o)
         ws_meta.cell(row=15, column=2, value=proj.gwp.ch4_fossil)
-        ws_meta.cell(row=META_ROW_ANALYSIS_PURPOSE, column=1, value="Analysis purpose")
-        ws_meta.cell(row=META_ROW_ANALYSIS_PURPOSE, column=2, value=proj.analysis_purpose.name if proj.analysis_purpose else "N/A")
-        ws_meta.cell(row=META_ROW_PROJECT_PHASE, column=1, value="Project phase")
-        ws_meta.cell(row=META_ROW_PROJECT_PHASE, column=2, value=proj.project_phase.name if proj.project_phase else "N/A")
         ws_meta.cell(row=18, column=2, value="START")
         ws_meta.cell(row=18, column=3, value="WITH")
         ws_meta.cell(row=18, column=4, value="WITHOUT")

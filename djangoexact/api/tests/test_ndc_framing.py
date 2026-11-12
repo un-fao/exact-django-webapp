@@ -1,5 +1,4 @@
-"""NDC framing: project analysis purpose / phase, activity conditionality,
-and the project balance split by conditionality.
+"""NDC framing: activity conditionality and the project balance split by conditionality.
 
 Run with:
     python manage.py test api.tests.test_ndc_framing --keepdb
@@ -9,12 +8,12 @@ import json
 from unittest import mock
 
 from django.test import SimpleTestCase, TestCase
-from django.urls import resolve
+from django.urls import Resolver404, resolve
 from rest_framework import status as http_status
 from rest_framework.response import Response
 from rest_framework.test import APIRequestFactory, force_authenticate
 
-from api.models import Activity, AnalysisPurpose, Climate, Country, Group, Moisture, Project, ProjectMembership, ProjectPhase, SoilType
+from api.models import Activity, Climate, Country, Group, Moisture, Project, ProjectMembership, SoilType
 from api.reports.constants import ROW_NDC_FIRST
 from api.reports.data_types import ActivityResult, EmissionsAggregator
 from api.reports.renderer import ExcelRenderer
@@ -84,44 +83,15 @@ class FieldRoundTripTests(TestCase):
         Group.objects.get_or_create(name="Admin")
         self.user = UserFactory(email="ndc-framing@example.com", is_superuser=True, is_staff=True)
         self.project = ProjectFactory(owner=self.user, country=Country.objects.first())
-        self.purpose = AnalysisPurpose.objects.get(name_en="Nationally Determined Contribution")
-        self.phase = ProjectPhase.objects.get(name_en="Design")
 
-    def patch_project(self, payload):
-        with mock.patch("api.views.security.check_permission", return_value=None), \
-             mock.patch("api.views.ProjectViewSet.get_object", return_value=self.project), \
-             mock.patch("api.models.Project._check_lock_expiration"):
-            return call(self.user, "patch", f"/api/projects/{self.project.pk}/", payload)
-
-    def test_lookup_endpoints_list_the_options(self):
-        purposes = call(self.user, "get", "/api/analysis-purposes/")
-        phases = call(self.user, "get", "/api/project-phases/")
-        self.assertEqual(purposes.status_code, 200)
-        self.assertEqual(len(purposes.data), 6)
-        self.assertEqual(len(phases.data), 5)
-
-    def test_project_defaults_to_null(self):
+    def test_analysis_purpose_and_project_phase_are_gone(self):
         data = ReadProjectSerializer(self.project, context={"request": mock.Mock(user=self.user)}).data
-        self.assertIsNone(data["analysis_purpose"])
-        self.assertIsNone(data["project_phase"])
-
-    def test_patch_and_read_back(self):
-        resp = self.patch_project({"analysis_purpose": self.purpose.pk, "project_phase": self.phase.pk})
-        self.assertEqual(resp.status_code, 200, resp.data)
-        self.project.refresh_from_db()
-        self.assertEqual(self.project.analysis_purpose, self.purpose)
-        self.assertEqual(self.project.project_phase, self.phase)
-
-        resp = self.patch_project({"analysis_purpose": None})
-        self.assertEqual(resp.status_code, 200, resp.data)
-        self.project.refresh_from_db()
-        self.assertIsNone(self.project.analysis_purpose)
-
-    def test_framing_change_keeps_module_caches(self):
-        with mock.patch("api.models.invalidate_module_caches") as invalidate:
-            resp = self.patch_project({"project_phase": self.phase.pk})
-        self.assertEqual(resp.status_code, 200, resp.data)
-        invalidate.assert_not_called()
+        self.assertNotIn("analysis_purpose", data)
+        self.assertNotIn("project_phase", data)
+        self.assertNotIn("analysis_purpose", ProjectExportSerializer(self.project).data)
+        for path in ("/api/analysis-purposes/", "/api/project-phases/"):
+            with self.assertRaises(Resolver404):
+                resolve(path)
 
     def test_activity_conditionality(self):
         activity = ActivityFactory(project=self.project, owner=self.user)
@@ -198,8 +168,6 @@ class ExportImportTests(TestCase):
             moisture=Moisture.objects.first(),
             soil_type=SoilType.objects.first(),
             country=Country.objects.first(),
-            analysis_purpose=AnalysisPurpose.objects.get(value=5),
-            project_phase=ProjectPhase.objects.get(value=3),
         )
         ProjectMembership.objects.create(project=self.project, user=self.user, group=Group.objects.get_or_create(name="Admin")[0])
         ActivityFactory(project=self.project, owner=self.user, name="U", conditionality="unconditional")
@@ -214,28 +182,27 @@ class ExportImportTests(TestCase):
         self.assertEqual(resp.status_code, http_status.HTTP_201_CREATED, getattr(resp, "data", None))
 
         imported = Project.objects.get(id=resp.data["projectId"])
-        self.assertEqual(imported.analysis_purpose.value, 5)
-        self.assertEqual(imported.project_phase.value, 3)
         self.assertEqual(dict(imported.activities.values_list("name", "conditionality")), {"U": "unconditional", "N": None})
 
-    def test_export_of_unset_fields_is_null(self):
-        project = ProjectFactory(owner=self.user, country=Country.objects.first())
-        data = ProjectExportSerializer(project).data
-        self.assertIsNone(data["analysis_purpose"])
-        self.assertIsNone(data["project_phase"])
+    def test_import_of_an_older_export_ignores_the_dropped_fields(self):
+        exported = call(self.user, "get", f"/api/projects/{self.project.id}/export/")
+        payload = json.loads(exported.content)
+        payload["project"]["analysis_purpose"] = 5
+        payload["project"]["project_phase"] = 3
+
+        resp = call(self.user, "post", "/api/projects/import_project/?forceCopy=true", payload)
+        self.assertEqual(resp.status_code, http_status.HTTP_201_CREATED, getattr(resp, "data", None))
 
 
 class ExcelReportTests(SimpleTestCase):
     DURATION = 3
 
-    def render(self, conditionalities, purpose=None):
-        project = mock.Mock(status=None, project_phase=None, analysis_purpose=mock.Mock() if purpose else None, implementation_years=2, capitalization_years=1)
+    def render(self, conditionalities):
+        project = mock.Mock(status=None, implementation_years=2, capitalization_years=1)
         project.configure_mock(**{
             "name": "P", "country.name": "Kenya", "climate.name": "Tropical", "moisture.name": "Wet", "soil_type.name": "HAC",
             "gwp.name": "AR5", "gwp.co2": 1, "gwp.ch4": 28, "gwp.n2o": 265, "gwp.ch4_fossil": 30,
         })
-        if purpose:
-            project.analysis_purpose.name = purpose
         result = mock.Mock(
             project=project, start_year=2024, last_year=2024 + self.DURATION, duration=self.DURATION,
             aggregated=EmissionsAggregator(duration=self.DURATION),
@@ -253,10 +220,10 @@ class ExcelReportTests(SimpleTestCase):
         renderer._write_results_sheet(wb["Results"], "", "balance")
         return wb
 
-    def test_metadata_rows(self):
-        meta = self.render([None], purpose="Nationally Determined Contribution")["Metadata"]
-        self.assertEqual((meta.cell(16, 1).value, meta.cell(16, 2).value), ("Analysis purpose", "Nationally Determined Contribution"))
-        self.assertEqual((meta.cell(17, 1).value, meta.cell(17, 2).value), ("Project phase", "N/A"))
+    def test_metadata_rows_16_and_17_stay_empty(self):
+        meta = self.render([None])["Metadata"]
+        self.assertEqual([meta.cell(row, col).value for row in (16, 17) for col in (1, 2)], [None] * 4)
+        self.assertEqual(meta.cell(18, 2).value, "START")
 
     def test_results_layout_unchanged_without_conditionality(self):
         wb = self.render([None, None])
