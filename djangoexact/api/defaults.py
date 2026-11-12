@@ -28,6 +28,10 @@ from types import SimpleNamespace
 import sys
 import api.calculators as calcs
 import api.models as api
+from api.services import reservoirs
+from api.services.solid_waste import module_defaults
+from api.services.forest_stock_difference import stock_difference_defaults
+from math_model.no_time_dependency_final.hwp_decay import DEFAULT_HALF_LIVES
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
@@ -795,9 +799,9 @@ class LargeFisheryDefaults(Defaults):
             refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
-            refrigerant_gwp_t2_start_default=defaults.project.gw_potential.co2,
-            refrigerant_gwp_t2_w_default=defaults.project.gw_potential.co2,
-            refrigerant_gwp_t2_wo_default=defaults.project.gw_potential.co2,
+            refrigerant_gwp_t2_start_default=defaults.refrigerant_gwp_ef.value,
+            refrigerant_gwp_t2_w_default=defaults.refrigerant_gwp_ef.value,
+            refrigerant_gwp_t2_wo_default=defaults.refrigerant_gwp_ef.value,
             tonnes_of_ice_t2_start_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_w_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_wo_default=defaults.tonnes_ice_default,
@@ -864,9 +868,9 @@ class SmallFisheryDefaults(Defaults):
             refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
-            refrigerant_gwp_t2_start_default=defaults.project.gw_potential.co2,
-            refrigerant_gwp_t2_w_default=defaults.project.gw_potential.co2,
-            refrigerant_gwp_t2_wo_default=defaults.project.gw_potential.co2,
+            refrigerant_gwp_t2_start_default=defaults.refrigerant_gwp_ef.value,
+            refrigerant_gwp_t2_w_default=defaults.refrigerant_gwp_ef.value,
+            refrigerant_gwp_t2_wo_default=defaults.refrigerant_gwp_ef.value,
             tonnes_of_ice_t2_start_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_w_default=defaults.tonnes_ice_default,
             tonnes_of_ice_t2_wo_default=defaults.tonnes_ice_default,
@@ -1139,6 +1143,7 @@ class WaterbodyDefaults(Defaults):
             mean_annual_t2_start_default=0,
             mean_annual_t2_w_default=0,
             mean_annual_t2_wo_default=0,
+            rd_t2_default=None,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1147,16 +1152,26 @@ class WaterbodyDefaults(Defaults):
         defaults = calcs.WaterbodyCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        alpha = {s: getattr(defaults, f"trophic_state_{s}").value for s in ("start", "w", "wo")}
+        if self.input.is_reservoir():
+            ch4_ef = reservoirs.ch4_ef_at_start(self.input, defaults.reservoir_ef)
+            rd_t2 = reservoirs.RD_DEFAULT
+            alpha = {s: reservoirs.class_alpha(getattr(defaults, f"trophic_state_{s}")) for s in alpha}
+        else:
+            ch4_ef = defaults.methane_emission_factor.value
+            rd_t2 = None
+
         return _with_ranges(SimpleNamespace(
-            ch4_ef_t2_start_default=defaults.methane_emission_factor.value,
-            ch4_ef_t2_w_default=defaults.methane_emission_factor.value,
-            ch4_ef_t2_wo_default=defaults.methane_emission_factor.value,
-            alpha_t2_start_default=defaults.trophic_state_start.value,
-            alpha_t2_w_default=defaults.trophic_state_w.value,
-            alpha_t2_wo_default=defaults.trophic_state_wo.value,
+            ch4_ef_t2_start_default=ch4_ef,
+            ch4_ef_t2_w_default=ch4_ef,
+            ch4_ef_t2_wo_default=ch4_ef,
+            alpha_t2_start_default=alpha["start"],
+            alpha_t2_w_default=alpha["w"],
+            alpha_t2_wo_default=alpha["wo"],
             mean_annual_t2_start_default=defaults.trophic_state_start.chloa,
             mean_annual_t2_w_default=defaults.trophic_state_w.chloa,
             mean_annual_t2_wo_default=defaults.trophic_state_wo.chloa,
+            rd_t2_default=rd_t2,
         ), [
             (('ch4_ef_t2_start_default', 'ch4_ef_t2_w_default', 'ch4_ef_t2_wo_default'), defaults.methane_emission_factor, 'value'),
             (('alpha_t2_start_default',), defaults.trophic_state_start, 'value'),
@@ -1699,9 +1714,17 @@ class ForestManagementDefaults(Defaults):
             degradation_dry_matter_impacted_t2_w_default=0,
             degradation_dry_matter_impacted_t2_wo_default=0,
         )
+        # Computed here too because DefaultsFactory returns self.values for a module that is not ready, which is
+        # exactly when the stock inputs still need prefilling.
+        self.stock_defaults = stock_difference_defaults(input)
+        vars(self.values).update(self.stock_defaults)
 
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.ForestManagement
+
+        if self.input.is_stock_difference():
+            # The gain-loss path below raises on missing growth / root-to-shoot data that stock difference never uses.
+            return SimpleNamespace(**self.stock_defaults)
 
         defaults = calcs.ForestManagementCalculator(self.input)
         defaults.get_defaults(calculate=True)
@@ -1762,6 +1785,7 @@ class ForestManagementDefaults(Defaults):
             bgb_max_wo = defaults.bgb_max_wo
 
         return _with_ranges(SimpleNamespace(
+            **self.stock_defaults,
             soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
             soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
             soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
@@ -1868,6 +1892,27 @@ class ForestDisturbanceDefaults(Defaults):
             start_year_t2_w_default=self.start_year_t2_w_default,
             start_year_t2_wo_default=self.start_year_t2_wo_default,
         )
+
+
+class SolidWasteDefaults(Defaults):
+    """Tier 1 treatment factors and crop sources (yield, production); needed before the module is ready."""
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+        self.values = SimpleNamespace(**module_defaults(input))
+
+
+class HarvestedWoodProductsDefaults(Defaults):
+    """IPCC 2019 Refinement Vol. 4 ch. 12 Table 12.3 Tier 1 half-lives (years), the same in every scenario."""
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+        self.values = SimpleNamespace(
+            **{f"half_life_{product}_t2_{scenario}_default": value for product, value in DEFAULT_HALF_LIVES.items() for scenario in ("start", "w", "wo")}
+        )
+
+    def get_defaults(self, calculate=False) -> SimpleNamespace:
+        return self.values
 
 
 @dataclass
@@ -2003,6 +2048,19 @@ class PackagingEntryDefaults(ValueChainEntryEnergyDefaultsMixin):
         self.emission_factor_t2_wo_default = self.defaults.packaging_ef_wo.value
 
         return self.get_defaults_for_frontend()
+
+
+class ValueChainParentDefaults(Defaults):
+    """
+    Value chain parents (Storage, Transport, Processing, Packaging) hold no tier 2
+    fields; their defaults live on each entry's own /defaults/ endpoint.
+    """
+
+    def get_defaults(self, calculate=False) -> SimpleNamespace:
+        return SimpleNamespace()
+
+
+StorageDefaults = TransportDefaults = ProcessingDefaults = PackagingDefaults = ValueChainParentDefaults
 
 
 @dataclass

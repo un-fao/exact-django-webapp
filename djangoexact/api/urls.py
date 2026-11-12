@@ -133,9 +133,11 @@ router.register(r"disturbance-types", views.public_generic_viewset(models.Distur
 router.register(r"forest-types", views.public_generic_viewset(models.ForestType), basename="foresttypes")
 router.register(r"forest-condition-types", views.public_generic_viewset(models.ForestConditionType), basename="forestconditiontypes")
 router.register(r"forest-disturbances", views.generic_module_viewset(models.ForestDisturbance), basename="forestdisturbance")
+router.register(r"harvested-wood-products", views.generic_module_viewset(models.HarvestedWoodProducts), basename="harvestedwoodproducts")
 
 # Waterbodies
 router.register(r"waterbodies", views.generic_module_viewset(models.Waterbody), basename="waterbody")
+router.register(r"solid-waste", views.generic_module_viewset(models.SolidWaste), basename="solidwaste")
 router.register(r"waterbody-types", views.public_generic_viewset(models.WaterbodyType), basename="waterbodytypes")
 router.register(r"trophic-types", views.public_generic_viewset(models.TrophicType), basename="trophictypes")
 
@@ -158,6 +160,7 @@ router.register(r"emission-factor-sources", views.public_generic_viewset(models.
 # Fuel
 router.register(r"macro-fuel-types", views.public_generic_viewset(models.MacroFuelType), basename="macrofueltypes")
 router.register(r"fuel-types", views.FuelTypeViewSet, basename="fueltypes")
+router.register(r"value-chain-stages", views.public_generic_viewset(models.ValueChainStage), basename="valuechainstages")
 router.register(r"fuel-use-types", views.public_generic_viewset(models.FuelUseType), basename="fuelusetypes")
 
 # Organic Soil

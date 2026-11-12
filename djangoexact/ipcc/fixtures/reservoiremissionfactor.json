@@ -1,0 +1,112 @@
+[
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 1,
+    "fields": {
+      "climate": 4,
+      "moisture": 1,
+      "ch4_age_le_20": 27.7,
+      "ch4_age_gt_20": 13.6,
+      "co2_c_age_le_20": 0.94
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 2,
+    "fields": {
+      "climate": 4,
+      "moisture": 2,
+      "ch4_age_le_20": 27.7,
+      "ch4_age_gt_20": 13.6,
+      "co2_c_age_le_20": 0.94
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 3,
+    "fields": {
+      "climate": 1,
+      "moisture": 1,
+      "ch4_age_le_20": 84.7,
+      "ch4_age_gt_20": 54.0,
+      "co2_c_age_le_20": 1.02
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 4,
+    "fields": {
+      "climate": 1,
+      "moisture": 2,
+      "ch4_age_le_20": 84.7,
+      "ch4_age_gt_20": 54.0,
+      "co2_c_age_le_20": 1.02
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 5,
+    "fields": {
+      "climate": 2,
+      "moisture": 1,
+      "ch4_age_le_20": 195.6,
+      "ch4_age_gt_20": 150.9,
+      "co2_c_age_le_20": 1.7
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 6,
+    "fields": {
+      "climate": 2,
+      "moisture": 2,
+      "ch4_age_le_20": 127.5,
+      "ch4_age_gt_20": 80.3,
+      "co2_c_age_le_20": 1.46
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 7,
+    "fields": {
+      "climate": 3,
+      "moisture": 1,
+      "ch4_age_le_20": 392.3,
+      "ch4_age_gt_20": 283.7,
+      "co2_c_age_le_20": 2.95
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 8,
+    "fields": {
+      "climate": 20,
+      "moisture": 1,
+      "ch4_age_le_20": 392.3,
+      "ch4_age_gt_20": 283.7,
+      "co2_c_age_le_20": 2.95
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 9,
+    "fields": {
+      "climate": 3,
+      "moisture": 2,
+      "ch4_age_le_20": 251.6,
+      "ch4_age_gt_20": 141.1,
+      "co2_c_age_le_20": 2.77
+    }
+  },
+  {
+    "model": "ipcc.reservoiremissionfactor",
+    "pk": 10,
+    "fields": {
+      "climate": 3,
+      "moisture": 4,
+      "ch4_age_le_20": 251.6,
+      "ch4_age_gt_20": 141.1,
+      "co2_c_age_le_20": 2.77
+    }
+  }
+]

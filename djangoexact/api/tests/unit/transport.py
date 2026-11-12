@@ -44,7 +44,7 @@ class TransportTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_patch_to_not_ready(self):
 
@@ -53,7 +53,7 @@ class TransportTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate_results(self):
 

@@ -20,7 +20,10 @@ import numpy as np
 
 import api.models as api_models
 import api.calculators as calculators
+from api.services import reservoirs
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
+from api.services.solid_waste import crop_sources, food_waste
+from math_model.no_time_dependency_final.solid_waste import SWDS_ROUTES
 
 from .base import BaseModuleReport, NotReadyError
 from .data_types import InventoryItem, MetadataWrite, ModuleResult, ResultRow
@@ -111,6 +114,33 @@ def _energy_fuel_metadata_writes(
     return writes
 
 
+def _energy_value_chain_stage_metadata_writes(
+    entries,
+    base_row: int,
+    *,
+    is_start: bool,
+    is_with: bool,
+    is_without: bool,
+) -> list[MetadataWrite]:
+    """One metadata row per energy entry with its value-chain stage.
+
+    Nothing is written when no entry has a stage, so reports of projects that
+    never set one stay byte-identical. Entry numbers follow creation order.
+    """
+    if not any(entry.value_chain_stage_id for entry in entries):
+        return []
+
+    writes: list[MetadataWrite] = []
+    for i, entry in enumerate(entries):
+        row = base_row + i
+        writes.append(MetadataWrite(row, 1, f"Energy entry {i + 1} - value chain stage"))
+        stage_name = entry.value_chain_stage.name if entry.value_chain_stage else ""
+        for col, is_state in [(2, is_start), (3, is_with), (4, is_without)]:
+            if is_state:
+                writes.append(MetadataWrite(row, col, stage_name))
+    return writes
+
+
 # ---------------------------------------------------------------------------
 # Waterbody
 # ---------------------------------------------------------------------------
@@ -128,13 +158,25 @@ class WaterbodyReport(BaseModuleReport):
         m = self.module
         es = self.emissions_set
 
-        ch4 = self._extract(es, math_utils.ActivityTypes.COASTAL_WATERBODIES, math_utils.GasTypes.CH4)
-        total = list(ch4)
+        if m.is_reservoir():
+            result_rows = [
+                ResultRow("CH4 from flooded land (reservoir)", self._extract(es, math_utils.ActivityTypes.FLOODED_LAND_CH4, math_utils.GasTypes.CH4)),
+                ResultRow("CO2 from land converted to flooded land", self._extract(es, math_utils.ActivityTypes.FLOODED_LAND_CO2, math_utils.GasTypes.CO2)),
+            ]
+        else:
+            result_rows = [ResultRow("CH4 from waterbody management", self._extract(es, math_utils.ActivityTypes.COASTAL_WATERBODIES, math_utils.GasTypes.CH4))]
 
         mw = [
             MetadataWrite(1, 1, "Waterbody type"),
             MetadataWrite(2, 1, "Trophic class"),
         ]
+        if m.is_reservoir():
+            mw += [
+                MetadataWrite(3, 1, "Reservoir age at project start (years)"),
+                MetadataWrite(3, 2, m.reservoir_age_start),
+                MetadataWrite(4, 1, "Downstream CH4 ratio (Rd)"),
+                MetadataWrite(4, 2, reservoirs.rd(m)),
+            ]
         if m.is_start():
             mw += [
                 MetadataWrite(1, 2, m.waterbody_type.name),
@@ -154,12 +196,99 @@ class WaterbodyReport(BaseModuleReport):
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title="Waterbody",
-            result_rows=[ResultRow("CH4 from waterbody management", ch4)],
+            result_rows=result_rows,
             metadata_writes=mw,
             total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Solid waste
+# ---------------------------------------------------------------------------
+
+SOLID_WASTE_RESULT_ROWS = (
+    ("CH4 from solid waste disposal (CRT 5.A)", math_utils.ActivityTypes.SOLID_WASTE_DISPOSAL, math_utils.GasTypes.CH4),
+    ("CH4 from composting (CRT 5.B.1)", math_utils.ActivityTypes.COMPOSTING, math_utils.GasTypes.CH4),
+    ("N2O from composting (CRT 5.B.1)", math_utils.ActivityTypes.COMPOSTING, math_utils.GasTypes.N2O),
+    ("CH4 from anaerobic digestion (CRT 5.B.2)", math_utils.ActivityTypes.ANAEROBIC_DIGESTION, math_utils.GasTypes.CH4),
+    ("Fossil CO2 from waste incineration (CRT 5.C.1)", math_utils.ActivityTypes.WASTE_INCINERATION, math_utils.GasTypes.CO2),
+    ("CH4 from waste incineration (CRT 5.C.1)", math_utils.ActivityTypes.WASTE_INCINERATION, math_utils.GasTypes.CH4),
+    ("N2O from waste incineration (CRT 5.C.1)", math_utils.ActivityTypes.WASTE_INCINERATION, math_utils.GasTypes.N2O),
+    ("Fossil CO2 from open burning of waste (CRT 5.C.2)", math_utils.ActivityTypes.WASTE_OPEN_BURNING, math_utils.GasTypes.CO2),
+    ("CH4 from open burning of waste (CRT 5.C.2)", math_utils.ActivityTypes.WASTE_OPEN_BURNING, math_utils.GasTypes.CH4),
+    ("N2O from open burning of waste (CRT 5.C.2)", math_utils.ActivityTypes.WASTE_OPEN_BURNING, math_utils.GasTypes.N2O),
+)
+
+
+@dataclass
+class SolidWasteReport(BaseModuleReport):
+    module: api_models.SolidWaste
+
+    def __post_init__(self):
+        self.calculator = calculators.SolidWasteCalculator(self.module)
+        super().__post_init__()
+
+    def compute(self) -> ModuleResult:
+        m = self.module
+        totals = food_waste(m, crop_sources(m))
+        rows = (
+            ("Food loss and waste, total (t wet weight/yr)", lambda s: totals[s]),
+            ("Food loss and waste not from crop modules (t wet weight/yr)", lambda s: getattr(m, f"amount_{s}")),
+            ("Disposal sites and open dumping (%)", lambda s: sum(m.routes(s)[r] for r in SWDS_ROUTES) * 100),
+            ("Composting (%)", lambda s: m.routes(s)["composting"] * 100),
+            ("Anaerobic digestion (%)", lambda s: m.routes(s)["anaerobic_digestion"] * 100),
+            ("Incineration (%)", lambda s: m.routes(s)["incineration"] * 100),
+            ("Open burning (%)", lambda s: m.routes(s)["open_burning"] * 100),
+        )
+        mw = [MetadataWrite(row, 1, label) for row, (label, _value) in enumerate(rows, start=1)]
+        for col, scenario in ((2, "start"), (3, "w"), (4, "wo")):
+            mw += [MetadataWrite(row, col, value(scenario)) for row, (_label, value) in enumerate(rows, start=1)]
+        mw.append(MetadataWrite(1, 6, m.amount_thread.format_comments() if m.amount_thread else ""))
+
+        return ModuleResult(
+            title=m.module_type.name,
+            metadata_section_title="Food Loss and Waste",
+            result_rows=[ResultRow(label, self._extract(self.emissions_set, activity, gas)) for label, activity, gas in SOLID_WASTE_RESULT_ROWS],
+            metadata_writes=mw,
+            total_emissions=self._balance_total(),
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+            _inventory_items=self._inventory_items_from_module(m.activity.name),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Harvested wood products
+# ---------------------------------------------------------------------------
+
+@dataclass
+class HarvestedWoodProductsReport(BaseModuleReport):
+    module: api_models.HarvestedWoodProducts
+
+    def __post_init__(self):
+        self.calculator = calculators.HarvestedWoodProductsCalculator(self.module)
+        super().__post_init__()
+
+    def compute(self) -> ModuleResult:
+        m = self.module
+        products = (("sawnwood", "Sawnwood share (%)"), ("panels", "Wood-based panels share (%)"), ("paper", "Paper and paperboard share (%)"))
+        mw = [MetadataWrite(row, 1, label) for row, (_product, label) in enumerate(products, start=1)]
+        for col, scenario in ((2, "start"), (3, "w"), (4, "wo")):
+            shares = m.shares(scenario)
+            mw += [MetadataWrite(row, col, shares[product] * 100) for row, (product, _label) in enumerate(products, start=1)]
+
+        return ModuleResult(
+            title=m.module_type.name,
+            metadata_section_title="Harvested Wood Products",
+            result_rows=[ResultRow("CO2 from HWP pool (CRT 4.G)", self._extract(self.emissions_set, math_utils.ActivityTypes.HWP_POOL, math_utils.GasTypes.CO2))],
+            metadata_writes=mw,
+            total_emissions=self._balance_total(),
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+            _inventory_items=self._inventory_items_from_module(m.activity.name),
         )
 
 
@@ -570,6 +699,14 @@ class EnergyReport(BaseModuleReport):
                 is_with=m.is_with(),
                 is_without=m.is_without(),
             )
+
+        mw += _energy_value_chain_stage_metadata_writes(
+            list(m.entries.select_related("value_chain_stage").order_by("id")),
+            base_row=fuel_base + 4 * len(fuels),
+            is_start=m.is_start(),
+            is_with=m.is_with(),
+            is_without=m.is_without(),
+        )
 
         return ModuleResult(
             title=m.module_type.name,

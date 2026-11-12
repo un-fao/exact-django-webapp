@@ -69,6 +69,7 @@ from .models import (
     ProjectFileAttachment,
     APIHealth,
     FuelType,
+    Energy,
     SoilType,
     Fishery,
     Livestock,
@@ -115,7 +116,6 @@ from .serializers import (
     ActivitySerializerWithModules,
     ResetPasswordSerializer,
     FieldDefinitionResponseSerializer,
-    FieldDefinitionSerializer,
     ProjectResultSerializer,
     ActivityResultSerializer,
     ProjectSummarySerializer,
@@ -159,6 +159,8 @@ from django.utils.translation import override as translation_override
 from api.services import async_jobs
 from api.services import finalization
 from api.services import report_links
+from api.services.conditionality_results import AGGREGATE_CONDITIONALITY, aggregate_by_conditionality
+from api.services import energy_value_chain
 from api.services.project_invitations import InvitationNotAcceptableError, accept_invitation
 
 logger = logging.getLogger("console")
@@ -487,9 +489,9 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(UserReadSerializer(request.user).data, status=http_status.HTTP_200_OK)
 
 
-class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
+class LandUseTypeViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows land use types to be viewed or edited.
+    API endpoint that allows land use types to be viewed.
     """
 
     queryset = LandUseType.objects.all()
@@ -578,6 +580,27 @@ _REPORT_BODY = openapi.Schema(
         ),
     },
 )
+
+
+_INDICATORS_LANG_PARAM = openapi.Parameter(
+    "lang",
+    openapi.IN_QUERY,
+    description="Label language; falls back to Accept-Language, then en",
+    type=openapi.TYPE_STRING,
+    required=False,
+)
+
+
+def indicators_response(request, project):
+    """Shared by the private and public project indicators actions."""
+    from django.utils import translation
+    from api.services import indicators as indicators_service
+
+    lang = utils.requested_language(request)
+    with translation.override(lang):
+        data = indicators_service.compute_project_indicators(project)
+        # Render lazy labels while the requested language is still active.
+        return Response(data=json.loads(json.dumps(data, default=str)), status=http_status.HTTP_200_OK)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -809,6 +832,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 description="Return cached results",
                 type=openapi.TYPE_BOOLEAN,
             ),
+            openapi.Parameter(
+                "aggregate",
+                openapi.IN_QUERY,
+                description=(
+                    "Aggregate module results by. 'conditionality' returns the 'gas' breakdown plus a "
+                    "'conditionality' object with the balance split by NDC conditionality."
+                ),
+                type=openapi.TYPE_STRING,
+                enum=[*(b.value for b in BreakdownTypes if b != BreakdownTypes.INVENTORY), AGGREGATE_CONDITIONALITY],
+            ),
         ],
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results", 200: ProjectResultSerializer},
     )
@@ -836,9 +869,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         response = serialized_project
         response["activities"] = []
 
-        # Function to process an activity
+        by_conditionality = request.query_params.get("aggregate") == AGGREGATE_CONDITIONALITY
+        module_aggregate = BreakdownTypes.GAS.value if by_conditionality else None
+
         def process_activity(activity_pk):
-            return ActivityViewSet.results(self, request, pk=activity_pk).data
+            return ActivityViewSet.results(self, request, pk=activity_pk, aggregate=module_aggregate).data
 
         activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
@@ -853,7 +888,26 @@ class ProjectViewSet(viewsets.ModelViewSet):
             on_error=log_activity_failure,
         )
 
+        if by_conditionality:
+            response["conditionality"] = aggregate_by_conditionality(response["activities"], project.start_year_of_activities)
+
         return Response(data=response, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        manual_parameters=[_INDICATORS_LANG_PARAM],
+        responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
+    )
+    def indicators(self, request, pk=None):
+        """Project indicators (land use change matrix, food waste), grouped.
+
+        Read-only: computed from the module results of the project's ready activities.
+        """
+        project: Project = get_object_or_404(Project, pk=pk)
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+        return indicators_response(request, project)
 
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(
@@ -2480,9 +2534,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         ],
         responses={400: "Bad request", 403: "Selected user does not have permission to view activity results", 200: ActivityResultSerializer},
     )
-    def results(self, request, pk=None):
+    def results(self, request, pk=None, aggregate=None):
         """
         Calculates and returns total emissions for each module in the activity.
+
+        ``aggregate`` overrides the request's ``?aggregate=`` for internal callers.
         """
 
         activity = Activity.objects.prefetch_related().get(pk=pk)
@@ -2501,7 +2557,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             module_dict = get_module_serializer(module.__class__)(module).data
 
             try:
-                viewset = generic_module_viewset(module.__class__).results(self, request, pk=module.pk)
+                viewset = generic_module_viewset(module.__class__).results(self, request, pk=module.pk, aggregate=aggregate)
                 module_dict[labels.RESULTS] = viewset.data
 
             except Exception as e:
@@ -2616,6 +2672,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 class CommentThreadViewSet(viewsets.ModelViewSet):
     queryset = CommentThread.objects.all()
     serializer_class = CommentThreadSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     @action(detail=True, methods=["get"])
     def comments(self, request, pk=None):
@@ -2703,6 +2760,7 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -2732,9 +2790,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-class ModuleTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
+class ModuleTypeViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows module types to be viewed or edited.
+    API endpoint that allows module types to be viewed.
     """
 
     queryset = ModuleType.objects.all()
@@ -2762,9 +2820,9 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-class CountryViewSet(viewsets.ModelViewSet, PublicViewSet):
+class CountryViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows countries to be viewed or edited.
+    API endpoint that allows countries to be viewed.
     """
 
     queryset = Country.objects.all()
@@ -2784,9 +2842,9 @@ class CountryViewSet(viewsets.ModelViewSet, PublicViewSet):
         return super().list(request)
 
 
-class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class InputTypeViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows input types to be viewed or edited.
+    API endpoint that allows input types to be viewed.
     """
 
     queryset = InputType.objects.all()
@@ -2955,13 +3013,13 @@ def generic_module_viewset(model: Module):
                     openapi.IN_QUERY,
                     description="Aggregate results by",
                     type=openapi.TYPE_STRING,
-                    enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value],
+                    enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value, "value_chain_stage"],
                 ),
                 openapi.Parameter("cached", openapi.IN_QUERY, description="Use cached results", type=openapi.TYPE_BOOLEAN),
             ],
             responses={400: "Bad request", 403: "Selected user does not have permission to view module results", 200: DynamicResultSerializer},
         )
-        def results(self, request, pk=None):
+        def results(self, request, pk=None, aggregate=None):
             """
             Calculates and returns total emissions for a single module.
             """
@@ -2987,7 +3045,12 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
-                aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
+                if request.query_params.get("aggregate") == energy_value_chain.VALUE_CHAIN_STAGE_AGGREGATE:
+                    if not isinstance(module, Energy):
+                        return utils.ErrorResponse("aggregate=value_chain_stage is only available for the Energy module.")
+                    return Response(energy_value_chain.results_by_value_chain_stage(module))
+
+                aggregate_by = BreakdownTypes(aggregate or request.query_params.get("aggregate", BreakdownTypes.TOTAL))
                 use_cached_results = request.query_params.get("cached", "true") == "true"
                 module_results, frozen = finalization.module_results(module, aggregate_by, use_cache=use_cached_results)
 
@@ -3093,7 +3156,7 @@ def generic_viewset(model: Model):
 
 
 def public_generic_viewset(model: Model):
-    class PublicGenericViewSet(viewsets.ModelViewSet, PublicViewSet):
+    class PublicGenericViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
         filterset_class = api_filters.get_model_filter(model)
@@ -3103,21 +3166,6 @@ def public_generic_viewset(model: Model):
 
 
 class FieldDefinitionViewSet(viewsets.ViewSet):
-    @swagger_auto_schema(
-        request_body=FieldDefinitionSerializer,
-        responses={400: "Bad request", 201: FieldDefinitionSerializer},
-    )
-    def create(self, request, *args, **kwargs):
-        serializer = FieldDefinitionSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-
-        return Response(serializer.data, status=http_status.HTTP_201_CREATED)
-
-    # Custom action for listing field definitions
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter("module_type_id", openapi.IN_QUERY, description="Module type id", type=openapi.TYPE_INTEGER)],
         responses={400: "Model name not provided", 404: "Model not found", 200: FieldDefinitionResponseSerializer},
@@ -3366,12 +3414,12 @@ class APIHealthView(views.APIView):
         return Response(serializer.data, status=status)
 
 
-class FuelTypeViewSet(viewsets.ModelViewSet, PublicViewSet, DynamicFilterViewSet):
+class FuelTypeViewSet(PublicViewSet, DynamicFilterViewSet):
     queryset = FuelType.objects.all()
     serializer_class = FuelTypeSerializer
 
 
-class SoilTypeViewset(viewsets.ModelViewSet, PublicViewSet):
+class SoilTypeViewset(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     queryset = SoilType.objects.all()
     serializer_class = get_model_serializer(SoilType)
     filter_backends = [DjangoFilterBackend]
@@ -3425,9 +3473,9 @@ class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(serializer.data, status=http_status.HTTP_201_CREATED)
 
 
-class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
+class HandInHandAssessmentViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows Hand in Hand assessments to be viewed or edited.
+    API endpoint that allows Hand in Hand assessments to be viewed.
     """
 
     queryset = HandInHandAssessment.objects.all()

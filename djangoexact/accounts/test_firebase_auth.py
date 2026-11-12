@@ -38,6 +38,7 @@ from accounts.views import (
     FIREBASE_INVALID_RESPONSE_MESSAGE,
     FIREBASE_UNAVAILABLE_MESSAGE,
     LoginExistingUserView,
+    TokenRefreshView,
     firebase_error_response,
 )
 from api.models import CustomUser as User
@@ -45,6 +46,9 @@ from api.models import CustomUser as User
 TOKEN_EXPIRED_BODY = json.dumps({"error": {"code": 400, "message": "TOKEN_EXPIRED", "errors": []}})
 INVALID_CREDENTIALS_BODY = json.dumps({"error": {"code": 400, "message": "INVALID_LOGIN_CREDENTIALS"}})
 PROXY_HTML_BODY = "<html><head><title>502 Bad Gateway</title></head><body>nginx</body></html>"
+GOOGLE_UNAVAILABLE_BODY = json.dumps(
+    {"error": {"code": 503, "message": "The service is currently unavailable.", "status": "UNAVAILABLE"}}
+)
 
 
 class FakeResponse:
@@ -123,13 +127,31 @@ class FirebaseAuthExceptionTestCase(SimpleTestCase):
         self.assertEqual(ctx.exception.code, "INVALID_LOGIN_CREDENTIALS")
 
     def test_http_error_with_non_json_body_has_no_code(self):
-        with self._patch_post(return_value=FakeResponse(502, PROXY_HTML_BODY)):
+        with self._patch_post(return_value=FakeResponse(404, PROXY_HTML_BODY)):
             with self.assertLogs("console", level="WARNING"):
                 with self.assertRaises(FirebaseAuthError) as ctx:
                     self.client.refresh("token")
 
         self.assertIsNone(ctx.exception.code)
         self.assertEqual(ctx.exception.payload, {})
+        self.assertEqual(ctx.exception.status_code, 404)
+
+    def test_server_error_with_google_json_body_becomes_unavailable(self):
+        with self._patch_post(return_value=FakeResponse(503, GOOGLE_UNAVAILABLE_BODY)):
+            with self.assertRaises(FirebaseUnavailableError) as ctx:
+                self.client.refresh("token")
+
+        # The human sentence in error.message must not be passed off as a Firebase code.
+        self.assertEqual(ctx.exception.code, "FIREBASE_UNAVAILABLE")
+        self.assertEqual(ctx.exception.status_code, 503)
+        self.assertEqual(ctx.exception.payload["error"]["status"], "UNAVAILABLE")
+
+    def test_server_error_with_proxy_html_body_becomes_unavailable(self):
+        with self._patch_post(return_value=FakeResponse(502, PROXY_HTML_BODY)):
+            with self.assertLogs("console", level="WARNING"):
+                with self.assertRaises(FirebaseUnavailableError) as ctx:
+                    self.client.sign_in_with_email_and_password("user@example.com", "secret")
+
         self.assertEqual(ctx.exception.status_code, 502)
 
     def test_http_error_with_unexpected_json_shape_has_no_code(self):
@@ -141,11 +163,18 @@ class FirebaseAuthExceptionTestCase(SimpleTestCase):
         self.assertEqual(ctx.exception.payload, {"message": "nope"})
 
     def test_http_error_with_empty_body_has_no_code(self):
-        with self._patch_post(return_value=FakeResponse(500, "")):
+        with self._patch_post(return_value=FakeResponse(400, "")):
             with self.assertRaises(FirebaseAuthError) as ctx:
                 self.client.refresh("token")
 
         self.assertIsNone(ctx.exception.code)
+
+    def test_server_error_with_empty_body_becomes_unavailable(self):
+        with self._patch_post(return_value=FakeResponse(500, "")):
+            with self.assertRaises(FirebaseUnavailableError) as ctx:
+                self.client.refresh("token")
+
+        self.assertEqual(ctx.exception.status_code, 500)
 
     def test_connection_error_becomes_unavailable(self):
         with self._patch_post(side_effect=RequestsConnectionError("no route to host")):
@@ -226,7 +255,7 @@ class FirebaseErrorResponseTestCase(SimpleTestCase):
 
     def test_missing_code_falls_back_to_the_supplied_message(self):
         with self.assertLogs("console", level="ERROR"):
-            response = self._map(FirebaseAuthError(status_code=502), "details", fallback="Token refresh failed")
+            response = self._map(FirebaseAuthError(status_code=400), "details", fallback="Token refresh failed")
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, {"details": "Token refresh failed"})
@@ -252,6 +281,33 @@ class FirebaseErrorResponseTestCase(SimpleTestCase):
             response = self._map(exc, "error")
 
         self.assertNotIn("do not leak", str(response.data))
+
+
+class TokenRefreshOutageTestCase(SimpleTestCase):
+    """A Firebase outage must not look like a rejected refresh token.
+
+    The frontend signs the user out when the refresh is rejected (400), so a
+    Firebase 5xx has to reach it as 503 to keep the session alive.
+    """
+
+    def _refresh(self, firebase_response):
+        request = SimpleNamespace(data={"refresh": "refresh-token"})
+        with patch("accounts.firebase_auth.requests.post", return_value=firebase_response):
+            return TokenRefreshView().post(request)
+
+    def test_firebase_server_error_returns_service_unavailable(self):
+        with self.assertLogs("console", level="ERROR"):
+            response = self._refresh(FakeResponse(503, GOOGLE_UNAVAILABLE_BODY))
+
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.data, {"details": FIREBASE_UNAVAILABLE_MESSAGE})
+
+    def test_rejected_refresh_token_still_returns_bad_request(self):
+        body = json.dumps({"error": {"code": 400, "message": "INVALID_REFRESH_TOKEN"}})
+        response = self._refresh(FakeResponse(400, body))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {"details": "INVALID_REFRESH_TOKEN"})
 
 
 class OrphanedAccountCleanupTestCase(SimpleTestCase):

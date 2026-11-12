@@ -18,6 +18,11 @@ import ipcc.models as ipcc
 
 from django.utils.translation import gettext_lazy as _
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
+from math_model.no_time_dependency_final.hwp_decay import PRODUCTS as HWP_PRODUCTS
+from math_model.no_time_dependency_final.solid_waste import ROUTES as SOLID_WASTE_ROUTES
+
+# crop_waste_<key> field key -> crop module class whose production feeds the solid waste module
+SOLID_WASTE_CROP_MODULES = {"annual_cropland": "AnnualCropland", "perennial_cropland": "PerennialCropland", "flooded_rice": "FloodedRice"}
 from dirtyfields import DirtyFieldsMixin
 from django.utils.text import slugify
 
@@ -520,6 +525,8 @@ class PeatType(models.Model):
 
 class WaterbodyType(models.Model):
     name = models.CharField(max_length=100)
+    # Reservoirs follow IPCC 2019 Vol. 4 Ch. 7 flooded land methods (age-dependent EFs, CO2, downstream CH4).
+    is_reservoir = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -602,6 +609,15 @@ class FuelType(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.fuel_use_type}"
+
+
+class ValueChainStage(models.Model):
+    """Agrifood value-chain stage an energy use belongs to."""
+
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class SalinityType(models.Model):
@@ -1113,6 +1129,12 @@ class NoteMixin(models.Model):
 
 
 class Activity(Historical, NoteMixin, DirtyFieldsMixin):
+    class Conditionality(models.TextChoices):
+        """Whether the activity is an unconditional or conditional NDC measure. Null means not specified."""
+
+        UNCONDITIONAL = "unconditional", "Unconditional"
+        CONDITIONAL = "conditional", "Conditional"
+
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities", verbose_name="project")
     name = models.CharField(max_length=255, verbose_name="name")
     description = models.TextField(null=True, blank=True, verbose_name="description")
@@ -1134,6 +1156,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name="owner")
 
     is_b_intact = models.BooleanField(default=False)
+    conditionality = models.CharField(max_length=16, choices=Conditionality.choices, null=True, blank=True, default=None, verbose_name="conditionality")
 
     @property
     def soc(self):
@@ -1287,7 +1310,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         if self.pk:
             if self.is_dirty(check_relationship=True):
                 dirty_fields = self.get_dirty_fields(check_relationship=True)
-                exclude_fields = ["cost", "description", "name", "owner", "updated_at"]
+                exclude_fields = ["cost", "description", "name", "owner", "updated_at", "conditionality"]
 
                 if any(field not in exclude_fields for field in dirty_fields):
                     invalidate_module_caches(activity=self)
@@ -1414,6 +1437,13 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
 
             if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
                 self.last_modified = timezone.now()
+                # An edit must also drop the stored payload: the module serializer's cached_results_*
+                # fields and the report submodule rollups read it without is_cached_results_valid().
+                # Skipped for update_fields saves, which only persist the listed cache columns and
+                # would otherwise write a None over the value being cached.
+                if not kwargs.get("update_fields"):
+                    for name, value in _MODULE_CACHE_INVALIDATION.items():
+                        setattr(self, name, value)
 
         if isinstance(self, Submodule):
             parent: Module = self.parent
@@ -1450,6 +1480,10 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         if isinstance(self, Submodule):
             parent: Module = self.parent
             parent.invalidate_cached_results()
+        elif type(self).__name__ in HarvestedWoodProducts.HWP_SOURCE_CLASSES:
+            # A submodule change or deletion reaches its parent only here, without moving last_modified, which is
+            # what the pool's cache check compares.
+            HarvestedWoodProducts.objects.filter(activity_id=self.activity_id).update(**_MODULE_CACHE_INVALIDATION)
         self.save()
 
     def is_cached_results_valid(self):
@@ -2550,6 +2584,37 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     degradation_dry_matter_impacted_t2_w = models.FloatField(null=True, blank=True)
     degradation_dry_matter_impacted_t2_wo = models.FloatField(null=True, blank=True)
 
+    # Stock-difference approach (IPCC 2006 Vol. 4, ch. 2, eq. 2.5). Carbon stocks in tC/ha: _start at the start of the period, _w / _wo expected at its end.
+    # Gain-loss inputs (growth, rotation, logging, degradation, disturbances) are ignored under stock difference.
+
+    APPROACH_GAIN_LOSS = "gain_loss"
+    APPROACH_STOCK_DIFFERENCE = "stock_difference"
+    APPROACH_CHOICES = [(APPROACH_GAIN_LOSS, "Gain-loss"), (APPROACH_STOCK_DIFFERENCE, "Stock difference")]
+    # Soil carbon is deliberately not a pool here (FAO review 2026-10-28): stock difference accounts for biomass and DOM only.
+    STOCK_DIFFERENCE_POOLS = ("agb", "bgb", "litter", "deadwood")
+
+    approach = models.CharField(max_length=20, choices=APPROACH_CHOICES, default=APPROACH_GAIN_LOSS, verbose_name="approach")
+
+    stock_agb_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_agb_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_agb_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_bgb_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_bgb_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_bgb_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_litter_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_litter_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_litter_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_deadwood_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_deadwood_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    stock_deadwood_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+
+    def is_stock_difference(self) -> bool:
+        return self.approach == self.APPROACH_STOCK_DIFFERENCE
+
+    def stock_difference_stocks(self, scenario: str) -> dict[str, float | None]:
+        """Pool -> stock (tC/ha) for scenario "start", "w" or "wo"."""
+        return {pool: getattr(self, f"stock_{pool}_{scenario}") for pool in self.STOCK_DIFFERENCE_POOLS}
+
     @property
     def submodules(self) -> list["Submodule"]:
         return list(self.disturbances.all())
@@ -2645,6 +2710,15 @@ class Waterbody(Module):
     mean_annual_t2_start = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_start")
     mean_annual_t2_w = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_w")
     mean_annual_t2_wo = models.FloatField(null=True, blank=True, verbose_name="mean_annual_t2_wo")
+
+    # Reservoir-only inputs. Years since flooding at the project start: the reservoir is "land converted to
+    # flooded land" while younger than 20 years and "flooded land remaining flooded land" after.
+    reservoir_age_start = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="reservoir_age_start")
+    downstream_emissions = models.BooleanField(default=True, verbose_name="downstream_emissions")
+    rd_t2 = models.FloatField(null=True, blank=True, verbose_name="rd_t2")
+
+    def is_reservoir(self) -> bool:
+        return bool(self.waterbody_type and self.waterbody_type.is_reservoir)
 
 
 class CoastalWetland(Module):
@@ -2966,6 +3040,7 @@ class Fuel(Submodule, FuelMixin, FuelTier2Mixin):
 
 class EnergyEntry(Submodule, ElectricityTier2Mixin, FuelTier2Mixin):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
+    value_chain_stage = models.ForeignKey(ValueChainStage, on_delete=models.SET_NULL, null=True, blank=True, related_name="energy_entries")
     fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name="fuel_type_start", related_name="%(class)s_fuel_type_start")
     fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name="fuel_type_w", related_name="%(class)s_fuel_type_w")
     fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name="fuel_type_wo", related_name="%(class)s_fuel_type_wo")
@@ -3129,6 +3204,9 @@ class OtherInfrastructure(Submodule, SettlementSubmoduleTier2Mixin):
     area_m2_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=models.SET_NULL)
 
 
+WATER_TABLE_CLASS_CHOICES = [("shallow_drained", "Shallow-drained"), ("deep_drained", "Deep-drained")]
+
+
 class OrganicSoil(LandModuleFixed):
     drainage_area_start = models.FloatField(default=0, verbose_name="drainage_area_start")
     drainage_area_w = models.FloatField(default=0, verbose_name="drainage_area_w")
@@ -3260,6 +3338,11 @@ class OrganicSoil(LandModuleFixed):
     peat_density_t2_w = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
     peat_density_t2_wo = models.FloatField(null=True, blank=True)  # TODO: Change to volume of air dry peat for excavated area
 
+    water_table_class_start = models.CharField(max_length=20, choices=WATER_TABLE_CLASS_CHOICES, null=True, blank=True)
+    water_table_class_w = models.CharField(max_length=20, choices=WATER_TABLE_CLASS_CHOICES, null=True, blank=True)
+    water_table_class_wo = models.CharField(max_length=20, choices=WATER_TABLE_CLASS_CHOICES, null=True, blank=True)
+    water_table_class_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_water_table_class_thread", on_delete=models.SET_NULL)
+
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
             self.land_use_type_start = LandUseType.objects.get(name_en="Organic Soil")
@@ -3341,6 +3424,13 @@ class LandUseChange(Module):
 
     organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_organic_soil", verbose_name="organic_soil")
 
+    # Only land that had trees has wood to harvest before the conversion; for any other start the input is ignored so the
+    # biomass is emitted in full instead of vanishing.
+    WOODY_START_CLASSES = ("ForestManagement", "PerennialCropland")
+
+    def harvests_wood_before_conversion(self) -> bool:
+        return self.module_type_start is not None and self.module_type_start.class_name in self.WOODY_START_CLASSES
+
     def is_filled(self):
         return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
 
@@ -3387,6 +3477,193 @@ class LandUseChange(Module):
             raise Exception("At least one module type is missing")
 
         return module_types
+
+
+class SolidWaste(Module):
+    """Agrifood systems waste of an activity, all of it food waste, in tonnes of wet waste per year (not a land module).
+
+    IPCC 2006 Vol. 5 with the 2019 Refinement where updated; the math is in
+    math_model/no_time_dependency_final/solid_waste.py and the calculator in api/services/solid_waste.py. Shares are
+    fractions (0-1). The food waste of a scenario is ``amount`` (waste not tied to a crop module of the activity, e.g.
+    livestock, fish or processing) plus, per crop module of the activity, its production times ``crop_waste_<key>``.
+    Null route shares, recoveries and Tier 2 emission factors mean 0, 0 and the IPCC default.
+    """
+
+    amount_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    amount_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    amount_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    amount_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_amount_thread")
+
+    crop_waste_annual_cropland_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_annual_cropland_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_annual_cropland_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_perennial_cropland_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_perennial_cropland_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_perennial_cropland_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_flooded_rice_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_flooded_rice_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    crop_waste_flooded_rice_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+
+    route_swds_managed_anaerobic_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_anaerobic_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_anaerobic_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_semi_aerobic_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_semi_aerobic_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_managed_semi_aerobic_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_deep_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_deep_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_deep_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_shallow_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_shallow_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_unmanaged_shallow_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_uncategorised_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_uncategorised_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_swds_uncategorised_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_dumping_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_dumping_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_dumping_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_composting_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_composting_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_composting_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_anaerobic_digestion_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_anaerobic_digestion_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_anaerobic_digestion_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_incineration_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_incineration_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_incineration_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_burning_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_burning_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_open_burning_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_other_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_other_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    route_other_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+
+    swds_recovery_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    swds_recovery_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    swds_recovery_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    ad_recovery_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    ad_recovery_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    ad_recovery_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+
+    composting_ch4_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_ch4_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_ch4_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_n2o_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_n2o_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    composting_n2o_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    ad_ch4_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    ad_ch4_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    ad_ch4_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_ch4_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_ch4_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_ch4_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_n2o_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_n2o_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    incineration_n2o_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_ch4_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_ch4_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_ch4_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_n2o_ef_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_n2o_ef_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+    open_burning_n2o_ef_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
+
+    def routes(self, scenario: str) -> dict[str, float]:
+        return {route: getattr(self, f"route_{route}_{scenario}") or 0.0 for route in SOLID_WASTE_ROUTES}
+
+    def get_cached_results(self, by=BreakdownTypes.TOTAL):
+        results = super().get_cached_results(by)
+        # Report runs cache emissions without the food-waste block the module page and indicators read: recompute.
+        if not (isinstance(results, dict) and "solid_waste" in results):
+            return None
+        # Crop module edits change the food waste amount but only invalidate the crop module's own cache.
+        crops = (module for module in self.activity.modules if type(module).__name__ in SOLID_WASTE_CROP_MODULES.values())
+        return None if any(crop.last_modified and crop.last_modified > self.last_cached_at for crop in crops) else results
+
+
+class HarvestedWoodProducts(Module):
+    """Harvested wood products (HWP) module: a first-order decay pool fed by the wood the activity's other modules harvest.
+
+    IPCC 2019 Refinement, Vol. 4, ch. 12 (eq. 12.1 and 12.2, Table 12.3 half-lives); the math lives in
+    math_model/no_time_dependency_final/hwp_decay.py and the calculator in api/hwp_calculator.py. The pool collects from
+    every source module of the activity (HWP_SOURCE_CLASSES), so a module only exists when the activity harvests wood
+    for long-lived products; without it every result stays as before. Shares are fractions (0-1) of the harvested
+    carbon going to each product, the rest is oxidised at once. Half-lives are Tier 2 overrides in years (null = IPCC).
+    """
+
+    HWP_SOURCE_CLASSES = ("ForestManagement", "PerennialCropland", "LandUseChange")
+
+    share_sawnwood_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_sawnwood_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_sawnwood_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_sawnwood_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_share_sawnwood_thread")
+
+    share_panels_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_panels_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_panels_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_panels_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_share_panels_thread")
+
+    share_paper_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_paper_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_paper_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0), validators.MaxValueValidator(1)])
+    share_paper_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_share_paper_thread")
+
+    half_life_sawnwood_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_sawnwood_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_sawnwood_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+
+    half_life_panels_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_panels_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_panels_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+
+    half_life_paper_t2_start = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_paper_t2_w = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+    half_life_paper_t2_wo = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0.1)])
+
+    def shares(self, scenario: str) -> dict[str, float]:
+        return {product: getattr(self, f"share_{product}_{scenario}") or 0.0 for product in HWP_PRODUCTS}
+
+    def half_lives_t2(self, scenario: str) -> dict[str, float]:
+        values = {product: getattr(self, f"half_life_{product}_t2_{scenario}") for product in HWP_PRODUCTS}
+        return {product: value for product, value in values.items() if value is not None}
+
+    @classmethod
+    def sources_of(cls, activity: Activity) -> list[Module]:
+        """The activity's modules that can feed the pool. A stock-difference forest has no harvest to feed it."""
+        return [
+            module
+            for module in activity.modules
+            if type(module).__name__ in cls.HWP_SOURCE_CLASSES
+            and not getattr(module, "is_stock_difference", lambda: False)()
+            and (not isinstance(module, LandUseChange) or module.harvests_wood_before_conversion())
+        ]
+
+    @property
+    def sources(self) -> list[Module]:
+        return self.sources_of(self.activity)
+
+    def is_cached_results_valid(self):
+        if not super().is_cached_results_valid():
+            return False
+        sources = self.sources
+        cached = self.cached_results_total
+        cached_sources = {(entry["class_name"], entry["id"]) for entry in cached["hwp"]["sources"]} if isinstance(cached, dict) and "hwp" in cached else None
+        # A source added or deleted since the cache changes the pool without touching any remaining module.
+        if cached_sources != {(type(source).__name__, source.pk) for source in sources}:
+            return False
+        # Only edits count, not whether a source is cached: an edit can clear a source's cache, and the pool never
+        # caches its sources. Every forest, perennial or land use change module counts, sources or not: a land use
+        # change from forest reads the forest module even when that forest uses stock difference and feeds nothing.
+        # Changes that clear a cache without an edit (submodules) reach the pool through invalidate_cached_results.
+        return all(
+            module.last_modified is None or module.last_modified <= self.last_cached_at
+            for module in self.activity.modules
+            if type(module).__name__ in self.HWP_SOURCE_CLASSES
+        )
+
+    def get_cached_results(self, by=BreakdownTypes.TOTAL):
+        results = super().get_cached_results(by)
+        # Report runs cache emissions without the per-source breakdown the module page reads: recompute those.
+        return results if isinstance(results, dict) and "hwp" in results else None
 
 
 ### MODEL PARAMETERS TABLES ###

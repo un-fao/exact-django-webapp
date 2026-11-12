@@ -60,6 +60,7 @@ _API_ENTRIES = [
     ("api.FuelType", ("name",), "fueltype.json", "fuel"),
     ("api.SalinityType", ("value",), "salinitytype.json", "fuel"),
     ("api.EnergySourceType", ("name",), "energysourcetype.json", "fuel"),
+    ("api.ValueChainStage", ("name",), "valuechainstage.json", "fuel"),
     # Input-related in dependency order
     ("api.MacroInputType", ("name",), "macroinputtype.json", "input"),
     ("api.InputType", ("name",), "inputtype.json", "input"),
@@ -145,6 +146,10 @@ _IPCC_ENTRIES = [
     ("ipcc.RewettingCarbonFactor", ("id",), "rewettingcarbonfactor.json", "ipcc"),
     ("ipcc.RewettingMethaneFactor", ("id",), "rewettingmethanefactor.json", "ipcc"),
     ("ipcc.OtherConstructedWaterbodiesEmissionFactor", ("id",), "otherconstructedwaterbodiesemissionfactor.json", "ipcc"),
+    ("ipcc.ReservoirEmissionFactor", ("id",), "reservoiremissionfactor.json", "ipcc"),
+    ("ipcc.WasteComponent", ("id",), "wastecomponent.json", "ipcc"),
+    ("ipcc.SolidWasteDisposalSiteType", ("id",), "solidwastedisposalsitetype.json", "ipcc"),
+    ("ipcc.WasteTreatmentEmissionFactor", ("id",), "wastetreatmentemissionfactor.json", "ipcc"),
     ("ipcc.Atwood", ("id",), "atwood.json", "ipcc"),
     ("ipcc.DefaultSoilCarbonStock", ("id",), "defaultsoilcarbonstock.json", "ipcc"),
     ("ipcc.DrainageEmissionFactor", ("id",), "drainageemissionfactor.json", "ipcc"),

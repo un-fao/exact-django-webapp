@@ -8,8 +8,6 @@ on the "Activity complete" page.
 
 from unittest import mock
 
-from django.conf import settings
-from django.test import override_settings
 from rest_framework.test import APITestCase
 
 from api.models import Group, ModuleType
@@ -22,11 +20,9 @@ def serial_map(func, items, **kwargs):
     return [func(item) for item in items]
 
 
-# Both stand-ins keep every request inside the test transaction. Worker threads open
-# their own connections, which cannot see uncommitted rows, and DatabaseConnectionMiddleware
-# closes all connections after each response, ending the transaction for the next test.
+# Worker threads open their own connections, which cannot see the rows of the test
+# transaction, and close them on exit.
 @mock.patch("api.concurrency.map_in_bounded_threads", serial_map)
-@override_settings(MIDDLEWARE=[m for m in settings.MIDDLEWARE if m != "minitool.middleware.DatabaseConnectionMiddleware"])
 class PublicApiShapeTestCase(APITestCase):
     def setUp(self):
         Group.objects.get_or_create(name="Admin")
@@ -92,6 +88,18 @@ class PublicApiShapeTestCase(APITestCase):
         self.assertEqual(len(data["modules"]), 1)
         self.assertEqual(data["modules"][0]["id"], self.module.pk)
         self.assertEqual(data["modules"][0]["results"]["balance"], 4.0)
+
+    def test_module_defaults_do_not_write_the_module(self):
+        updated_at = self.module.updated_at
+        history_count = self.module.history.count()
+
+        with mock.patch("api.defaults.DefaultsFactory.get_defaults", return_value={"value": 1}):
+            data = self.get(f"/api/public/inputs/{self.module.pk}/defaults/")
+
+        self.assertEqual(data, {"value": 1})
+        self.module.refresh_from_db()
+        self.assertEqual(self.module.updated_at, updated_at)
+        self.assertEqual(self.module.history.count(), history_count)
 
     def test_private_project_stays_hidden(self):
         self.project.is_public = False
