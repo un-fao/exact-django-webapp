@@ -18,7 +18,6 @@ import api.defaults as defaults
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 
 from .base import BaseModuleReport, NotReadyError
-from .cache import submodule_balance_emissions
 from .data_types import InventoryItem, MetadataWrite, ModuleResult, ResultRow
 from . import land_pools
 from .extractors import _add, extract_emissions
@@ -1148,7 +1147,7 @@ class SettlementReport(LandModuleReport):
                 else calculators.BuildingCalculator
             )
             try:
-                sub_es = submodule_balance_emissions(submodule, CalculatorClass(submodule))
+                sub_es = self._submodule_set(submodule, CalculatorClass)
             except Exception as e:
                 log.error(f"Cannot calculate submodule {submodule.module_type.name}: {e}")
                 raise NotReadyError(f"Cannot calculate submodule {submodule.module_type.name}: {e}")

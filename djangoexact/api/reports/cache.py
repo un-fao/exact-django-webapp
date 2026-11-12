@@ -133,15 +133,23 @@ def load_emissions_from_cache(module) -> CacheResult | None:
     return _cache_result(cached, module.cached_units_breakdown)
 
 
-def submodule_balance_emissions(submodule, calculator):
-    """Balance emission sets of a submodule: frozen for a finalized project, calculated otherwise."""
+def submodule_emission_sets(submodule, calculator_class) -> dict:
+    """Emission sets of a submodule keyed "balance" / "total_w" / "total_wo".
+
+    Frozen for a finalized project, calculated otherwise.
+    """
     from api.calculators import Result
     from api.services.finalization import frozen_result
 
     frozen = frozen_result(submodule)
     if frozen is not None:
-        return frozen.results_by_activity_by_gas["balance"]
-    return Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+        return frozen.results_by_activity_by_gas
+    result = Result(*calculator_class(submodule).calculate())
+    return {
+        "balance": result.balance.yearly_emissions_by_sector_by_gas,
+        "total_w": result.total_w.yearly_emissions_by_sector_by_gas,
+        "total_wo": result.total_wo.yearly_emissions_by_sector_by_gas,
+    }
 
 
 def _cache_result(cached: dict, units: dict | None) -> CacheResult:

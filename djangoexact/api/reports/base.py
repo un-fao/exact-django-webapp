@@ -53,6 +53,9 @@ class BaseModuleReport:
     _from_cache: bool = field(default=False, repr=False)
     _cached_inventory: list = field(default_factory=list, repr=False)
     _cache_result: Any = field(default=None, repr=False)
+    # Key of the emission sets compute() is reading: "balance", "total_w" or "total_wo"
+    scenario: str = field(default="balance", repr=False)
+    _submodule_sets: dict = field(default_factory=dict, repr=False)
 
     def __post_init__(self):
         from api.services.finalization import FrozenResultMissingError
@@ -170,9 +173,10 @@ class BaseModuleReport:
     def compute_with_scenarios(self) -> ModuleResult:
         """compute(), plus result rows and totals for the with/without scenarios.
 
-        Every module builds its Results rows from ``self.emissions_set``, so
-        pointing it at the with/without set and re-running compute() yields the
-        same rows, labels and gas split as the balance, as absolute fluxes.
+        Modules build their Results rows from ``self.emissions_set``, or, when
+        the rows are split per submodule, from ``_submodule_set()``. Both follow
+        ``self.scenario``, so re-running compute() per scenario yields the same
+        rows, labels and gas split as the balance, as absolute fluxes.
         compute() only reads emission sets; cache writes live in __post_init__.
 
         ponytail: runs compute() three times per module; give each module a
@@ -181,17 +185,26 @@ class BaseModuleReport:
         result = self.compute()
         balance = self.emissions_set
         try:
-            self.emissions_set = self.emissions_set_w
+            self.emissions_set, self.scenario = self.emissions_set_w, "total_w"
             with_result = self.compute()
-            self.emissions_set = self.emissions_set_wo
+            self.emissions_set, self.scenario = self.emissions_set_wo, "total_wo"
             without_result = self.compute()
         finally:
-            self.emissions_set = balance
+            self.emissions_set, self.scenario = balance, "balance"
         result.result_rows_w = with_result.result_rows
         result.total_emissions_w = with_result.total_emissions
         result.result_rows_wo = without_result.result_rows
         result.total_emissions_wo = without_result.total_emissions
         return result
+
+    def _submodule_set(self, submodule, calculator_class) -> list:
+        """The current scenario's emission set of a submodule, computed once per report."""
+        from .cache import submodule_emission_sets
+
+        key = (type(submodule), submodule.pk)
+        if key not in self._submodule_sets:
+            self._submodule_sets[key] = submodule_emission_sets(submodule, calculator_class)
+        return self._submodule_sets[key][self.scenario]
 
     def _inventory_items_from_module(self, activity_title: str) -> list[InventoryItem]:
         """Build InventoryItem list — from cache or from live inventory object."""
