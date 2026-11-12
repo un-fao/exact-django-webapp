@@ -175,6 +175,14 @@ class SolidWasteTestCase(base_module.BaseModuleTestCase):
         report = SolidWasteReport(self.module)
         self.assertTrue(report.emissions_set)
 
+    def test_module_is_named_food_loss_and_waste(self):
+        module_type = models.ModuleType.objects.get(class_name="SolidWaste")
+        self.assertEqual(
+            (module_type.name_en, module_type.name_fr, module_type.name_es, module_type.name_ru),
+            ("Food Loss and Waste", "Pertes et gaspillages alimentaires", "Pérdida y desperdicio de alimentos",
+             "Продовольственные потери и пищевые отходы"),
+        )
+
     def test_export_import_round_trip(self):
         values = {**AMOUNTS, **routes(open_burning=0.25, swds_managed_anaerobic=0.75), "swds_recovery_w": 0.3, "crop_waste_flooded_rice_wo": 0.05}
         self.edit_module(self.module, self.user, values)

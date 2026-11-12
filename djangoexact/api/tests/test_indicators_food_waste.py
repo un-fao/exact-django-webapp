@@ -90,8 +90,8 @@ class FoodWasteIndicatorsTests(base_module.BaseModuleTestCase):
 
         ws = openpyxl.load_workbook(BytesIO(generate_excel_report(self.project)))["Indicators"]
         labels = [row[0] for row in ws.iter_rows(min_col=1, max_col=1, values_only=True)]
-        self.assertIn("Food waste", labels)
-        self.assertIn("Food waste valorised by anaerobic digestion", labels)
+        self.assertIn("Food loss and waste", labels)
+        self.assertIn("Food loss and waste valorised by anaerobic digestion", labels)
 
     def test_cached_module_results_give_the_same_numbers(self):
         cold = self._group()
