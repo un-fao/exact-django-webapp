@@ -1,3 +1,9 @@
+## 1.22.3 (2026-11-12)
+
+### Fix
+
+- **reports**: show scenario fluxes for submodule rows on the with/without sheets
+
 ## 1.22.2 (2026-11-09)
 
 ### Fix
