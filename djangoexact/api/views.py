@@ -1990,10 +1990,23 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
+        error = self._refuse_last_admin_demotion(membership, serializer.validated_data)
+        if error:
+            return error
+
         serializer.save()
 
         return Response(ProjectMembershipReadSerializer(membership).data, status=http_status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_description="Partially update a project membership",
+        request_body=ProjectMembershipWriteSerializer,
+        responses={
+            400: "Bad request",
+            200: "Project membership updated successfully",
+            403: "Selected user does not have permission to change project memberships",
+        },
+    )
     def partial_update(self, request, *args, **kwargs):
         membership = self.get_object()
         error = security.check_permission("change_projectmembership", self.request.user, membership.project)
@@ -2005,9 +2018,22 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
+        error = self._refuse_last_admin_demotion(membership, serializer.validated_data)
+        if error:
+            return error
+
         serializer.save()
 
         return Response(ProjectMembershipReadSerializer(membership).data, status=http_status.HTTP_200_OK)
+
+    @staticmethod
+    def _refuse_last_admin_demotion(membership, validated_data):
+        new_group = validated_data.get("group")
+        if membership.group.name != "Admin" or new_group is None or new_group.name == "Admin":
+            return None
+        if membership.project.members.filter(group__name="Admin").count() == 1:
+            return utils.ErrorResponse("Cannot change the role of the last Admin in the project", status=http_status.HTTP_400_BAD_REQUEST)
+        return None
 
     @swagger_auto_schema(
         operation_description="Delete a project membership",
