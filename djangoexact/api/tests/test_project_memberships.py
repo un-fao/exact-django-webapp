@@ -1,6 +1,7 @@
 from datetime import timedelta
 from unittest import mock
 
+from django.contrib.auth.models import Permission
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from rest_framework.test import APITestCase
@@ -118,3 +119,25 @@ class MembershipUniquenessTestCase(MembershipTestBase):
     def test_database_rejects_a_second_membership(self):
         with self.assertRaises(IntegrityError), transaction.atomic():
             ProjectMembership.objects.create(user=self.owner, project=self.project, group=self.viewer_group)
+
+
+class InvitationDeleteTestCase(MembershipTestBase):
+    def setUp(self):
+        super().setUp()
+        self.invitee = UserFactory(email="membership-invitee@example.com")
+        self.invitation = self.invite(self.invitee, self.viewer_group)
+
+    def delete(self):
+        return self.client.delete(f"/api/project-invitations/{self.invitation.pk}/")
+
+    def test_non_member_cannot_delete(self):
+        self.client.force_authenticate(UserFactory(email="membership-outsider@example.com"))
+        self.assertEqual(self.delete().status_code, 403)
+        self.assertTrue(ProjectInvitation.objects.filter(pk=self.invitation.pk).exists())
+
+    def test_member_with_change_permission_can_delete(self):
+        self.viewer_group.permissions.add(Permission.objects.get(codename="change_projectinvitation"))
+        ProjectMembership.objects.create(user=self.member, project=self.project, group=self.viewer_group)
+        self.client.force_authenticate(self.member)
+        self.assertEqual(self.delete().status_code, 204)
+        self.assertFalse(ProjectInvitation.objects.filter(pk=self.invitation.pk).exists())
