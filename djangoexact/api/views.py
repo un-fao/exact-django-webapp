@@ -2323,6 +2323,25 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return self.partial_update(request, *args, **kwargs)
 
     @swagger_auto_schema(
+        operation_description="Delete a project invitation",
+        responses={
+            204: "Invitation deleted successfully",
+            403: "Selected user does not have permission to delete invitations",
+        },
+    )
+    def destroy(self, request, *args, **kwargs):
+        invitation = self.get_object()
+        # change_ rather than delete_: revoking through partial_update already requires it, and the
+        # production group permissions are not in the repo, so delete_ may not be granted to anyone.
+        error = security.check_permission("change_projectinvitation", self.request.user, invitation.project)
+        if error:
+            return error
+
+        invitation.delete()
+
+        return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
         manual_parameters=[project_id],
         responses={
             400: "Bad request",
