@@ -1,6 +1,7 @@
 from datetime import timedelta
 from unittest import mock
 
+from django.contrib.auth.models import Permission
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from rest_framework.test import APITestCase
@@ -118,3 +119,54 @@ class MembershipUniquenessTestCase(MembershipTestBase):
     def test_database_rejects_a_second_membership(self):
         with self.assertRaises(IntegrityError), transaction.atomic():
             ProjectMembership.objects.create(user=self.owner, project=self.project, group=self.viewer_group)
+
+
+class MembershipRoleChangeTestCase(MembershipTestBase):
+    LAST_ADMIN_ERROR = "Cannot change the role of the last Admin in the project"
+
+    def setUp(self):
+        super().setUp()
+        change = Permission.objects.get(codename="change_projectmembership")
+        self.admin_group.permissions.add(change)
+        self.owner_membership = ProjectMembership.objects.get(user=self.owner, project=self.project)
+        self.client.force_authenticate(self.owner)
+
+    def url(self, membership):
+        return f"/api/project-memberships/{membership.pk}/"
+
+    def patch_group(self, membership, group):
+        return self.client.patch(self.url(membership), {"group": group.pk}, format="json")
+
+    def assert_group(self, membership, group):
+        membership.refresh_from_db()
+        self.assertEqual(membership.group_id, group.pk)
+
+    def test_patch_refuses_demoting_the_last_admin(self):
+        resp = self.patch_group(self.owner_membership, self.viewer_group)
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn(self.LAST_ADMIN_ERROR, str(resp.data))
+        self.assert_group(self.owner_membership, self.admin_group)
+
+    def test_put_refuses_demoting_the_last_admin(self):
+        body = {"project": self.project.pk, "user": self.owner.pk, "group": self.viewer_group.pk}
+        resp = self.client.put(self.url(self.owner_membership), body, format="json")
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn(self.LAST_ADMIN_ERROR, str(resp.data))
+        self.assert_group(self.owner_membership, self.admin_group)
+
+    def test_patch_without_group_skips_the_check(self):
+        resp = self.client.patch(self.url(self.owner_membership), {"project": self.project.pk}, format="json")
+        self.assertEqual(resp.status_code, 200)
+        self.assert_group(self.owner_membership, self.admin_group)
+
+    def test_admin_can_be_demoted_when_another_admin_exists(self):
+        other = ProjectMembership.objects.create(user=self.member, project=self.project, group=self.admin_group)
+        resp = self.patch_group(other, self.viewer_group)
+        self.assertEqual(resp.status_code, 200)
+        self.assert_group(other, self.viewer_group)
+
+    def test_non_admin_role_change_still_works(self):
+        member = ProjectMembership.objects.create(user=self.member, project=self.project, group=self.viewer_group)
+        resp = self.patch_group(member, self.admin_group)
+        self.assertEqual(resp.status_code, 200)
+        self.assert_group(member, self.admin_group)
