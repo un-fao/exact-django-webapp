@@ -2305,8 +2305,8 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def destroy(self, request, *args, **kwargs):
         invitation = self.get_object()
-        # change_ rather than delete_: the production groups grant change_projectinvitation, which is what
-        # revoking through partial_update already requires.
+        # change_ rather than delete_: revoking through partial_update already requires it, and the
+        # production group permissions are not in the repo, so delete_ may not be granted to anyone.
         error = security.check_permission("change_projectinvitation", self.request.user, invitation.project)
         if error:
             return error
