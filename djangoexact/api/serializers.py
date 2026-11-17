@@ -3729,10 +3729,22 @@ class ProjectInvitationModelReadSerializer(serializers.ModelSerializer):
 
 
 class ProjectInvitationModelWriteSerializer(serializers.ModelSerializer):
+    """Update of an existing invitation: only its status changes.
+
+    The project, user and group are fixed when the invitation is sent. A request that tries to set any
+    other field is refused rather than silently ignored, so a client never believes it changed them.
+    """
+
     class Meta:
         model = ProjectInvitation
-        fields = "__all__"
+        fields = ["status"]
         ref_name = "ProjectInvitation"
+
+    def validate(self, data):
+        unexpected = sorted(set(self.initial_data) - set(self.fields))
+        if unexpected:
+            raise serializers.ValidationError({field: "Only the status of an invitation can be changed" for field in unexpected})
+        return data
 
 
 class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
