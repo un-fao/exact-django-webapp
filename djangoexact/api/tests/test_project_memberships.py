@@ -213,3 +213,48 @@ class InvitationDeleteTestCase(MembershipTestBase):
         self.client.force_authenticate(self.member)
         self.assertEqual(self.delete().status_code, 204)
         self.assertFalse(ProjectInvitation.objects.filter(pk=self.invitation.pk).exists())
+
+
+class InvitationUpdateTestCase(MembershipTestBase):
+    def setUp(self):
+        super().setUp()
+        self.rejected = _status(InvitationStatus.REJECTED.value)
+        self.admin_group.permissions.add(Permission.objects.get(codename="change_projectinvitation"))
+        self.invitation = self.invite(self.member, self.viewer_group)
+        self.client.force_authenticate(self.owner)
+
+    def patch(self, body):
+        return self.client.patch(f"/api/project-invitations/{self.invitation.pk}/", body, format="json")
+
+    def assert_unchanged(self):
+        self.invitation.refresh_from_db()
+        self.assertEqual(self.invitation.project_id, self.project.pk)
+        self.assertEqual(self.invitation.user_id, self.member.pk)
+        self.assertEqual(self.invitation.group_id, self.viewer_group.pk)
+        self.assertEqual(self.invitation.status_id, self.pending.pk)
+
+    def test_patch_refuses_changing_the_project(self):
+        other_project = ProjectFactory(owner=self.member, country=self.project.country, gw_potential=self.project.gw_potential)
+        resp = self.patch({"status": self.rejected.pk, "project": other_project.pk})
+        self.assertEqual(resp.status_code, 400)
+        self.assert_unchanged()
+
+    def test_patch_refuses_changing_the_user_and_group(self):
+        resp = self.patch({"status": self.rejected.pk, "user": self.owner.pk, "group": self.admin_group.pk})
+        self.assertEqual(resp.status_code, 400)
+        self.assert_unchanged()
+
+    def test_patch_without_status_is_a_bad_request(self):
+        self.assertEqual(self.patch({}).status_code, 400)
+        self.assert_unchanged()
+
+    def test_patch_status_rejects_the_invitation(self):
+        resp = self.patch({"status": self.rejected.pk})
+        self.assertEqual(resp.status_code, 200)
+        self.invitation.refresh_from_db()
+        self.assertEqual(self.invitation.status_id, self.rejected.pk)
+
+    def test_patch_status_accepts_the_invitation(self):
+        resp = self.patch({"status": self.accepted.pk})
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(ProjectMembership.objects.filter(user=self.member, project=self.project, group=self.viewer_group).exists())

@@ -2286,7 +2286,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        data = ProjectInvitationModelWriteSerializer(invitation, data=request.data, partial=True)
+        data = ProjectInvitationModelWriteSerializer(invitation, data=request.data)
 
         if not data.is_valid():
             return Response(data.errors, status=http_status.HTTP_400_BAD_REQUEST)
