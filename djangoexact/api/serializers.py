@@ -3315,6 +3315,13 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
     def validate(self, data):
         super().validate(data)
 
+        # A membership stays tied to the project and user it was created for: adding people goes through
+        # create and invitations, and an update only changes the group.
+        if self.instance is not None:
+            for field in ("project", "user"):
+                if field in data and data[field] != getattr(self.instance, field):
+                    raise serializers.ValidationError({field: f"The {field} of an existing membership cannot be changed"})
+
         project: Project = utils.getany([data, self.instance], "project")
 
         check_member_management_allowed(project, self.context.get("request"))
