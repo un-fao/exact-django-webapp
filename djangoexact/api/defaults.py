@@ -57,6 +57,21 @@ def _with_ranges(values, sources):
     return values
 
 
+def _found(row):
+    """Return the IPCC row, or None when the lookup missed.
+
+    On a miss the calculator keeps the unsaved placeholder it was initialised with
+    (pk None, value 0) so a tier-2 input can stand in. Reporting that 0 as the
+    default would claim IPCC publishes 0 when it publishes nothing.
+    """
+    return row if row is not None and row.pk is not None else None
+
+
+def _found_value(row):
+    row = _found(row)
+    return row.value if row is not None else None
+
+
 def _get_defaults_class(class_name: str):
     """Look up a Defaults subclass by name within this module, returning None if not found.
 
@@ -361,22 +376,27 @@ class PerennialCroplandDefaults(Defaults):
         defaults = calcs.PerennialCropCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        # Scenarios the module doesn't run borrow a neighbour's max AGB, picked once so value and range agree.
+        agb_max_w = defaults.agb_max_w_default if self.input.is_with() else defaults.agb_max_wo_default
+        if self.input.is_start():
+            agb_max_start = defaults.agb_max_start_default
+        else:
+            agb_max_start = defaults.agb_max_w_default if _found_value(defaults.agb_max_w_default) else defaults.agb_max_wo_default
+
         return _with_ranges(SimpleNamespace(
             soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
             soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
             soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
             agb_t2_start_default=defaults.agb_start_default.value if self.input.is_start() else defaults.biomass_ef_start_w.value or defaults.biomass_ef_start_wo.value,
-            # agb_t2_w_default=defaults.agb_start_w_default.value if self.input.is_with() else defaults.biomass_ef_w.value,
-            # agb_t2_wo_default=defaults.agb_start_wo_default.value if self.input.is_without() else defaults.biomass_ef_wo.value,
-            agb_rate_t2_start_default=defaults.agb_rate_start_default.value,
-            agb_rate_t2_w_default=defaults.agb_rate_w_default.value,
-            agb_rate_t2_wo_default=defaults.agb_rate_wo_default.value,
-            agb_max_t2_start_default=defaults.agb_max_start_default.value if self.input.is_start() else defaults.agb_max_w_default.value or defaults.agb_max_wo_default.value,
-            agb_max_t2_w_default=defaults.agb_max_w_default.value if self.input.is_with() else defaults.agb_max_wo_default.value,
-            agb_max_t2_wo_default=defaults.agb_max_wo_default.value if self.input.is_without() else defaults.agb_max_wo_default.value,
-            bgb_t2_start_default=defaults.bgb_start_default.value if self.input.is_start() else 0,
-            bgb_t2_w_default=defaults.bgb_w_default.value if self.input.is_with() else 0,
-            bgb_t2_wo_default=defaults.bgb_wo_default.value if self.input.is_without() else 0,
+            agb_rate_t2_start_default=_found_value(defaults.agb_rate_start_default),
+            agb_rate_t2_w_default=_found_value(defaults.agb_rate_w_default),
+            agb_rate_t2_wo_default=_found_value(defaults.agb_rate_wo_default),
+            agb_max_t2_start_default=_found_value(agb_max_start),
+            agb_max_t2_w_default=_found_value(agb_max_w),
+            agb_max_t2_wo_default=_found_value(defaults.agb_max_wo_default),
+            bgb_t2_start_default=_found_value(defaults.bgb_start_default) if self.input.is_start() else 0,
+            bgb_t2_w_default=_found_value(defaults.bgb_w_default) if self.input.is_with() else 0,
+            bgb_t2_wo_default=_found_value(defaults.bgb_wo_default) if self.input.is_without() else 0,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
@@ -398,15 +418,15 @@ class PerennialCroplandDefaults(Defaults):
         ), [
             *(((f"soc_t2_{scenario}_default",), getattr(defaults, f"soc_{scenario}") if not self.input.activity.soc else None, "value") for scenario in ("start", "w", "wo")),
             (('agb_t2_start_default',), defaults.agb_start_default if self.input.is_start() else defaults.biomass_ef_start_w if defaults.biomass_ef_start_w.value else defaults.biomass_ef_start_wo, 'value'),
-            (('agb_max_t2_start_default',), defaults.agb_max_start_default if self.input.is_start() else defaults.agb_max_w_default if defaults.agb_max_w_default.value else defaults.agb_max_wo_default, 'value'),
-            (('agb_max_t2_w_default',), defaults.agb_max_w_default if self.input.is_with() else defaults.agb_max_wo_default, 'value'),
-            (('agb_max_t2_wo_default',), defaults.agb_max_wo_default, 'value'),
-            (('bgb_t2_start_default',), defaults.bgb_start_default if self.input.is_start() else None, 'value'),
-            (('bgb_t2_w_default',), defaults.bgb_w_default if self.input.is_with() else None, 'value'),
-            (('bgb_t2_wo_default',), defaults.bgb_wo_default if self.input.is_without() else None, 'value'),
-            (('agb_rate_t2_start_default',), defaults.agb_rate_start_default, 'value'),
-            (('agb_rate_t2_w_default',), defaults.agb_rate_w_default, 'value'),
-            (('agb_rate_t2_wo_default',), defaults.agb_rate_wo_default, 'value'),
+            (('agb_max_t2_start_default',), _found(agb_max_start), 'value'),
+            (('agb_max_t2_w_default',), _found(agb_max_w), 'value'),
+            (('agb_max_t2_wo_default',), _found(defaults.agb_max_wo_default), 'value'),
+            (('bgb_t2_start_default',), _found(defaults.bgb_start_default) if self.input.is_start() else None, 'value'),
+            (('bgb_t2_w_default',), _found(defaults.bgb_w_default) if self.input.is_with() else None, 'value'),
+            (('bgb_t2_wo_default',), _found(defaults.bgb_wo_default) if self.input.is_without() else None, 'value'),
+            (('agb_rate_t2_start_default',), _found(defaults.agb_rate_start_default), 'value'),
+            (('agb_rate_t2_w_default',), _found(defaults.agb_rate_w_default), 'value'),
+            (('agb_rate_t2_wo_default',), _found(defaults.agb_rate_wo_default), 'value'),
             (('flu_t2_start_default',), defaults.flu_start, 'value'),
             (('flu_t2_w_default',), defaults.flu_w, 'value'),
             (('flu_t2_wo_default',), defaults.flu_wo, 'value'),
