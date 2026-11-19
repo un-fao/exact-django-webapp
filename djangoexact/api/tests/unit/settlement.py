@@ -46,7 +46,9 @@ class SettlementTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.edit_module(self.module, self.user, self.validated_data)
         self.edit_module(self.submodules[0], self.user, self.validated_data)
         self.edit_module(self.submodules[1], self.user, self.validated_data)
-        self.edit_module(self.submodules[2], self.user, self.validated_data)
+        # Other infrastructure has no IPCC emission factor, so the settlement cannot be calculated without a tier 2 one.
+        other_infrastructure_ef_t2 = {f"ef_t2_{s}": FuzzyFloat(0, 1000).fuzz() for s in ("start", "w", "wo")}
+        self.edit_module(self.submodules[2], self.user, {**self.validated_data, **other_infrastructure_ef_t2})
 
         self.submodules[0].refresh_from_db()
         self.submodules[1].refresh_from_db()

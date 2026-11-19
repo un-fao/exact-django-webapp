@@ -197,14 +197,21 @@ class BaseModuleReport:
         result.total_emissions_wo = without_result.total_emissions
         return result
 
-    def _submodule_set(self, submodule, calculator_class) -> list:
-        """The current scenario's emission set of a submodule, computed once per report."""
+    def submodule_scenario_sets(self, submodule, calculator_class) -> dict:
+        """Emission sets of a submodule keyed "balance" / "total_w" / "total_wo", computed once per report.
+
+        Frozen for a finalized project (raises FrozenResultMissingError without a snapshot), calculated otherwise.
+        """
         from .cache import submodule_emission_sets
 
         key = (type(submodule), submodule.pk)
         if key not in self._submodule_sets:
             self._submodule_sets[key] = submodule_emission_sets(submodule, calculator_class)
-        return self._submodule_sets[key][self.scenario]
+        return self._submodule_sets[key]
+
+    def _submodule_set(self, submodule, calculator_class) -> list:
+        """The current scenario's emission set of a submodule, computed once per report."""
+        return self.submodule_scenario_sets(submodule, calculator_class)[self.scenario]
 
     def _inventory_items_from_module(self, activity_title: str) -> list[InventoryItem]:
         """Build InventoryItem list — from cache or from live inventory object."""

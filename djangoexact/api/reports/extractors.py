@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from itertools import zip_longest
-from typing import Any
+from typing import Any, Iterator
 
 import logging as log
 
@@ -29,6 +29,21 @@ def _eq(val: Any, target: Any) -> bool:
         or (hasattr(target, "value") and val == target.value)
         or (hasattr(target, "name") and val == target.name)
     )
+
+
+def iter_fluxes(source: list | dict) -> Iterator[tuple[Any, Any, list[float]]]:
+    """Yield ``(activity, gas, yearly values)`` for each entry of an emission set, in any stored form.
+
+    ``source`` is a list of ``YearlyGasActivityEmissionSet`` objects, the serialized cache form (a list of
+    dicts whose ``gas_type`` is a ``{"name": ...}`` dict), or a dict of such dicts keyed by index.
+    Activity and gas come back as stored (enums, or the cache's strings), so compare them with ``_eq``.
+    """
+    for e in source.values() if isinstance(source, dict) else source:
+        if isinstance(e, dict):
+            activity, gas, values = e.get("activity"), e.get("gas_type"), [v["value"] for v in e.get("emissions", [])]
+        else:
+            activity, gas, values = e.activity, e.gas_type, [v.value for v in e.emissions]
+        yield activity, gas.get("name") if isinstance(gas, dict) else gas, values
 
 
 def extract_emissions(
@@ -60,34 +75,7 @@ def extract_emissions(
     zeros = [0.0] * duration
     emissions: list[list[float]] = [zeros]
 
-    if isinstance(source, dict):
-        entries = source.values()
-        get_activity = lambda e: e.get("activity")
-        get_gas = lambda e: e.get("gas_type")
-        get_values = lambda e: [v["value"] for v in e.get("emissions", [])]
-    else:
-        entries = source
-        first = next(iter(source), None)
-        if isinstance(first, dict):
-            # Serialized cache format: list of dicts with nested gas_type dict
-            # e.g. {"activity": "Biomass", "gas_type": {"id": 1, "name": "CO2"}, ...}
-            get_activity = lambda e: e.get("activity")
-            get_gas = lambda e: (
-                e["gas_type"].get("name")
-                if isinstance(e.get("gas_type"), dict)
-                else e.get("gas_type")
-            )
-            get_values = lambda e: [v["value"] for v in e.get("emissions", [])]
-        else:
-            # Live ORM queryset: list of YearlyGasActivityEmissionSet objects
-            get_activity = lambda e: e.activity
-            get_gas = lambda e: e.gas_type
-            get_values = lambda e: [v.value for v in e.emissions]
-
-    for entry in entries:
-        e_activity = get_activity(entry)
-        e_gas = get_gas(entry)
-
+    for e_activity, e_gas, values in iter_fluxes(source):
         if any(_eq(e_activity, ex) for ex in excluded_activity_types) or any(
             _eq(e_gas, ex) for ex in excluded_gas_types
         ):
@@ -96,17 +84,17 @@ def extract_emissions(
         if activity_type is not None and gas_type is not None:
             if _eq(e_activity, activity_type) and _eq(e_gas, gas_type):
                 log.debug(f"Found emissions for {activity_type} / {gas_type}")
-                emissions.append(get_values(entry))
+                emissions.append(values)
         elif activity_type is not None:
             if _eq(e_activity, activity_type):
                 log.debug(f"Found emissions for {e_activity} / {e_gas}")
-                emissions.append(get_values(entry))
+                emissions.append(values)
         elif gas_type is not None:
             if _eq(e_gas, gas_type):
                 log.debug(f"Found emissions for {e_activity} / {e_gas}")
-                emissions.append(get_values(entry))
+                emissions.append(values)
         else:
             log.debug("Extracting all emissions (no filter)")
-            emissions.append(get_values(entry))
+            emissions.append(values)
 
     return list(map(sum, zip_longest(*emissions, fillvalue=0)))
