@@ -12,7 +12,7 @@ import traceback
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import Count, Model
 from django.utils import timezone
@@ -2979,6 +2979,37 @@ def generic_module_viewset(model: Module):
 
             return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
+        @staticmethod
+        def _target_projects(data, is_submodule: bool) -> list[Project | None]:
+            """
+            Projects a create payload (one item or a list) targets through `activity`, or `parent` for a submodule.
+
+            A well-formed id that matches nothing yields None, so it is refused like a foreign target instead of
+            telling the caller it does not exist. Missing or malformed ids are skipped: field validation rejects
+            those items before `validate()` can take any lock.
+            """
+            target_field = model._meta.get_field("parent" if is_submodule else "activity")
+            target_model = target_field.related_model
+            target_pks = set()
+            for item in data if isinstance(data, list) else [data]:
+                try:
+                    target_pk = target_model._meta.pk.to_python(item.get(target_field.name))
+                except (AttributeError, DjangoValidationError):
+                    continue
+                if target_pk is not None:
+                    target_pks.add(target_pk)
+
+            project_path = "activity__project" if is_submodule else "project"
+            targets = target_model.objects.select_related(project_path).in_bulk(target_pks)
+            projects = []
+            for target_pk in target_pks:
+                target = targets.get(target_pk)
+                if target is None:
+                    projects.append(None)
+                else:
+                    projects.append(target.activity.project if is_submodule else target.project)
+            return projects
+
         @transaction.atomic
         def create(self, request):
             """
@@ -2988,8 +3019,23 @@ def generic_module_viewset(model: Module):
             logging.debug(f"START GenericModuleViewSet[{model.__name__}].create")
             logging.debug(f"request.data: {request.data}")
 
-            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=isinstance(request.data, list), context={"request": request})
             module_type = ModuleType.objects.get(class_name=model.__name__)
+
+            # IsPublicOrAuthenticated already refuses anonymous callers; this keeps the pre-check from ever
+            # running for one if that permission class changes.
+            if not request.user.is_authenticated:
+                return security.not_authenticated()
+
+            # Serializer validation writes (the project lock, a land module's Land Use Change), so a refused
+            # caller must be refused before it runs.
+            # ponytail: validate() still writes, move those writes to save() if another caller validates first
+            target_projects = dict.fromkeys(self._target_projects(request.data, module_type.is_submodule))
+            for project in target_projects:
+                error = security.check_permission("add_modules", self.request.user, project)
+                if error:
+                    return error
+
+            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=isinstance(request.data, list), context={"request": request})
 
             if not module_serializer.is_valid():
                 logger.error(f"Error creating module: {module_serializer.errors}")
