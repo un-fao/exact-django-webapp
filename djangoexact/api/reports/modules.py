@@ -1088,15 +1088,6 @@ class TransportReport(BaseModuleReport):
         electricity_co2 = _zeros(dur)
 
         for submodule in m.submodules:
-            cached = (submodule.cached_results_by_activity_by_gas[self.scenario]
-                      if submodule.cached_results_by_activity_by_gas is not None else None)
-            if cached is not None:
-                fuel_co2 = _add(fuel_co2, extract_emissions(cached, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2, duration=dur))
-                fuel_ch4 = _add(fuel_ch4, extract_emissions(cached, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4, duration=dur))
-                fuel_n2o = _add(fuel_n2o, extract_emissions(cached, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O, duration=dur))
-                electricity_co2 = _add(electricity_co2, extract_emissions(cached, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
-                continue
-
             try:
                 sub_es = self._submodule_set(submodule, calculators.TransportEntryCalculator)
             except Exception as e:
@@ -1150,16 +1141,6 @@ class ProcessingReport(BaseModuleReport):
         water_use = _zeros(dur)
 
         for submodule in m.submodules:
-            cached = (submodule.cached_results_by_activity_by_gas[self.scenario]
-                      if submodule.cached_results_by_activity_by_gas is not None else None)
-            if cached is not None:
-                fuel_co2 = _add(fuel_co2, extract_emissions(cached, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2, duration=dur))
-                fuel_ch4 = _add(fuel_ch4, extract_emissions(cached, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4, duration=dur))
-                fuel_n2o = _add(fuel_n2o, extract_emissions(cached, math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O, duration=dur))
-                electricity_co2 = _add(electricity_co2, extract_emissions(cached, math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2, duration=dur))
-                water_use = _add(water_use, extract_emissions(cached, math_utils.ActivityTypes.PROCESSING, math_utils.GasTypes.CO2, duration=dur))
-                continue
-
             try:
                 sub_es = self._submodule_set(submodule, calculators.ProcessingEntryCalculator)
             except Exception as e:
