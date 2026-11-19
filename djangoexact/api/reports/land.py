@@ -6,7 +6,6 @@ Each class implements compute() -> ModuleResult.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from itertools import zip_longest
 from typing import Any
 
 import logging as log
@@ -122,15 +121,6 @@ class LandModuleReport(BaseModuleReport):
         if extra_rows:
             rows.extend(extra_rows)
         return rows + self._unallocated_rows(rows)
-
-    def _unallocated_rows(self, rows: list[ResultRow]) -> list[ResultRow]:
-        """Whatever the module total holds beyond ``rows``, so the rows add up to the total."""
-        rest = self._balance_total()
-        for row in rows:
-            rest = [t - v for t, v in zip_longest(rest, row.yearly_values, fillvalue=0)]
-        if all(abs(v) < 1e-9 for v in rest):
-            return []
-        return [ResultRow("Other emissions (CO2-eq)", rest)]
 
     def _inventory_items(self, activity_title: str) -> list[InventoryItem]:
         return self._inventory_items_from_module(activity_title)

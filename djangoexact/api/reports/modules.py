@@ -952,6 +952,25 @@ class IrrigationReport(BaseModuleReport):
 # OrganicSoil
 # ---------------------------------------------------------------------------
 
+# On-site and off-site emissions share the same activity and gas, so each row sums both.
+# CO stays as its own row because the project aggregator counts it in the balance.
+ORGANIC_SOIL_RESULT_ROWS = (
+    ("CO2 from drainage of organic soils (incl. DOC)", math_utils.ActivityTypes.DRAINAGE, math_utils.GasTypes.CO2),
+    ("CH4 from drainage of organic soils", math_utils.ActivityTypes.DRAINAGE, math_utils.GasTypes.CH4),
+    ("N2O from drainage of organic soils", math_utils.ActivityTypes.DRAINAGE, math_utils.GasTypes.N2O),
+    ("CO2 from rewetting of organic soils (incl. DOC)", math_utils.ActivityTypes.REWETTING, math_utils.GasTypes.CO2),
+    ("CH4 from rewetting of organic soils", math_utils.ActivityTypes.REWETTING, math_utils.GasTypes.CH4),
+    ("N2O from rewetting of organic soils", math_utils.ActivityTypes.REWETTING, math_utils.GasTypes.N2O),
+    ("CO2 from fire on organic soils", math_utils.ActivityTypes.FIRE_ON_SOIL, math_utils.GasTypes.CO2),
+    ("CO from fire on organic soils", math_utils.ActivityTypes.FIRE_ON_SOIL, math_utils.GasTypes.CO),
+    ("CH4 from fire on organic soils", math_utils.ActivityTypes.FIRE_ON_SOIL, math_utils.GasTypes.CH4),
+    ("CO2 from peat extraction sites (incl. DOC)", math_utils.ActivityTypes.DRAINAGE_PEAT, math_utils.GasTypes.CO2),
+    ("CH4 from peat extraction sites", math_utils.ActivityTypes.DRAINAGE_PEAT, math_utils.GasTypes.CH4),
+    ("N2O from peat extraction sites", math_utils.ActivityTypes.DRAINAGE_PEAT, math_utils.GasTypes.N2O),
+    ("CO2 from extracted peat (off-site)", math_utils.ActivityTypes.OFFSITE_PEAT, math_utils.GasTypes.CO2),
+)
+
+
 @dataclass
 class OrganicSoilReport(BaseModuleReport):
     module: api_models.OrganicSoil
@@ -965,7 +984,6 @@ class OrganicSoilReport(BaseModuleReport):
         m = self.module
         luc: api_models.LandUseChange = m.land_use_change
 
-        # OrganicSoil has no result rows – only metadata
         # Stacked layout: start data in col 2 rows 1-12, with data col 3 rows 13-24,
         # without data col 4 rows 25-36
         mw = [
@@ -1052,12 +1070,14 @@ class OrganicSoilReport(BaseModuleReport):
             MetadataWrite(11, 6, m.peat_type_thread.format_comments()),
         ]
 
+        rows = [ResultRow(label, self._extract(self.emissions_set, activity, gas))
+                for label, activity, gas in ORGANIC_SOIL_RESULT_ROWS]
         return ModuleResult(
             title=m.module_type.name,
             metadata_section_title=str(m.module_type.name),
-            result_rows=[],
+            result_rows=rows + self._unallocated_rows(rows),
             metadata_writes=mw,
-            total_emissions=_zeros(self._project_duration),
+            total_emissions=self._balance_total(),
             is_with=m.is_with(),
             is_without=m.is_without(),
             _inventory_items=self._inventory_items_from_module(activity_title),
