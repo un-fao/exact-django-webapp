@@ -56,7 +56,7 @@ from .constants import (
     WS_SHADOW_PRICE,
 )
 from .data_types import ActivityResult, ModuleResult, ProjectResult, ResultRow
-from .excel_manager import ExcelFileManager
+from .excel_manager import ExcelFileManager, write_literal_cell
 
 _ORANGE = PatternFill(start_color="fce4d6", end_color="fce4d6", fill_type="solid")
 _BLUE = PatternFill(start_color="d9e1f2", end_color="d9e1f2", fill_type="solid")
@@ -138,16 +138,16 @@ class ExcelRenderer:
         ws_meta.cell(row=15, column=1, value="Fossil CH4")
 
         ws_meta.cell(row=1, column=2, value=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        ws_meta.cell(row=2, column=2, value=str(proj.name))
-        ws_meta.cell(row=3, column=2, value=proj.status.name if proj.status else "N/A")
-        ws_meta.cell(row=4, column=2, value=proj.country.name)
-        ws_meta.cell(row=5, column=2, value=proj.climate.name)
-        ws_meta.cell(row=6, column=2, value=proj.moisture.name)
-        ws_meta.cell(row=7, column=2, value=proj.soil_type.name)
+        write_literal_cell(ws_meta, 2, 2, str(proj.name))
+        write_literal_cell(ws_meta, 3, 2, proj.status.name if proj.status else "N/A")
+        write_literal_cell(ws_meta, 4, 2, proj.country.name)
+        write_literal_cell(ws_meta, 5, 2, proj.climate.name)
+        write_literal_cell(ws_meta, 6, 2, proj.moisture.name)
+        write_literal_cell(ws_meta, 7, 2, proj.soil_type.name)
         ws_meta.cell(row=8, column=2, value=proj.implementation_years)
         ws_meta.cell(row=9, column=2, value=proj.capitalization_years)
         ws_meta.cell(row=10, column=2, value=r.duration)
-        ws_meta.cell(row=11, column=2, value=proj.gwp.name)
+        write_literal_cell(ws_meta, 11, 2, proj.gwp.name)
         ws_meta.cell(row=12, column=2, value=proj.gwp.co2)
         ws_meta.cell(row=13, column=2, value=proj.gwp.ch4)
         ws_meta.cell(row=14, column=2, value=proj.gwp.n2o)
@@ -201,19 +201,19 @@ class ExcelRenderer:
 
         # Metadata: activity title + T2 overrides
         meta_row = ws_meta.max_row + 1
-        ws_meta.cell(row=meta_row, column=1, value=str(ar.title)).fill = _BLUE
+        write_literal_cell(ws_meta, meta_row, 1, str(ar.title)).fill = _BLUE
         if ar.conditionality:
             meta_row += 1
             ws_meta.cell(row=meta_row, column=META_COL_LABEL, value="NDC conditionality")
-            ws_meta.cell(row=meta_row, column=META_COL_START, value=ar.conditionality.capitalize())
+            write_literal_cell(ws_meta, meta_row, META_COL_START, ar.conditionality.capitalize())
         for t2 in ar.t2_overrides:
             meta_row += 1
-            ws_meta.cell(row=meta_row, column=META_COL_LABEL, value=t2.label)
-            ws_meta.cell(row=meta_row, column=META_COL_TIER2, value=t2.value)
+            write_literal_cell(ws_meta, meta_row, META_COL_LABEL, t2.label)
+            write_literal_cell(ws_meta, meta_row, META_COL_TIER2, t2.value)
 
         # Additional Indicators: activity structure
         ai_base = ws_ai.max_row + 1
-        ws_ai.cell(row=ai_base, column=1, value=str(ar.title)).fill = _ORANGE
+        write_literal_cell(ws_ai, ai_base, 1, str(ar.title)).fill = _ORANGE
         ws_ai.cell(row=ai_base + 1, column=1, value="Land Uses Targeted (ha)").fill = _BLUE
         ws_ai.cell(row=ai_base + 2, column=1, value="With project").fill = _BEIGE
         ws_ai.cell(row=ai_base + 3, column=1, value="Without project").fill = _BEIGE
@@ -232,7 +232,7 @@ class ExcelRenderer:
             # Each insert shifts "Without project" and all existing wo data down by 1.
             for label, values in mr.additional_indicator_rows_w:
                 ws_ai.insert_rows(with_row + 1)
-                ws_ai.cell(with_row + 1, 1, label)
+                write_literal_cell(ws_ai, with_row + 1, 1, label)
                 for i, v in enumerate(values[:dur]):
                     ws_ai.cell(with_row + 1, i + DATA_COL_START, v)
                 wo_row += 1  # "Without project" shifted down
@@ -241,7 +241,7 @@ class ExcelRenderer:
             # wo_row stays fixed – wo data accumulates below it in reverse module order.
             for label, values in mr.additional_indicator_rows_wo:
                 ws_ai.insert_rows(wo_row + 1)
-                ws_ai.cell(wo_row + 1, 1, label)
+                write_literal_cell(ws_ai, wo_row + 1, 1, label)
                 for i, v in enumerate(values[:dur]):
                     ws_ai.cell(wo_row + 1, i + DATA_COL_START, v)
                 # wo_row does NOT change: next insert also goes right after "Without project"
@@ -282,7 +282,7 @@ class ExcelRenderer:
 
         for ar in r.activity_results:
             activity_row = ws.max_row + 1
-            ws.cell(row=activity_row, column=1, value=str(ar.title)).fill = _ORANGE
+            write_literal_cell(ws, activity_row, 1, str(ar.title)).fill = _ORANGE
             for mr in ar.module_results:
                 self._write_module_results(ws, mr.title, getattr(mr, "result_rows" + suffix), dur)
             totals = getattr(ar, "total_emissions" + suffix)
@@ -294,11 +294,11 @@ class ExcelRenderer:
         self, ws: pxl.worksheet.worksheet.Worksheet, title: str, rows: list[ResultRow], dur: int
     ) -> None:
         title_row = ws.max_row + 1
-        ws.cell(row=title_row, column=1, value=str(title)).fill = _BLUE
+        write_literal_cell(ws, title_row, 1, str(title)).fill = _BLUE
 
         for rr in rows:
             title_row += 1
-            ws.cell(row=title_row, column=1, value=rr.label)
+            write_literal_cell(ws, title_row, 1, rr.label)
             vals = rr.yearly_values
             for i in range(dur):
                 ws.cell(row=title_row, column=i + DATA_COL_START,
@@ -310,13 +310,11 @@ class ExcelRenderer:
         section_base = ws_meta.max_row + 1
 
         if mr.metadata_section_title:
-            ws_meta.cell(
-                row=section_base, column=1, value=mr.metadata_section_title
-            ).fill = _BLUE
+            write_literal_cell(ws_meta, section_base, 1, mr.metadata_section_title).fill = _BLUE
 
         for mw in mr.metadata_writes:
             row = section_base + mw.row_offset
-            cell = ws_meta.cell(row=row, column=mw.col, value=mw.value)
+            cell = write_literal_cell(ws_meta, row, mw.col, mw.value)
             if mw.fill:
                 cell.fill = _FILL_MAP.get(mw.fill, _BEIGE)
 
@@ -516,10 +514,10 @@ class ExcelRenderer:
             return
 
         for i, item in enumerate(items, start=2):
-            ws_inv.cell(row=i, column=INV_COL_ACTIVITY, value=item.activity_name)
-            ws_inv.cell(row=i, column=INV_COL_MODULE, value=item.module_name)
-            ws_inv.cell(row=i, column=INV_COL_IPCC_CATEGORY, value=item.ipcc_category)
-            ws_inv.cell(row=i, column=INV_COL_GAS_TYPE, value=item.gas_type)
+            write_literal_cell(ws_inv, i, INV_COL_ACTIVITY, item.activity_name)
+            write_literal_cell(ws_inv, i, INV_COL_MODULE, item.module_name)
+            write_literal_cell(ws_inv, i, INV_COL_IPCC_CATEGORY, item.ipcc_category)
+            write_literal_cell(ws_inv, i, INV_COL_GAS_TYPE, item.gas_type)
             ws_inv.cell(row=i, column=INV_COL_VALUE, value=item.value)
 
     def _write_indicators(self, wb: pxl.Workbook) -> None:
@@ -530,7 +528,7 @@ class ExcelRenderer:
         headers = ["Indicator", "Unit", "With project", "Without project", "Value"]
         row = 1
         for group in data["groups"]:
-            ws.cell(row=row, column=1, value=str(group["label"])).fill = _BLUE
+            write_literal_cell(ws, row, 1, str(group["label"])).fill = _BLUE
             row += 1
             if not group["available"]:
                 ws.cell(row=row, column=1, value="Not applicable to this project").fill = _BEIGE
@@ -543,14 +541,14 @@ class ExcelRenderer:
             for item in group["indicators"]:
                 values = [str(item["label"]), item["unit"], item["with"], item["without"], item["value"]]
                 for col, value in enumerate(values, start=1):
-                    ws.cell(row=row, column=col, value=value)
+                    write_literal_cell(ws, row, col, value)
                 if item.get("series"):
                     series_rows.append(item)
                 row += 1
             for item in series_rows:
                 row += 1
                 series = item["series"]
-                ws.cell(row=row, column=1, value=f"{item['label']} ({item['unit']})").fill = _ORANGE
+                write_literal_cell(ws, row, 1, f"{item['label']} ({item['unit']})").fill = _ORANGE
                 for i, year in enumerate(series["years"]):
                     ws.cell(row=row, column=i + DATA_COL_START, value=year)
                 for label, key in (("With project", "with"), ("Without project", "without")):
@@ -566,10 +564,10 @@ class ExcelRenderer:
                 row += 1
                 ws.cell(row=row, column=1, value=label).fill = _ORANGE
                 for j, category in enumerate(matrix["categories"]):
-                    ws.cell(row=row, column=j + DATA_COL_START, value=str(category["label"]))
+                    write_literal_cell(ws, row, j + DATA_COL_START, str(category["label"]))
                 for i, category in enumerate(matrix["categories"]):
                     row += 1
-                    ws.cell(row=row, column=1, value=str(category["label"]))
+                    write_literal_cell(ws, row, 1, str(category["label"]))
                     for j, value in enumerate(matrix[key][i]):
                         ws.cell(row=row, column=j + DATA_COL_START, value=value)
                 row += 1
