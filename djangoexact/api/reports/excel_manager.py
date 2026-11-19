@@ -6,8 +6,30 @@ import os
 import tempfile
 from datetime import datetime
 from io import BytesIO
+from typing import Any
 
+from django.utils.functional import Promise
 import openpyxl as pxl
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE, Cell
+from openpyxl.worksheet.worksheet import Worksheet
+
+
+def write_literal_cell(ws: Worksheet, row: int, column: int, value: Any) -> Cell:
+    """Write ``value`` like ``ws.cell(row, column, value)``, but keep strings as literal text.
+
+    openpyxl turns a string starting with "=" into a formula (and "#N/A"-style strings into
+    error cells), so user text such as ``=HYPERLINK(...)`` would run in the reader's Excel.
+    Control characters are dropped because openpyxl refuses them and would abort the report.
+    openpyxl already truncates strings to Excel's 32,767-character cell limit.
+    Lazy translations are rendered to text first. Other non-string values are written unchanged.
+    """
+    if isinstance(value, Promise):
+        value = str(value)
+    if not isinstance(value, str):
+        return ws.cell(row=row, column=column, value=value)
+    cell = ws.cell(row=row, column=column, value=ILLEGAL_CHARACTERS_RE.sub("", value))
+    cell.data_type = "s"
+    return cell
 
 
 class ExcelFileManager:
