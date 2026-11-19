@@ -1438,7 +1438,7 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
             if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
                 self.last_modified = timezone.now()
                 # An edit must also drop the stored payload: the module serializer's cached_results_*
-                # fields and the report submodule rollups read it without is_cached_results_valid().
+                # fields read it without is_cached_results_valid().
                 # Skipped for update_fields saves, which only persist the listed cache columns and
                 # would otherwise write a None over the value being cached.
                 if not kwargs.get("update_fields"):

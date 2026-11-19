@@ -63,17 +63,9 @@ class TestSubmoduleScenarioRows(unittest.TestCase):
                 row_sum = [sum(year) for year in zip(*(r.yearly_values for r in scenario_rows))]
                 self.assertEqual(row_sum, totals[scenario])
 
-    def test_transport_cached_entry(self):
+    def test_transport_rows_per_scenario(self):
         sets = _sets("Fuel")
-        module = Mock(submodules=[Mock(cached_results_by_activity_by_gas=sets)])
-        report = _report(TransportReport, module, sets)
-        with patch.object(TransportReport, "_inventory_items_from_module", return_value=[]):
-            result = report.compute_with_scenarios()
-        self.assert_scenario_rows(result, "CO2 from fuel combustion")
-
-    def test_transport_calculated_entry(self):
-        sets = _sets("Fuel")
-        module = Mock(submodules=[Mock(cached_results_by_activity_by_gas=None)])
+        module = Mock(submodules=[Mock()])
         report = _report(TransportReport, module, sets)
         with _frozen(sets), patch("api.calculators.TransportEntryCalculator"), \
                 patch.object(TransportReport, "_inventory_items_from_module", return_value=[]):
@@ -100,7 +92,7 @@ class TestSubmoduleScenarioRows(unittest.TestCase):
 
     def test_each_submodule_is_computed_once_for_all_three_sheets(self):
         sets = _sets("Fuel")
-        module = Mock(submodules=[Mock(cached_results_by_activity_by_gas=None)])
+        module = Mock(submodules=[Mock()])
         report = _report(TransportReport, module, sets)
         with _frozen(sets) as frozen, patch("api.calculators.TransportEntryCalculator"), \
                 patch.object(TransportReport, "_inventory_items_from_module", return_value=[]):
