@@ -184,8 +184,7 @@ STD 1019 open-source agreement_EX-ACT.docx
 .venv
 .env*
 
-# Stray local database files (minitool.db and test_db.sqlite3 are already
-# tracked and stay tracked; this only stops new ones being committed).
+# Local database files (e.g. minitool.db snapshots) must never be committed.
 *.db
 EXACT_guide.pdf
 2-results-report-2.xlsx

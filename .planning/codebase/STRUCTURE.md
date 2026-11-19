@@ -126,7 +126,6 @@ exact-django-webapp/                        # Repo root (deployment templates, C
     │   ├── views.py                         # MinitoolViewSet
     │   ├── urls.py
     │   ├── middleware.py                    # Separate SQLite DB connection
-    │   ├── minitool.db                      # (Checked-in working file; local SQLite)
     │   ├── migrations/
     │   └── tests/
     │
@@ -369,9 +368,9 @@ exact-django-webapp/                        # Repo root (deployment templates, C
 - Committed: Yes (tests may depend on schema)
 
 **`djangoexact/minitool.db`:**
-- Purpose: Minitool standalone calculator database
-- Generated: No (manually committed)
-- Committed: Yes (working file for tool)
+- Purpose: Optional local SQLite snapshot of minitool data (regenerable from Postgres)
+- Generated: Yes
+- Committed: No (removed from the repo and Git LFS; `*.db` is gitignored)
 
 **`djangoexact/logs/`:**
 - Purpose: Runtime log files
