@@ -164,6 +164,18 @@ class StorageEntry:
     pk = 8
 
 
+class Settlement(Energy):
+    pass
+
+
+class Building:
+    pk = 9
+
+
+class OtherInfrastructure:
+    pk = 10
+
+
 def failing_report(error: Exception) -> SimpleNamespace:
     def raise_error(entry, calculator):
         raise error
@@ -202,6 +214,32 @@ class EntryCollectionTests(SimpleTestCase):
         residual = row_by(rows, MODULE_LEVEL_ENTRY, W)
         self.assertEqual((residual.flux_label, residual.removals), ("Storage", -3))
         warning.assert_called_once()
+
+    def test_other_infrastructure_gets_its_own_settlement_row_without_a_drift_warning(self):
+        building, infrastructure = Building(), OtherInfrastructure()
+        sets_by_entry = {
+            building: {"total_w": [cached("Roads", "CO2", [1, 1, 1])], "total_wo": []},
+            infrastructure: {"total_w": [cached("Roads", "CO2", [4, 4, 4])], "total_wo": []},
+        }
+        calculators_used = []
+
+        def entry_sets(entry, calculator):
+            calculators_used.append(calculator.__name__)
+            return sets_by_entry[entry]
+
+        report = SimpleNamespace(module=Settlement([building, infrastructure]), submodule_scenario_sets=entry_sets)
+        entries = scope_rows._entry_sets(report)
+        self.assertEqual(calculators_used, ["BuildingCalculator", "OtherInfrastructureCalculator"])
+
+        module_total_since_infrastructure_counts = [cached("Roads", "CO2", [5, 5, 5])]
+        module = ModuleSets(1, "Settlement", report.module, sets_w=module_total_since_infrastructure_counts,
+                            sets_wo=[], entries=entries)
+        with patch.object(scope_rows.log, "warning") as warning:
+            rows = build_scope_rows([ActivitySets(1, "A", (module,))], YEARS)
+        infrastructure_row = next(r for r in rows if r.entry_label == "OtherInfrastructure 2")
+        self.assertEqual((infrastructure_row.emissions, infrastructure_row.rule.default), (12, Scope.SCOPE_3))
+        self.assertFalse([r for r in rows if r.entry_label == MODULE_LEVEL_ENTRY])
+        warning.assert_not_called()
 
 
 def fake_result(activities: list[ActivitySets]) -> SimpleNamespace:

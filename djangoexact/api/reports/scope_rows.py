@@ -42,8 +42,8 @@ RESIDUAL_ABS_TOLERANCE_TCO2E = 1e-6
 MODULES_WITH_ENTRIES = frozenset(
     {"Energy", "Input", "Irrigation", "Settlement", "Transport", "Processing", "Storage", "Packaging"}
 )
-# The calculator each module report uses for an entry. Entries missing here (OtherInfrastructure is not part of
-# the Settlement total today) get no row of their own.
+# The calculator each module report uses for an entry. An entry type missing here gets no row of its own, and its
+# fluxes stay in the module-level row.
 ENTRY_CALCULATORS = {
     "EnergyEntry": calculators.EnergyEntryCalculator,
     "InputEntry": calculators.InputEntryCalculator,
@@ -51,6 +51,7 @@ ENTRY_CALCULATORS = {
     "IrrigationSystem": calculators.IrrigationSystemCalculator,
     "Building": calculators.BuildingCalculator,
     "Road": calculators.RoadCalculator,
+    "OtherInfrastructure": calculators.OtherInfrastructureCalculator,
     "TransportEntry": calculators.TransportEntryCalculator,
     "ProcessingEntry": calculators.ProcessingEntryCalculator,
     "StorageEntry": calculators.StorageEntryCalculator,
