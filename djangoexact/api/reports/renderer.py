@@ -57,6 +57,7 @@ from .constants import (
 )
 from .data_types import ActivityResult, ModuleResult, ProjectResult, ResultRow
 from .excel_manager import ExcelFileManager, write_literal_cell
+from .scopes_sheet import write_scope_sheets
 
 _ORANGE = PatternFill(start_color="fce4d6", end_color="fce4d6", fill_type="solid")
 _BLUE = PatternFill(start_color="d9e1f2", end_color="d9e1f2", fill_type="solid")
@@ -95,6 +96,7 @@ class ExcelRenderer:
         self._write_shadow_price(wb)
         self._write_inventory(wb)
         self._write_indicators(wb)
+        write_scope_sheets(wb, self.result)
 
         return self._manager.finalize()
 

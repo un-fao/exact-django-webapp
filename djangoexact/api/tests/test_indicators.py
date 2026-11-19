@@ -196,7 +196,7 @@ class ComputedProjectTests(base_module.BaseModuleTestCase):
         from api.reports import generate_excel_report
 
         wb = openpyxl.load_workbook(BytesIO(generate_excel_report(self.project)))
-        self.assertEqual(wb.sheetnames[-1], "Indicators")
+        self.assertEqual(wb.sheetnames[-4:], ["Indicators", "Scope Assignment", "Results by Scope", "Scope Lists"])
 
 
 class PdfPartialTests(SimpleTestCase):
