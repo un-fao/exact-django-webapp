@@ -39,7 +39,7 @@ class StorageTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_patch_to_not_ready(self):
 
@@ -48,33 +48,27 @@ class StorageTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_add_refrigerant(self):
 
-        is_modification_valid = False
+        def add_refrigerant():
+            validated_data = copy.deepcopy(self.validated_data)
+            validated_data["is_refrigerant_used"] = True
+            validated_data["refrigerant_type_start"] = models.RefrigerantType.objects.order_by("?").first().pk
+            validated_data["refrigerant_type_w"] = models.RefrigerantType.objects.order_by("?").first().pk
+            validated_data["refrigerant_type_wo"] = models.RefrigerantType.objects.order_by("?").first().pk
+            validated_data["total_refrigerant_leakage_start"] = FuzzyFloat(0, 1000).fuzz()
+            validated_data["total_refrigerant_leakage_w"] = FuzzyFloat(0, 1000).fuzz()
+            validated_data["total_refrigerant_leakage_wo"] = FuzzyFloat(0, 1000).fuzz()
+            response = self.edit_module(self.submodules[0], self.user, validated_data)
 
-        while not is_modification_valid:
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(self.module_status_name(response), "READY")
 
-            try:
-                validated_data = copy.deepcopy(self.validated_data)
-                validated_data["is_refrigerant_used"] = True
-                validated_data["refrigerant_type_start"] = models.RefrigerantType.objects.order_by("?").first().pk
-                validated_data["refrigerant_type_w"] = models.RefrigerantType.objects.order_by("?").first().pk
-                validated_data["refrigerant_type_wo"] = models.RefrigerantType.objects.order_by("?").first().pk
-                validated_data["total_refrigerant_leakage_start"] = FuzzyFloat(0, 1000).fuzz()
-                validated_data["total_refrigerant_leakage_w"] = FuzzyFloat(0, 1000).fuzz()
-                validated_data["total_refrigerant_leakage_wo"] = FuzzyFloat(0, 1000).fuzz()
-                response = self.edit_module(self.submodules[0], self.user, validated_data)
+            self.test_calculate_results()
 
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertEqual(response.data["status"]["name"], "READY")
-
-                self.test_calculate_results()
-
-                is_modification_valid = True
-            except Exception as e:
-                continue
+        self.retry(add_refrigerant, what="storage add refrigerant")
 
     def test_calculate_results(self):
         view = self.module_viewset.as_view({"get": "results"})

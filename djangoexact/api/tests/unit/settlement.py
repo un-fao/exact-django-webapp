@@ -88,7 +88,7 @@ class SettlementTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_patch_to_not_ready(self):
 
@@ -97,7 +97,7 @@ class SettlementTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate_results(self):
 
@@ -132,7 +132,7 @@ class SettlementTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
         self.module.refresh_from_db()
         self.assertEqual(self.module.status.name, "SUBMODULES_EMPTY")
@@ -148,14 +148,14 @@ class SettlementTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         validated_data["settlement_type_start"] = None
         response = self.edit_module(self.module, self.user, validated_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
         # Modify submodule to not ready
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["building_type"] = None
         response = self.edit_module(self.submodules[0], self.user, validated_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
         # Modify parent module to ready
         validated_data = copy.deepcopy(self.validated_data)

@@ -26,6 +26,10 @@ from .ghg_inventory_class import InventoryPerGasPerActivity
 
 @dataclass(kw_only=True)
 class Defo(BaseModule):
+    # Wood harvested before deforestation is subtracted from the cleared biomass and never emitted.
+    HWP_INFLOW_ALREADY_EMITTED = False
+    # hwp_before_t_dm_per_ha enters the biomass balance as carbon, with no carbon fraction.
+    HWP_INFLOW_CARBON_FRACTION = 1.0
     ha_start: float
     ha_end: float
     biomass_final_1_year_t_per_ha_default: float
@@ -123,6 +127,7 @@ class Defo(BaseModule):
                 biomass_loss = biomass_forest_agb_bgb_t_co2 * self.area_deforested
 
                 emissions_biomass_loss_yearly = breakdown_proportionally_to_values(biomass_loss, self.delta_hectares)
+                self.hwp_inflow_co2 = breakdown_proportionally_to_values(hwp_before_t_c * (44 / 12) * self.area_deforested, self.delta_hectares)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(

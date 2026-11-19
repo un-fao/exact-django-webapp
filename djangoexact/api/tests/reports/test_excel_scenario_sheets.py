@@ -22,6 +22,8 @@ from unittest.mock import Mock
 
 import openpyxl as pxl
 
+from api.reports.constants import ROW_FIRST_CATEGORY, ROW_YEARLY_FLUX_W, SUMMARY_CATEGORY_ROWS
+
 from api.reports.data_types import (
     ActivityResult,
     EmissionsAggregator,
@@ -140,6 +142,12 @@ def _project_result():
     )
 
 
+BIOMASS_ROW = ROW_FIRST_CATEGORY + [attr for _, attr in SUMMARY_CATEGORY_ROWS].index("biomass_co2")
+BIOMASS_LABEL = SUMMARY_CATEGORY_ROWS[BIOMASS_ROW - ROW_FIRST_CATEGORY][0]
+# Scenario sheets have no balance-only rows, so their activity blocks start right after the categories.
+SCENARIO_ACTIVITY_ROW = ROW_FIRST_CATEGORY + len(SUMMARY_CATEGORY_ROWS)
+
+
 def _row(ws, row):
     return [ws.cell(row=row, column=c).value for c in range(1, DURATION + 2)]
 
@@ -157,35 +165,35 @@ class TestScenarioSheets(unittest.TestCase):
     def test_balance_sheet_layout_is_unchanged(self):
         ws = self.wb["Results"]
         self.assertEqual(_row(ws, 2), ["Cumulative balance in Tco2-eq", 6.0, 12.0, 18.0])
-        self.assertEqual(_row(ws, 4), ["CO2 in biomass", 6.0, 6.0, 6.0])
-        self.assertEqual(ws.cell(row=14, column=1).value, "Yearly flux - with (tCO2-eq)")
-        self.assertEqual(_row(ws, 15), ["Maize", 6.0, 6.0, 6.0])
-        self.assertEqual(ws.cell(row=16, column=1).value, "Annual Cropland")
-        self.assertEqual(_row(ws, 17), ["CO2 in biomass", 6.0, 6.0, 6.0])
+        self.assertEqual(_row(ws, BIOMASS_ROW), [BIOMASS_LABEL, 6.0, 6.0, 6.0])
+        self.assertEqual(ws.cell(row=ROW_YEARLY_FLUX_W, column=1).value, "Yearly flux - with (tCO2-eq)")
+        self.assertEqual(_row(ws, ROW_YEARLY_FLUX_W + 1), ["Maize", 6.0, 6.0, 6.0])
+        self.assertEqual(ws.cell(row=ROW_YEARLY_FLUX_W + 2, column=1).value, "Annual Cropland")
+        self.assertEqual(_row(ws, ROW_YEARLY_FLUX_W + 3), ["CO2 in biomass", 6.0, 6.0, 6.0])
 
     def test_with_sheet_holds_absolute_with_fluxes(self):
         ws = self.wb["Results - With"]
         self.assertEqual(_row(ws, 1), ["Activity and GHGs / Years", 2020, 2021, 2022])
         self.assertEqual(_row(ws, 2), ["Cumulative flux in Tco2-eq", 10.0, 30.0, 60.0])
         self.assertEqual(_row(ws, 3), ["Yearly flux in Tco2-eq", 10.0, 20.0, 30.0])
-        self.assertEqual(_row(ws, 4), ["CO2 in biomass", 10.0, 20.0, 30.0])
-        self.assertEqual(_row(ws, 10), ["Maize", 10.0, 20.0, 30.0])
-        self.assertEqual(ws.cell(row=11, column=1).value, "Annual Cropland")
-        self.assertEqual(_row(ws, 12), ["CO2 in biomass", 10.0, 20.0, 30.0])
+        self.assertEqual(_row(ws, BIOMASS_ROW), [BIOMASS_LABEL, 10.0, 20.0, 30.0])
+        self.assertEqual(_row(ws, SCENARIO_ACTIVITY_ROW), ["Maize", 10.0, 20.0, 30.0])
+        self.assertEqual(ws.cell(row=SCENARIO_ACTIVITY_ROW + 1, column=1).value, "Annual Cropland")
+        self.assertEqual(_row(ws, SCENARIO_ACTIVITY_ROW + 2), ["CO2 in biomass", 10.0, 20.0, 30.0])
 
     def test_without_sheet_holds_absolute_without_fluxes(self):
         ws = self.wb["Results - Without"]
         self.assertEqual(_row(ws, 2), ["Cumulative flux in Tco2-eq", 4.0, 18.0, 42.0])
-        self.assertEqual(_row(ws, 10), ["Maize", 4.0, 14.0, 24.0])
-        self.assertEqual(_row(ws, 12), ["CO2 in biomass", 4.0, 14.0, 24.0])
+        self.assertEqual(_row(ws, SCENARIO_ACTIVITY_ROW), ["Maize", 4.0, 14.0, 24.0])
+        self.assertEqual(_row(ws, SCENARIO_ACTIVITY_ROW + 2), ["CO2 in biomass", 4.0, 14.0, 24.0])
 
     def test_scenario_sheets_mirror_the_balance_labels(self):
         res = self.wb["Results"]
-        balance_labels = [res.cell(row=r, column=1).value for r in range(4, 10)]
-        balance_labels += [res.cell(row=r, column=1).value for r in range(15, res.max_row + 1)]
+        balance_labels = [res.cell(row=r, column=1).value for r in range(ROW_FIRST_CATEGORY, SCENARIO_ACTIVITY_ROW)]
+        balance_labels += [res.cell(row=r, column=1).value for r in range(ROW_YEARLY_FLUX_W + 1, res.max_row + 1)]
         for name in ("Results - With", "Results - Without"):
             ws = self.wb[name]
-            labels = [ws.cell(row=r, column=1).value for r in range(4, ws.max_row + 1)]
+            labels = [ws.cell(row=r, column=1).value for r in range(ROW_FIRST_CATEGORY, ws.max_row + 1)]
             with self.subTest(sheet=name):
                 self.assertEqual(labels, balance_labels)
 

@@ -131,7 +131,7 @@ class AnnualCropland(LandModule):
 
         def calculate_minor_season_emissions():
             """Calculate methane and nitrous emissions for minor season"""
-            yield_value_minor = self.yield_value_minor * 1000 if self.yield_value_minor else None
+            yield_value_minor = self.yield_minor * 1000 if self.yield_minor else None
 
             # Calculate agricultural residue for minor season
             ag_residue_minor = (
@@ -165,11 +165,11 @@ class AnnualCropland(LandModule):
             # Calculate emissions for both seasons
             main_season_methane, main_season_nitrous = calculate_main_season_emissions()
 
-            if self.yield_value_minor is None:
+            if self.yield_minor is None:
                 minor_season_methane = 0
                 minor_season_nitrous = 0
             else:
-                # Calculate emissions for minor season only if yield_value_minor is provided
+                # Calculate emissions for minor season only if a minor yield (default or tier 2) is provided
                 minor_season_methane, minor_season_nitrous = calculate_minor_season_emissions()
 
             # Combine seasonal emissions

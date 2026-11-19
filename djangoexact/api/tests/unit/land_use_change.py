@@ -58,7 +58,7 @@ class AnnualToForestTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the annual cropland modules using unit test factories.
         """
         # Use factory to get reliable configuration data
-        annual_config_data = UnitTestAnnualCroplandFactory.build()
+        annual_config_data = UnitTestAnnualCroplandFactory.build(activity=self.activity)
 
         # Extract the configuration data for API calls
         config_data = {
@@ -80,7 +80,7 @@ class AnnualToForestTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the forest management module using unit test factories.
         """
         # Use factory to get reliable configuration data
-        forest_config_data = UnitTestForestManagementFactory.build()
+        forest_config_data = UnitTestForestManagementFactory.build(activity=self.activity)
 
         # Extract the configuration data for API calls
         config_data = {
@@ -103,35 +103,29 @@ class AnnualToForestTestCase(base_module.BaseLandUseChangeTestCase):
         - The forest management scenario shows environmental benefits
         """
         # Test individual module calculations
-        while True:
-            try:
-                start_response = self.get_module_results(self.module_start)
-                self.assertEqual(start_response.status_code, status.HTTP_200_OK)
-                self.assertIn("balance", start_response.data)
-                break
-            except Exception as e:
-                log.error(f"Error: {e}. Retrying...")
-                self.configure_annual_cropland_modules()
+        def get_start_response():
+            start_response = self.get_module_results(self.module_start)
+            self.assertEqual(start_response.status_code, status.HTTP_200_OK)
+            self.assertIn("balance", start_response.data)
+            return start_response
 
-        while True:
-            try:
-                wo_response = self.get_module_results(self.module_wo)
-                self.assertEqual(wo_response.status_code, status.HTTP_200_OK)
-                self.assertIn("balance", wo_response.data)
-                break
-            except Exception as e:
-                log.error(f"Error: {e}. Retrying...")
-                self.configure_annual_cropland_modules()
+        start_response = self.retry(get_start_response, self.configure_annual_cropland_modules, "start_response")
 
-        while True:
-            try:
-                w_response = self.get_module_results(self.module_w)
-                self.assertEqual(w_response.status_code, status.HTTP_200_OK)
-                self.assertIn("balance", w_response.data)
-                break
-            except Exception as e:
-                log.error(f"Error: {e}. Retrying...")
-                self.configure_forest_management_module()
+        def get_wo_response():
+            wo_response = self.get_module_results(self.module_wo)
+            self.assertEqual(wo_response.status_code, status.HTTP_200_OK)
+            self.assertIn("balance", wo_response.data)
+            return wo_response
+
+        wo_response = self.retry(get_wo_response, self.configure_annual_cropland_modules, "wo_response")
+
+        def get_w_response():
+            w_response = self.get_module_results(self.module_w)
+            self.assertEqual(w_response.status_code, status.HTTP_200_OK)
+            self.assertIn("balance", w_response.data)
+            return w_response
+
+        w_response = self.retry(get_w_response, self.configure_forest_management_module, "w_response")
 
         # Test land use change calculation
         luc_response = self.get_land_use_change_results()
@@ -236,7 +230,7 @@ class ForestToAnnualTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the forest management modules using unit test factories.
         """
         # Use factory to get reliable configuration data
-        forest_config_data = UnitTestForestManagementFactory.build()
+        forest_config_data = UnitTestForestManagementFactory.build(activity=self.activity)
 
         # Extract the configuration data for API calls
         config_data = {
@@ -253,7 +247,7 @@ class ForestToAnnualTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the annual cropland module using unit test factories.
         """
         # Use factory to get reliable configuration data
-        annual_config_data = UnitTestAnnualCroplandFactory.build()
+        annual_config_data = UnitTestAnnualCroplandFactory.build(activity=self.activity)
 
         # Extract the configuration data for API calls
         config_data = {
@@ -281,29 +275,23 @@ class ForestToAnnualTestCase(base_module.BaseLandUseChangeTestCase):
         self.assertIn("balance", luc_response.data)
 
         # Test individual module results
-        while True:
-            try:
-                start_response = self.get_module_results(self.module_start)
-                break
-            except Exception as e:
-                log.error(f"Error: {e}. Retrying...")
-                self.configure_annual_cropland_module()
+        def get_start_response():
+            start_response = self.get_module_results(self.module_start)
+            return start_response
 
-        while True:
-            try:
-                wo_response = self.get_module_results(self.module_wo)
-                break
-            except Exception as e:
-                log.error(f"Error: {e}. Retrying...")
-                self.configure_forest_management_modules()
+        start_response = self.retry(get_start_response, self.configure_annual_cropland_module, "start_response")
 
-        while True:
-            try:
-                w_response = self.get_module_results(self.module_w)
-                break
-            except Exception as e:
-                log.error(f"Error: {e}. Retrying...")
-                self.configure_annual_cropland_module()
+        def get_wo_response():
+            wo_response = self.get_module_results(self.module_wo)
+            return wo_response
+
+        wo_response = self.retry(get_wo_response, self.configure_forest_management_modules, "wo_response")
+
+        def get_w_response():
+            w_response = self.get_module_results(self.module_w)
+            return w_response
+
+        w_response = self.retry(get_w_response, self.configure_annual_cropland_module, "w_response")
 
         # Log results for analysis
         log.info(f"Forest Management (start) balance: {start_response.data['balance']}")
@@ -354,7 +342,7 @@ class AnnualToOtherLandTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the annual cropland modules using unit test factories.
         """
         # Use factory to get reliable configuration data
-        annual_config_data = UnitTestAnnualCroplandFactory.build()
+        annual_config_data = UnitTestAnnualCroplandFactory.build(activity=self.activity)
 
         # Extract the configuration data for API calls
         config_data = {
@@ -379,11 +367,11 @@ class AnnualToOtherLandTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the other land module using unit test factories.
         """
         # Use factory to get reliable configuration data
-        other_land_config_data = UnitTestOtherLandFactory.build()
+        other_land_config_data = UnitTestOtherLandFactory.build(activity=self.activity)
 
         # Extract the configuration data for API calls
         config_data = {
-            "land_use_type_start": other_land_config_data.land_use_type_start.id,
+            "is_degraded_land_w": other_land_config_data.is_degraded_land_w,
         }
 
         # Configure with project module (other land)
@@ -594,7 +582,7 @@ class AnnualToGrasslandTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the annual cropland modules using unit test factories.
         """
         # Use factory to get reliable configuration data
-        annual_config_data = UnitTestAnnualCroplandFactory.build()
+        annual_config_data = UnitTestAnnualCroplandFactory.build(activity=self.activity)
 
         # Extract the configuration data for API calls
         config_data = {
@@ -619,12 +607,15 @@ class AnnualToGrasslandTestCase(base_module.BaseLandUseChangeTestCase):
         Configure the grassland module using unit test factories.
         """
         # Use factory to get reliable configuration data
-        grassland_config_data = UnitTestGrasslandFactory.build()
+        grassland_config_data = UnitTestGrasslandFactory.build(activity=self.activity)
 
         # Extract the configuration data for API calls
         config_data = {
-            "land_use_type_start": grassland_config_data.land_use_type_start.id,
-            "land_use_type_w": grassland_config_data.land_use_type_w.id,
+            "grassland_management_type_w": grassland_config_data.grassland_management_type_w.id,
+            "is_fire_used_w": grassland_config_data.is_fire_used_w,
+            "fire_periodicity_w": grassland_config_data.fire_periodicity_w,
+            "fire_impact_w": grassland_config_data.fire_impact_w,
+            "yield_w": grassland_config_data.yield_w,
         }
 
         # Configure with project module (grassland)
