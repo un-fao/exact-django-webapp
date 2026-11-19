@@ -7,21 +7,28 @@ the parameter win. An English-only IFAD annex hid the divergence, but a
 Spanish FAO report requested with ?lang=es from a browser sending
 Accept-Language: en came back in English.
 
-All three call sites now read the same expression: the explicit parameter
-first, the header as fallback, "en" last. An empty ?lang= counts as absent
-rather than selecting a language that cannot exist.
+Every path now reads the same expression: the explicit parameter first, the
+header as fallback, "en" last. The synchronous Excel report was the last to
+ignore it. An empty ?lang= counts as absent rather than selecting a language
+that cannot exist.
 
 Run with:
     python manage.py test api.tests.reports.test_report_language_selection
 """
 from __future__ import annotations
 
+from io import BytesIO
 from unittest.mock import Mock, patch
 
+import openpyxl
 from django.test import SimpleTestCase
 from rest_framework.exceptions import ValidationError
 
 import api.utilities as utils
+from api.models import AnnualCropland
+from api.reports.constants import WS_METADATA
+from api.tests.unit import base_module
+from api.tests.unit.factories import UnitTestAnnualCroplandFactory
 
 
 def _request(*, lang=None, header_lang=None):
@@ -137,3 +144,41 @@ class RequestedLanguageValidationTestCase(SimpleTestCase):
         with self.assertRaises(ValidationError) as ctx:
             utils.requested_language(_request(lang=secret))
         self.assertNotIn(secret, str(ctx.exception))
+
+
+class SyncExcelLanguageTestCase(base_module.BaseModuleTestCase):
+    """Sent through the client so LocaleMiddleware activates the header language,
+    which is what the Excel used to come out in."""
+
+    # Inherited from BaseModuleTestCase, it tests module defaults and lock holders, not
+    # report language; None keeps the runner from collecting it a second time here.
+    test_defaults_visible_with_different_lock_holder = None
+
+    FRENCH_SOIL_TYPE = "Sol de reference en francais"
+
+    def setUp(self):
+        self.ModuleClass = AnnualCropland
+        super().setUp()
+        self.edit_module(self.module, self.user, UnitTestAnnualCroplandFactory.get_validated_data())
+        soil_type = self.project.soil_type
+        soil_type.name_fr = self.FRENCH_SOIL_TYPE
+        soil_type.save()
+        self.client.force_authenticate(self.user)
+
+    def _post_report(self, path, lang):
+        return self.client.post(
+            f"/api/projects/{self.project.pk}/{path}?lang={lang}", {}, format="json", HTTP_ACCEPT_LANGUAGE="en",
+        )
+
+    def test_query_parameter_beats_the_accept_language_header(self):
+        response = self._post_report("report/", "fr")
+        self.assertEqual(response.status_code, 200)
+        metadata = openpyxl.load_workbook(BytesIO(response.content))[WS_METADATA]
+        written = {cell.value for row in metadata.iter_rows() for cell in row}
+        self.assertIn(self.FRENCH_SOIL_TYPE, written)
+
+    def test_unsupported_language_is_rejected_like_the_async_path(self):
+        sync = self._post_report("report/", "de")
+        queued = self._post_report("report/async/", "de")
+        self.assertEqual(sync.status_code, 400)
+        self.assertEqual((sync.status_code, sync.data), (queued.status_code, queued.data))
