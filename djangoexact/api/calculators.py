@@ -4729,8 +4729,8 @@ class SettlementCalculator(LandModuleCalculator):
         # Reverse-relation managers raise on unsaved Settlement instances
         # ("Settlement instance needs to have a primary key value before
         # this relationship can be used"). The permutation runner builds
-        # Settlement unsaved to skip DB writes — when there's no pk, there
-        # can be no related Buildings or Roads to sum either.
+        # Settlement unsaved to skip DB writes: when there's no pk, there
+        # can be no related submodules to sum either.
         if self.module.pk:
             for building in self.module.buildings.all():
                 r_w, r_wo = BuildingCalculator(building).calculate()
@@ -4740,6 +4740,12 @@ class SettlementCalculator(LandModuleCalculator):
 
             for road in self.module.roads.all():
                 r_w, r_wo = RoadCalculator(road).calculate()
+
+                self.results_w += r_w
+                self.results_wo += r_wo
+
+            for infrastructure in self.module.other_infrastructures.all():
+                r_w, r_wo = OtherInfrastructureCalculator(infrastructure).calculate()
 
                 self.results_w += r_w
                 self.results_wo += r_wo
@@ -4888,6 +4894,10 @@ class OtherInfrastructureCalculator(BaseCalculator):
     Calculator for other infrastructure.
     """
 
+    # IPCC has no default for other infrastructure, so the tier 2 value is mandatory. The math model falls
+    # back to ef_ipcc when ef_tier_2 is falsy, so a None here would crash a tier 2 value of 0.
+    NO_IPCC_EMISSION_FACTOR = 0.0
+
     def __init__(self, input) -> None:
         super().__init__(input)
         self.module: OtherInfrastructure
@@ -4910,7 +4920,7 @@ class OtherInfrastructureCalculator(BaseCalculator):
 
         if self.module.is_with():
             self.inputs_w = {
-                "ef_ipcc": self.ef.value,
+                "ef_ipcc": self.NO_IPCC_EMISSION_FACTOR,
                 "ef_tier_2": self.module.ef_t2_w,
                 "units_end": self.module.area_m2_w,
                 "implementation_time": self.activity.implementation_years,
@@ -4924,7 +4934,7 @@ class OtherInfrastructureCalculator(BaseCalculator):
 
         if self.module.is_without():
             self.inputs_wo = {
-                "ef_ipcc": self.ef.value,
+                "ef_ipcc": self.NO_IPCC_EMISSION_FACTOR,
                 "ef_tier_2": self.module.ef_t2_wo,
                 "units_end": self.module.area_m2_wo,
                 "implementation_time": self.activity.implementation_years,
