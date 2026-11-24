@@ -1,6 +1,40 @@
 [
   {
     "model": "api.inputtype",
+    "pk": 38,
+    "fields": {
+      "macro_input_type": 11,
+      "name": "Ammonium Nitrate-Based N (IPCC 2019)",
+      "name_en": "Ammonium Nitrate-Based N (IPCC 2019)",
+      "name_fr": "Azote ammonitrique (GIEC 2019)",
+      "name_es": "N amoniacal-nítrico (IPCC 2019)",
+      "name_ru": "Аммиачно-нитратный азот (МГЭИК 2019)",
+      "description": "",
+      "has_co2_emissions": false,
+      "has_n2o_emissions": true,
+      "has_co2_e_emissions": true,
+      "unit": "t N/yr"
+    }
+  },
+  {
+    "model": "api.inputtype",
+    "pk": 36,
+    "fields": {
+      "macro_input_type": 11,
+      "name": "Ammonium-Based N (IPCC 2019)",
+      "name_en": "Ammonium-Based N (IPCC 2019)",
+      "name_fr": "Azote ammoniacal (GIEC 2019)",
+      "name_es": "N amoniacal (IPCC 2019)",
+      "name_ru": "Аммонийный азот (МГЭИК 2019)",
+      "description": "",
+      "has_co2_emissions": false,
+      "has_n2o_emissions": true,
+      "has_co2_e_emissions": true,
+      "unit": "t N/yr"
+    }
+  },
+  {
+    "model": "api.inputtype",
     "pk": 8,
     "fields": {
       "macro_input_type": 4,
@@ -137,6 +171,23 @@
   },
   {
     "model": "api.inputtype",
+    "pk": 37,
+    "fields": {
+      "macro_input_type": 11,
+      "name": "Nitrate-Based N (IPCC 2019)",
+      "name_en": "Nitrate-Based N (IPCC 2019)",
+      "name_fr": "Azote nitrique (GIEC 2019)",
+      "name_es": "N nítrico (IPCC 2019)",
+      "name_ru": "Нитратный азот (МГЭИК 2019)",
+      "description": "",
+      "has_co2_emissions": false,
+      "has_n2o_emissions": true,
+      "has_co2_e_emissions": true,
+      "unit": "t N/yr"
+    }
+  },
+  {
+    "model": "api.inputtype",
     "pk": 3,
     "fields": {
       "macro_input_type": 1,
@@ -222,6 +273,40 @@
   },
   {
     "model": "api.inputtype",
+    "pk": 39,
+    "fields": {
+      "macro_input_type": 4,
+      "name": "Sewage Sludge (IPCC 2019)",
+      "name_en": "Sewage Sludge (IPCC 2019)",
+      "name_fr": "Boues d'épuration (GIEC 2019)",
+      "name_es": "Lodos de depuradora (IPCC 2019)",
+      "name_ru": "Осадок сточных вод (МГЭИК 2019)",
+      "description": "",
+      "has_co2_emissions": false,
+      "has_n2o_emissions": true,
+      "has_co2_e_emissions": false,
+      "unit": "t N/yr"
+    }
+  },
+  {
+    "model": "api.inputtype",
+    "pk": 34,
+    "fields": {
+      "macro_input_type": 11,
+      "name": "Synthetic N, Unspecified Form (IPCC 2019)",
+      "name_en": "Synthetic N, Unspecified Form (IPCC 2019)",
+      "name_fr": "Azote synthétique, forme non précisée (GIEC 2019)",
+      "name_es": "N sintético, forma no especificada (IPCC 2019)",
+      "name_ru": "Синтетический азот, форма не указана (МГЭИК 2019)",
+      "description": "",
+      "has_co2_emissions": false,
+      "has_n2o_emissions": true,
+      "has_co2_e_emissions": true,
+      "unit": "t N/yr"
+    }
+  },
+  {
+    "model": "api.inputtype",
     "pk": 5,
     "fields": {
       "macro_input_type": 2,
@@ -247,6 +332,23 @@
       "name_fr": "Urée",
       "name_es": "Urea",
       "name_ru": "Kарбамид",
+      "description": "",
+      "has_co2_emissions": true,
+      "has_n2o_emissions": true,
+      "has_co2_e_emissions": true,
+      "unit": "t urea/yr"
+    }
+  },
+  {
+    "model": "api.inputtype",
+    "pk": 35,
+    "fields": {
+      "macro_input_type": 11,
+      "name": "Urea (IPCC 2019)",
+      "name_en": "Urea (IPCC 2019)",
+      "name_fr": "Urée (GIEC 2019)",
+      "name_es": "Urea (IPCC 2019)",
+      "name_ru": "Карбамид (МГЭИК 2019)",
       "description": "",
       "has_co2_emissions": true,
       "has_n2o_emissions": true,
