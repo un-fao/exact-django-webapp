@@ -6636,7 +6636,7 @@ class OrganicSoilCalculator(BaseCalculator):
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
             module_types = (parent_module_type,) * 3
 
-            self.area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
+            self.area_affected_by_module = 0 if parent_module_type.class_name == "ForestManagement" else parent_module.area
 
         cm = {
             "climate": self.climate,
