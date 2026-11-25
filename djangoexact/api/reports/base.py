@@ -25,6 +25,7 @@ from .data_types import (
     InventoryItem,
     ModuleResult,
     ProjectResult,
+    ResultRow,
     ShadowPriceRow,
     T2Override,
 )
@@ -163,6 +164,15 @@ class BaseModuleReport:
         return extract_emissions(
             self.emissions_set, duration=self._project_duration
         )
+
+    def _unallocated_rows(self, rows: list[ResultRow]) -> list[ResultRow]:
+        """Whatever the module total holds beyond ``rows``, so the rows add up to the total."""
+        rest = self._balance_total()
+        for row in rows:
+            rest = [t - v for t, v in zip_longest(rest, row.yearly_values, fillvalue=0)]
+        if all(abs(v) < 1e-9 for v in rest):
+            return []
+        return [ResultRow("Other emissions (CO2-eq)", rest)]
 
     def compute(self) -> ModuleResult:
         """Return a ModuleResult with all computed data. Must be overridden."""
