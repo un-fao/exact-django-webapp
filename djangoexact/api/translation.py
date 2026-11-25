@@ -181,6 +181,11 @@ class FuelTypeTranslationOptions(NameOnlyTranslationOptions):
     pass
 
 
+@register(models.ValueChainStage)
+class ValueChainStageTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
 @register(models.CropType)
 class CropTypeTranslationOptions(NameOnlyTranslationOptions):
     pass

@@ -1,8 +1,8 @@
 from datetime import timedelta
 from unittest import mock
 
+from django.contrib.auth.models import Permission
 from django.db import IntegrityError, transaction
-from django.test import modify_settings
 from django.utils import timezone
 from rest_framework.test import APITestCase
 
@@ -16,8 +16,6 @@ def _status(value):
     return InvitationStatusType.objects.get_or_create(name=value, defaults={"name_en": value})[0]
 
 
-# DatabaseConnectionMiddleware closes every connection after a request, which breaks TestCase's per-test transaction.
-@modify_settings(MIDDLEWARE={"remove": "minitool.middleware.DatabaseConnectionMiddleware"})
 class MembershipTestBase(APITestCase):
     def setUp(self):
         self.admin_group = Group.objects.get_or_create(name="Admin")[0]
@@ -121,3 +119,142 @@ class MembershipUniquenessTestCase(MembershipTestBase):
     def test_database_rejects_a_second_membership(self):
         with self.assertRaises(IntegrityError), transaction.atomic():
             ProjectMembership.objects.create(user=self.owner, project=self.project, group=self.viewer_group)
+
+
+class MembershipRoleChangeTestCase(MembershipTestBase):
+    LAST_ADMIN_ERROR = "Cannot change the role of the last Admin in the project"
+
+    def setUp(self):
+        super().setUp()
+        change = Permission.objects.get(codename="change_projectmembership")
+        self.admin_group.permissions.add(change)
+        self.owner_membership = ProjectMembership.objects.get(user=self.owner, project=self.project)
+        self.client.force_authenticate(self.owner)
+
+    def url(self, membership):
+        return f"/api/project-memberships/{membership.pk}/"
+
+    def patch_group(self, membership, group):
+        return self.client.patch(self.url(membership), {"group": group.pk}, format="json")
+
+    def assert_group(self, membership, group):
+        membership.refresh_from_db()
+        self.assertEqual(membership.group_id, group.pk)
+
+    def test_patch_refuses_demoting_the_last_admin(self):
+        resp = self.patch_group(self.owner_membership, self.viewer_group)
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn(self.LAST_ADMIN_ERROR, str(resp.data))
+        self.assert_group(self.owner_membership, self.admin_group)
+
+    def test_put_refuses_demoting_the_last_admin(self):
+        body = {"project": self.project.pk, "user": self.owner.pk, "group": self.viewer_group.pk}
+        resp = self.client.put(self.url(self.owner_membership), body, format="json")
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn(self.LAST_ADMIN_ERROR, str(resp.data))
+        self.assert_group(self.owner_membership, self.admin_group)
+
+    def test_patch_without_group_skips_the_check(self):
+        resp = self.client.patch(self.url(self.owner_membership), {"project": self.project.pk}, format="json")
+        self.assertEqual(resp.status_code, 200)
+        self.assert_group(self.owner_membership, self.admin_group)
+
+    def test_admin_can_be_demoted_when_another_admin_exists(self):
+        other = ProjectMembership.objects.create(user=self.member, project=self.project, group=self.admin_group)
+        resp = self.patch_group(other, self.viewer_group)
+        self.assertEqual(resp.status_code, 200)
+        self.assert_group(other, self.viewer_group)
+
+    def test_non_admin_role_change_still_works(self):
+        member = ProjectMembership.objects.create(user=self.member, project=self.project, group=self.viewer_group)
+        resp = self.patch_group(member, self.admin_group)
+        self.assertEqual(resp.status_code, 200)
+        self.assert_group(member, self.admin_group)
+
+    def test_patch_refuses_moving_to_another_project(self):
+        other_project = ProjectFactory(owner=self.member, country=self.project.country, gw_potential=self.project.gw_potential)
+        resp = self.client.patch(self.url(self.owner_membership), {"project": other_project.pk}, format="json")
+        self.assertEqual(resp.status_code, 400)
+        self.owner_membership.refresh_from_db()
+        self.assertEqual(self.owner_membership.project_id, self.project.pk)
+        self.assertFalse(other_project.members.filter(user=self.owner).exists())
+
+    def test_patch_refuses_reassigning_the_user(self):
+        resp = self.client.patch(self.url(self.owner_membership), {"user": self.member.pk}, format="json")
+        self.assertEqual(resp.status_code, 400)
+        self.owner_membership.refresh_from_db()
+        self.assertEqual(self.owner_membership.user_id, self.owner.pk)
+
+    def test_put_with_unchanged_project_and_user_still_works(self):
+        ProjectMembership.objects.create(user=self.member, project=self.project, group=self.admin_group)
+        body = {"project": self.project.pk, "user": self.owner.pk, "group": self.viewer_group.pk}
+        resp = self.client.put(self.url(self.owner_membership), body, format="json")
+        self.assertEqual(resp.status_code, 200)
+        self.assert_group(self.owner_membership, self.viewer_group)
+
+
+class InvitationDeleteTestCase(MembershipTestBase):
+    def setUp(self):
+        super().setUp()
+        self.invitee = UserFactory(email="membership-invitee@example.com")
+        self.invitation = self.invite(self.invitee, self.viewer_group)
+
+    def delete(self):
+        return self.client.delete(f"/api/project-invitations/{self.invitation.pk}/")
+
+    def test_non_member_cannot_delete(self):
+        self.client.force_authenticate(UserFactory(email="membership-outsider@example.com"))
+        self.assertEqual(self.delete().status_code, 403)
+        self.assertTrue(ProjectInvitation.objects.filter(pk=self.invitation.pk).exists())
+
+    def test_member_with_change_permission_can_delete(self):
+        self.viewer_group.permissions.add(Permission.objects.get(codename="change_projectinvitation"))
+        ProjectMembership.objects.create(user=self.member, project=self.project, group=self.viewer_group)
+        self.client.force_authenticate(self.member)
+        self.assertEqual(self.delete().status_code, 204)
+        self.assertFalse(ProjectInvitation.objects.filter(pk=self.invitation.pk).exists())
+
+
+class InvitationUpdateTestCase(MembershipTestBase):
+    def setUp(self):
+        super().setUp()
+        self.rejected = _status(InvitationStatus.REJECTED.value)
+        self.admin_group.permissions.add(Permission.objects.get(codename="change_projectinvitation"))
+        self.invitation = self.invite(self.member, self.viewer_group)
+        self.client.force_authenticate(self.owner)
+
+    def patch(self, body):
+        return self.client.patch(f"/api/project-invitations/{self.invitation.pk}/", body, format="json")
+
+    def assert_unchanged(self):
+        self.invitation.refresh_from_db()
+        self.assertEqual(self.invitation.project_id, self.project.pk)
+        self.assertEqual(self.invitation.user_id, self.member.pk)
+        self.assertEqual(self.invitation.group_id, self.viewer_group.pk)
+        self.assertEqual(self.invitation.status_id, self.pending.pk)
+
+    def test_patch_refuses_changing_the_project(self):
+        other_project = ProjectFactory(owner=self.member, country=self.project.country, gw_potential=self.project.gw_potential)
+        resp = self.patch({"status": self.rejected.pk, "project": other_project.pk})
+        self.assertEqual(resp.status_code, 400)
+        self.assert_unchanged()
+
+    def test_patch_refuses_changing_the_user_and_group(self):
+        resp = self.patch({"status": self.rejected.pk, "user": self.owner.pk, "group": self.admin_group.pk})
+        self.assertEqual(resp.status_code, 400)
+        self.assert_unchanged()
+
+    def test_patch_without_status_is_a_bad_request(self):
+        self.assertEqual(self.patch({}).status_code, 400)
+        self.assert_unchanged()
+
+    def test_patch_status_rejects_the_invitation(self):
+        resp = self.patch({"status": self.rejected.pk})
+        self.assertEqual(resp.status_code, 200)
+        self.invitation.refresh_from_db()
+        self.assertEqual(self.invitation.status_id, self.rejected.pk)
+
+    def test_patch_status_accepts_the_invitation(self):
+        resp = self.patch({"status": self.accepted.pk})
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(ProjectMembership.objects.filter(user=self.member, project=self.project, group=self.viewer_group).exists())

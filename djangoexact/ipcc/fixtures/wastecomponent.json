@@ -1,0 +1,222 @@
+[
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 1,
+    "fields": {
+      "code": "food",
+      "name": "Food waste",
+      "name_en": "Food waste",
+      "name_fr": "Déchets alimentaires",
+      "name_es": "Residuos de alimentos",
+      "name_ru": "Пищевые отходы",
+      "dry_matter": 0.4,
+      "doc": 0.15,
+      "carbon": 0.38,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.06,
+      "k_boreal_temperate_wet": 0.185,
+      "k_tropical_dry": 0.085,
+      "k_tropical_wet": 0.4
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 2,
+    "fields": {
+      "code": "garden",
+      "name": "Garden and park waste",
+      "name_en": "Garden and park waste",
+      "name_fr": "Déchets de jardins et de parcs",
+      "name_es": "Residuos de jardines y parques",
+      "name_ru": "Садово-парковые отходы",
+      "dry_matter": 0.4,
+      "doc": 0.2,
+      "carbon": 0.49,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.05,
+      "k_boreal_temperate_wet": 0.1,
+      "k_tropical_dry": 0.065,
+      "k_tropical_wet": 0.17
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 3,
+    "fields": {
+      "code": "paper",
+      "name": "Paper and cardboard",
+      "name_en": "Paper and cardboard",
+      "name_fr": "Papier et carton",
+      "name_es": "Papel y cartón",
+      "name_ru": "Бумага и картон",
+      "dry_matter": 0.9,
+      "doc": 0.4,
+      "carbon": 0.46,
+      "fossil_carbon": 0.01,
+      "k_boreal_temperate_dry": 0.04,
+      "k_boreal_temperate_wet": 0.06,
+      "k_tropical_dry": 0.045,
+      "k_tropical_wet": 0.07
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 4,
+    "fields": {
+      "code": "wood",
+      "name": "Wood",
+      "name_en": "Wood",
+      "name_fr": "Bois",
+      "name_es": "Madera",
+      "name_ru": "Древесина",
+      "dry_matter": 0.85,
+      "doc": 0.43,
+      "carbon": 0.5,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.02,
+      "k_boreal_temperate_wet": 0.03,
+      "k_tropical_dry": 0.025,
+      "k_tropical_wet": 0.035
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 5,
+    "fields": {
+      "code": "textiles",
+      "name": "Textiles",
+      "name_en": "Textiles",
+      "name_fr": "Textiles",
+      "name_es": "Textiles",
+      "name_ru": "Текстиль",
+      "dry_matter": 0.8,
+      "doc": 0.24,
+      "carbon": 0.5,
+      "fossil_carbon": 0.2,
+      "k_boreal_temperate_dry": 0.04,
+      "k_boreal_temperate_wet": 0.06,
+      "k_tropical_dry": 0.045,
+      "k_tropical_wet": 0.07
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 6,
+    "fields": {
+      "code": "nappies",
+      "name": "Disposable nappies",
+      "name_en": "Disposable nappies",
+      "name_fr": "Couches jetables",
+      "name_es": "Pañales desechables",
+      "name_ru": "Одноразовые подгузники",
+      "dry_matter": 0.4,
+      "doc": 0.24,
+      "carbon": 0.7,
+      "fossil_carbon": 0.1,
+      "k_boreal_temperate_dry": 0.04,
+      "k_boreal_temperate_wet": 0.06,
+      "k_tropical_dry": 0.045,
+      "k_tropical_wet": 0.07
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 7,
+    "fields": {
+      "code": "rubber_leather",
+      "name": "Rubber and leather",
+      "name_en": "Rubber and leather",
+      "name_fr": "Caoutchouc et cuir",
+      "name_es": "Caucho y cuero",
+      "name_ru": "Резина и кожа",
+      "dry_matter": 0.84,
+      "doc": 0.39,
+      "carbon": 0.67,
+      "fossil_carbon": 0.2,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 8,
+    "fields": {
+      "code": "plastics",
+      "name": "Plastics",
+      "name_en": "Plastics",
+      "name_fr": "Plastiques",
+      "name_es": "Plásticos",
+      "name_ru": "Пластмассы",
+      "dry_matter": 1.0,
+      "doc": 0.0,
+      "carbon": 0.75,
+      "fossil_carbon": 1.0,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 9,
+    "fields": {
+      "code": "metal",
+      "name": "Metal",
+      "name_en": "Metal",
+      "name_fr": "Métal",
+      "name_es": "Metal",
+      "name_ru": "Металл",
+      "dry_matter": 1.0,
+      "doc": 0.0,
+      "carbon": 0.0,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 10,
+    "fields": {
+      "code": "glass",
+      "name": "Glass",
+      "name_en": "Glass",
+      "name_fr": "Verre",
+      "name_es": "Vidrio",
+      "name_ru": "Стекло",
+      "dry_matter": 1.0,
+      "doc": 0.0,
+      "carbon": 0.0,
+      "fossil_carbon": 0.0,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  },
+  {
+    "model": "ipcc.wastecomponent",
+    "pk": 11,
+    "fields": {
+      "code": "other",
+      "name": "Other, inert waste",
+      "name_en": "Other, inert waste",
+      "name_fr": "Autres déchets inertes",
+      "name_es": "Otros residuos inertes",
+      "name_ru": "Прочие инертные отходы",
+      "dry_matter": 0.9,
+      "doc": 0.0,
+      "carbon": 0.03,
+      "fossil_carbon": 1.0,
+      "k_boreal_temperate_dry": 0.0,
+      "k_boreal_temperate_wet": 0.0,
+      "k_tropical_dry": 0.0,
+      "k_tropical_wet": 0.0
+    }
+  }
+]

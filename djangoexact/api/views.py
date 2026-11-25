@@ -12,7 +12,7 @@ import traceback
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import Count, Model
 from django.utils import timezone
@@ -69,6 +69,7 @@ from .models import (
     ProjectFileAttachment,
     APIHealth,
     FuelType,
+    Energy,
     SoilType,
     Fishery,
     Livestock,
@@ -115,7 +116,6 @@ from .serializers import (
     ActivitySerializerWithModules,
     ResetPasswordSerializer,
     FieldDefinitionResponseSerializer,
-    FieldDefinitionSerializer,
     ProjectResultSerializer,
     ActivityResultSerializer,
     ProjectSummarySerializer,
@@ -159,6 +159,8 @@ from django.utils.translation import override as translation_override
 from api.services import async_jobs
 from api.services import finalization
 from api.services import report_links
+from api.services.conditionality_results import AGGREGATE_CONDITIONALITY, aggregate_by_conditionality
+from api.services import energy_value_chain
 from api.services.project_invitations import InvitationNotAcceptableError, accept_invitation
 
 logger = logging.getLogger("console")
@@ -487,9 +489,9 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(UserReadSerializer(request.user).data, status=http_status.HTTP_200_OK)
 
 
-class LandUseTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
+class LandUseTypeViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows land use types to be viewed or edited.
+    API endpoint that allows land use types to be viewed.
     """
 
     queryset = LandUseType.objects.all()
@@ -578,6 +580,27 @@ _REPORT_BODY = openapi.Schema(
         ),
     },
 )
+
+
+_INDICATORS_LANG_PARAM = openapi.Parameter(
+    "lang",
+    openapi.IN_QUERY,
+    description="Label language; falls back to Accept-Language, then en",
+    type=openapi.TYPE_STRING,
+    required=False,
+)
+
+
+def indicators_response(request, project):
+    """Shared by the private and public project indicators actions."""
+    from django.utils import translation
+    from api.services import indicators as indicators_service
+
+    lang = utils.requested_language(request)
+    with translation.override(lang):
+        data = indicators_service.compute_project_indicators(project)
+        # Render lazy labels while the requested language is still active.
+        return Response(data=json.loads(json.dumps(data, default=str)), status=http_status.HTTP_200_OK)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -809,6 +832,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 description="Return cached results",
                 type=openapi.TYPE_BOOLEAN,
             ),
+            openapi.Parameter(
+                "aggregate",
+                openapi.IN_QUERY,
+                description=(
+                    "Aggregate module results by. 'conditionality' returns the 'gas' breakdown plus a "
+                    "'conditionality' object with the balance split by NDC conditionality."
+                ),
+                type=openapi.TYPE_STRING,
+                enum=[*(b.value for b in BreakdownTypes if b != BreakdownTypes.INVENTORY), AGGREGATE_CONDITIONALITY],
+            ),
         ],
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results", 200: ProjectResultSerializer},
     )
@@ -836,9 +869,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         response = serialized_project
         response["activities"] = []
 
-        # Function to process an activity
+        by_conditionality = request.query_params.get("aggregate") == AGGREGATE_CONDITIONALITY
+        module_aggregate = BreakdownTypes.GAS.value if by_conditionality else None
+
         def process_activity(activity_pk):
-            return ActivityViewSet.results(self, request, pk=activity_pk).data
+            return ActivityViewSet.results(self, request, pk=activity_pk, aggregate=module_aggregate).data
 
         activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
@@ -853,7 +888,26 @@ class ProjectViewSet(viewsets.ModelViewSet):
             on_error=log_activity_failure,
         )
 
+        if by_conditionality:
+            response["conditionality"] = aggregate_by_conditionality(response["activities"], project.start_year_of_activities)
+
         return Response(data=response, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        manual_parameters=[_INDICATORS_LANG_PARAM],
+        responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
+    )
+    def indicators(self, request, pk=None):
+        """Project indicators (land use change matrix, food waste), grouped.
+
+        Read-only: computed from the module results of the project's ready activities.
+        """
+        project: Project = get_object_or_404(Project, pk=pk)
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+        return indicators_response(request, project)
 
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(
@@ -886,12 +940,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
         # notes. Dropping them silently would hand back a file missing prose they wrote.
         from .reports import narrative as report_narrative
 
+        lang = utils.requested_language(request)
         report_narrative.content_from_request(request, None)
         report_narrative.sources_from_request(request, None)
 
         try:
             from .reports import generate_excel_report
-            file_bytes_buffer = generate_excel_report(project, activities=selected_activities)
+
+            # Reference names are read in the active language while the workbook is
+            # built; without this they follow Accept-Language instead of ?lang=.
+            with translation_override(lang):
+                file_bytes_buffer = generate_excel_report(project, activities=selected_activities)
         except Exception as e:
             traceback.print_exc()
             logger.error(f"Error generating report: {e}")
@@ -1936,10 +1995,23 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
+        error = self._refuse_last_admin_demotion(membership, serializer.validated_data)
+        if error:
+            return error
+
         serializer.save()
 
         return Response(ProjectMembershipReadSerializer(membership).data, status=http_status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_description="Partially update a project membership",
+        request_body=ProjectMembershipWriteSerializer,
+        responses={
+            400: "Bad request",
+            200: "Project membership updated successfully",
+            403: "Selected user does not have permission to change project memberships",
+        },
+    )
     def partial_update(self, request, *args, **kwargs):
         membership = self.get_object()
         error = security.check_permission("change_projectmembership", self.request.user, membership.project)
@@ -1951,9 +2023,22 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
+        error = self._refuse_last_admin_demotion(membership, serializer.validated_data)
+        if error:
+            return error
+
         serializer.save()
 
         return Response(ProjectMembershipReadSerializer(membership).data, status=http_status.HTTP_200_OK)
+
+    @staticmethod
+    def _refuse_last_admin_demotion(membership, validated_data):
+        new_group = validated_data.get("group")
+        if membership.group.name != "Admin" or new_group is None or new_group.name == "Admin":
+            return None
+        if membership.project.members.filter(group__name="Admin").count() == 1:
+            return utils.ErrorResponse("Cannot change the role of the last Admin in the project", status=http_status.HTTP_400_BAD_REQUEST)
+        return None
 
     @swagger_auto_schema(
         operation_description="Delete a project membership",
@@ -2206,7 +2291,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        data = ProjectInvitationModelWriteSerializer(invitation, data=request.data, partial=True)
+        data = ProjectInvitationModelWriteSerializer(invitation, data=request.data)
 
         if not data.is_valid():
             return Response(data.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -2241,6 +2326,25 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def update(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Delete a project invitation",
+        responses={
+            204: "Invitation deleted successfully",
+            403: "Selected user does not have permission to delete invitations",
+        },
+    )
+    def destroy(self, request, *args, **kwargs):
+        invitation = self.get_object()
+        # change_ rather than delete_: revoking through partial_update already requires it, and the
+        # production group permissions are not in the repo, so delete_ may not be granted to anyone.
+        error = security.check_permission("change_projectinvitation", self.request.user, invitation.project)
+        if error:
+            return error
+
+        invitation.delete()
+
+        return Response(status=http_status.HTTP_204_NO_CONTENT)
 
     @swagger_auto_schema(
         manual_parameters=[project_id],
@@ -2480,9 +2584,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         ],
         responses={400: "Bad request", 403: "Selected user does not have permission to view activity results", 200: ActivityResultSerializer},
     )
-    def results(self, request, pk=None):
+    def results(self, request, pk=None, aggregate=None):
         """
         Calculates and returns total emissions for each module in the activity.
+
+        ``aggregate`` overrides the request's ``?aggregate=`` for internal callers.
         """
 
         activity = Activity.objects.prefetch_related().get(pk=pk)
@@ -2501,7 +2607,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             module_dict = get_module_serializer(module.__class__)(module).data
 
             try:
-                viewset = generic_module_viewset(module.__class__).results(self, request, pk=module.pk)
+                viewset = generic_module_viewset(module.__class__).results(self, request, pk=module.pk, aggregate=aggregate)
                 module_dict[labels.RESULTS] = viewset.data
 
             except Exception as e:
@@ -2616,6 +2722,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 class CommentThreadViewSet(viewsets.ModelViewSet):
     queryset = CommentThread.objects.all()
     serializer_class = CommentThreadSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     @action(detail=True, methods=["get"])
     def comments(self, request, pk=None):
@@ -2703,6 +2810,7 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -2732,9 +2840,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-class ModuleTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
+class ModuleTypeViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows module types to be viewed or edited.
+    API endpoint that allows module types to be viewed.
     """
 
     queryset = ModuleType.objects.all()
@@ -2762,9 +2870,9 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, PublicViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-class CountryViewSet(viewsets.ModelViewSet, PublicViewSet):
+class CountryViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows countries to be viewed or edited.
+    API endpoint that allows countries to be viewed.
     """
 
     queryset = Country.objects.all()
@@ -2784,9 +2892,9 @@ class CountryViewSet(viewsets.ModelViewSet, PublicViewSet):
         return super().list(request)
 
 
-class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class InputTypeViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows input types to be viewed or edited.
+    API endpoint that allows input types to be viewed.
     """
 
     queryset = InputType.objects.all()
@@ -2876,6 +2984,37 @@ def generic_module_viewset(model: Module):
 
             return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
+        @staticmethod
+        def _target_projects(data, is_submodule: bool) -> list[Project | None]:
+            """
+            Projects a create payload (one item or a list) targets through `activity`, or `parent` for a submodule.
+
+            A well-formed id that matches nothing yields None, so it is refused like a foreign target instead of
+            telling the caller it does not exist. Missing or malformed ids are skipped: field validation rejects
+            those items before `validate()` can take any lock.
+            """
+            target_field = model._meta.get_field("parent" if is_submodule else "activity")
+            target_model = target_field.related_model
+            target_pks = set()
+            for item in data if isinstance(data, list) else [data]:
+                try:
+                    target_pk = target_model._meta.pk.to_python(item.get(target_field.name))
+                except (AttributeError, DjangoValidationError):
+                    continue
+                if target_pk is not None:
+                    target_pks.add(target_pk)
+
+            project_path = "activity__project" if is_submodule else "project"
+            targets = target_model.objects.select_related(project_path).in_bulk(target_pks)
+            projects = []
+            for target_pk in target_pks:
+                target = targets.get(target_pk)
+                if target is None:
+                    projects.append(None)
+                else:
+                    projects.append(target.activity.project if is_submodule else target.project)
+            return projects
+
         @transaction.atomic
         def create(self, request):
             """
@@ -2885,8 +3024,23 @@ def generic_module_viewset(model: Module):
             logging.debug(f"START GenericModuleViewSet[{model.__name__}].create")
             logging.debug(f"request.data: {request.data}")
 
-            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=isinstance(request.data, list), context={"request": request})
             module_type = ModuleType.objects.get(class_name=model.__name__)
+
+            # IsPublicOrAuthenticated already refuses anonymous callers; this keeps the pre-check from ever
+            # running for one if that permission class changes.
+            if not request.user.is_authenticated:
+                return security.not_authenticated()
+
+            # Serializer validation writes (the project lock, a land module's Land Use Change), so a refused
+            # caller must be refused before it runs.
+            # ponytail: validate() still writes, move those writes to save() if another caller validates first
+            target_projects = dict.fromkeys(self._target_projects(request.data, module_type.is_submodule))
+            for project in target_projects:
+                error = security.check_permission("add_modules", self.request.user, project)
+                if error:
+                    return error
+
+            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=isinstance(request.data, list), context={"request": request})
 
             if not module_serializer.is_valid():
                 logger.error(f"Error creating module: {module_serializer.errors}")
@@ -2955,13 +3109,13 @@ def generic_module_viewset(model: Module):
                     openapi.IN_QUERY,
                     description="Aggregate results by",
                     type=openapi.TYPE_STRING,
-                    enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value],
+                    enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value, "value_chain_stage"],
                 ),
                 openapi.Parameter("cached", openapi.IN_QUERY, description="Use cached results", type=openapi.TYPE_BOOLEAN),
             ],
             responses={400: "Bad request", 403: "Selected user does not have permission to view module results", 200: DynamicResultSerializer},
         )
-        def results(self, request, pk=None):
+        def results(self, request, pk=None, aggregate=None):
             """
             Calculates and returns total emissions for a single module.
             """
@@ -2987,7 +3141,12 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
-                aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
+                if request.query_params.get("aggregate") == energy_value_chain.VALUE_CHAIN_STAGE_AGGREGATE:
+                    if not isinstance(module, Energy):
+                        return utils.ErrorResponse("aggregate=value_chain_stage is only available for the Energy module.")
+                    return Response(energy_value_chain.results_by_value_chain_stage(module))
+
+                aggregate_by = BreakdownTypes(aggregate or request.query_params.get("aggregate", BreakdownTypes.TOTAL))
                 use_cached_results = request.query_params.get("cached", "true") == "true"
                 module_results, frozen = finalization.module_results(module, aggregate_by, use_cache=use_cached_results)
 
@@ -3093,7 +3252,7 @@ def generic_viewset(model: Model):
 
 
 def public_generic_viewset(model: Model):
-    class PublicGenericViewSet(viewsets.ModelViewSet, PublicViewSet):
+    class PublicGenericViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
         filterset_class = api_filters.get_model_filter(model)
@@ -3103,21 +3262,6 @@ def public_generic_viewset(model: Model):
 
 
 class FieldDefinitionViewSet(viewsets.ViewSet):
-    @swagger_auto_schema(
-        request_body=FieldDefinitionSerializer,
-        responses={400: "Bad request", 201: FieldDefinitionSerializer},
-    )
-    def create(self, request, *args, **kwargs):
-        serializer = FieldDefinitionSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-
-        return Response(serializer.data, status=http_status.HTTP_201_CREATED)
-
-    # Custom action for listing field definitions
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter("module_type_id", openapi.IN_QUERY, description="Module type id", type=openapi.TYPE_INTEGER)],
         responses={400: "Model name not provided", 404: "Model not found", 200: FieldDefinitionResponseSerializer},
@@ -3366,12 +3510,12 @@ class APIHealthView(views.APIView):
         return Response(serializer.data, status=status)
 
 
-class FuelTypeViewSet(viewsets.ModelViewSet, PublicViewSet, DynamicFilterViewSet):
+class FuelTypeViewSet(PublicViewSet, DynamicFilterViewSet):
     queryset = FuelType.objects.all()
     serializer_class = FuelTypeSerializer
 
 
-class SoilTypeViewset(viewsets.ModelViewSet, PublicViewSet):
+class SoilTypeViewset(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     queryset = SoilType.objects.all()
     serializer_class = get_model_serializer(SoilType)
     filter_backends = [DjangoFilterBackend]
@@ -3425,9 +3569,9 @@ class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(serializer.data, status=http_status.HTTP_201_CREATED)
 
 
-class HandInHandAssessmentViewSet(viewsets.ModelViewSet, PublicViewSet):
+class HandInHandAssessmentViewSet(viewsets.ReadOnlyModelViewSet, PublicViewSet):
     """
-    API endpoint that allows Hand in Hand assessments to be viewed or edited.
+    API endpoint that allows Hand in Hand assessments to be viewed.
     """
 
     queryset = HandInHandAssessment.objects.all()

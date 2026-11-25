@@ -1,6 +1,7 @@
 from rest_framework import status
 from django.urls import reverse
 import api.models as models
+import ipcc.models as ipcc_models
 from rest_framework.test import force_authenticate
 from factory.fuzzy import FuzzyChoice
 import copy
@@ -15,8 +16,9 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         self.ModuleClass = models.PerennialCropland
         super().setUp()
 
-        self.trees = models.LandUseType.objects.filter(module_types__class_name="PerennialCropland", climates=self.project.climate, moistures=self.project.moisture, is_active=True)
-
+        # Only crops with a tier-1 AGB row for this climate/moisture/region can compute without tier-2 input.
+        with_agb = ipcc_models.PerennialAGB.objects.filter(climate=self.project.climate, moisture=self.project.moisture, continent=self.project.country.region, value__isnull=False)
+        self.trees = models.LandUseType.objects.filter(module_types__class_name="PerennialCropland", climates=self.project.climate, moistures=self.project.moisture, is_active=True, id__in=with_agb.values("land_use_type"))
 
         self.validated_data = self.build_validated_data()
 
@@ -47,18 +49,16 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, self.validated_data)
         self.module.refresh_from_db()
         if retry:
-            workable = False
-            while not workable:
-                try:
-                    self.test_calculate_results()
-                    workable = True
-                except Exception as e:
-                    self.validated_data = self.build_validated_data()
-                    self.edit_module(self.module, self.user, self.validated_data)
-                    self.module.refresh_from_db()
+
+            def repick():
+                self.validated_data = self.build_validated_data()
+                self.edit_module(self.module, self.user, self.validated_data)
+                self.module.refresh_from_db()
+
+            self.retry(self.test_calculate_results, repick, "perennial cropland results")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
     def test_modify_and_check_cache_invalidation(self):
         self.test_modify(retry=True)
@@ -81,7 +81,7 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "READY")
+        self.assertEqual(self.module_status_name(response), "READY")
 
         # Check that the cache is invalidated
         view = self.module_viewset.as_view({"get": "results"})
@@ -104,7 +104,7 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["status"]["name"], "EMPTY")
+        self.assertEqual(self.module_status_name(response), "EMPTY")
 
     def test_calculate_results(self):
 

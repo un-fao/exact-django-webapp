@@ -158,7 +158,7 @@ class _FakeMembers:
 
 
 def _user(is_superuser=False):
-    return SimpleNamespace(is_superuser=is_superuser)
+    return SimpleNamespace(is_superuser=is_superuser, is_authenticated=True)
 
 
 def _project_for_permission_check(admins=()):

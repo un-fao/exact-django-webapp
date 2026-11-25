@@ -46,6 +46,7 @@ class ActivityTypes(Enum):
     HWP_LOGGING_BGB = "Harvested Wood Product Logging BGB"
     HWP_ROTATION_AGB = "Harvested Wood Product Rotation AGB"
     HWP_ROTATION_BGB = "Harvested Wood Product Rotation BGB"
+    HWP_POOL = "Harvested Wood Products Pool"
     CH4_EMITTED_RICE = "CH4 Emitted Rice"
     STRAW_BURNING = "Straw Burning"
     IRRIGATION_OPERATIONAL = "Operational Phase of Irrigation"
@@ -73,6 +74,8 @@ class ActivityTypes(Enum):
     DRAINAGE_PEAT = "Drainage Peat Extraction"
     OFFSITE_PEAT = "Offsite Peat Extraction"
     COASTAL_WATERBODIES = "Coastal Waterbodies"
+    FLOODED_LAND_CH4 = "Flooded Land CH4"
+    FLOODED_LAND_CO2 = "Flooded Land CO2"
     DEGRADATION_AGB = "Degradation AGB"
     DEGRADATION_BGB = "Degradation BGB"
     DEGRADATION_LITTER = "Degradation Litter"
@@ -81,6 +84,11 @@ class ActivityTypes(Enum):
     TRANSPORT = "Transport"
     STORAGE = "Storage"
     PROCESSING = "Processing"
+    SOLID_WASTE_DISPOSAL = "Solid Waste Disposal"
+    COMPOSTING = "Composting"
+    ANAEROBIC_DIGESTION = "Anaerobic Digestion"
+    WASTE_INCINERATION = "Waste Incineration"
+    WASTE_OPEN_BURNING = "Open Burning of Waste"
 
 
 class Emission:

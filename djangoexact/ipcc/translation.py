@@ -9,3 +9,18 @@ class NameOnlyTranslationOptions(TranslationOptions):
 @register(models.GlobalWarmingPotential)
 class GlobalWarmingPotentialTranslationOptions(NameOnlyTranslationOptions):
     pass
+
+
+@register(models.WasteComponent)
+class WasteComponentTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
+@register(models.SolidWasteDisposalSiteType)
+class SolidWasteDisposalSiteTypeTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
+@register(models.WasteTreatmentEmissionFactor)
+class WasteTreatmentEmissionFactorTranslationOptions(NameOnlyTranslationOptions):
+    pass

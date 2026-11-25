@@ -127,7 +127,14 @@ class LoginExistingUserView(APIView):
 
     @swagger_auto_schema(
         request_body=LoginSerializer,
-        responses={200: LoginResponseSerializer, 400: "Bad Request", 401: "Unauthorized", 404: "Not Found"},
+        responses={
+            200: LoginResponseSerializer,
+            400: "Bad Request",
+            401: "Unauthorized",
+            404: "Not Found",
+            502: "Invalid response from authentication service",
+            503: "Authentication service unavailable",
+        },
     )
     @transaction.atomic
     def post(self, request):
@@ -247,7 +254,12 @@ class TokenRefreshView(APIView):
     permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(
-        responses={200: LoginResponseSerializer, 400: "Bad Request"},
+        responses={
+            200: LoginResponseSerializer,
+            400: "Refresh token rejected",
+            502: "Invalid response from authentication service",
+            503: "Authentication service unavailable",
+        },
     )
     def post(self, request):
         # No @transaction.atomic: this view performs no DB writes (Firebase only).
