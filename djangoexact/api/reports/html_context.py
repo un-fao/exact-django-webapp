@@ -321,6 +321,9 @@ def build_template_context(
     impl_years = project.implementation_years or 0
     balance_during_implementation = float(sum(yearly_bal[:impl_years]))
     balance_after_implementation = float(sum(yearly_bal[impl_years:]))
+    # GCF mid-term target: the first half of implementation, rounded down.
+    mid_term_years = impl_years // 2
+    balance_mid_term = float(sum(yearly_bal[:mid_term_years]))
 
     # Gas-level totals and GHG ranking
     gas_data = _compute_gas_totals(result, total_balance)
@@ -407,6 +410,13 @@ def build_template_context(
         "balance_during_implementation": balance_during_implementation,
         "balance_after_implementation": balance_after_implementation,
         "capitalization_years": project.capitalization_years,
+        "mid_term_years": mid_term_years,
+        # GCF reports tCO2eq reduced as a positive number; EX-ACT's balance is negative for mitigation.
+        "gcf_mitigation": {
+            "mid_term": -balance_mid_term,
+            "final": -balance_during_implementation,
+            "lifetime": -total_balance,
+        },
         "total_area": indicators["total_area"],
         "total_heads": indicators["total_heads"],
         "total_tonnes_of_catch": indicators["total_tonnes_of_catch"],

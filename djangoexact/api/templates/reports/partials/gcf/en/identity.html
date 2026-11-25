@@ -1,0 +1,32 @@
+<section>
+    <h1>Greenhouse gas reporting for the GCF Annual Performance Report</h1>
+    <table class="identity-table">
+        <tr>
+            <td>Project Name:</td>
+            <td>{{ project.name }}</td>
+        </tr>
+        <tr>
+            <td>Funding Proposal:</td>
+            <td><span class="analyst-input">FP number</span></td>
+        </tr>
+        <tr>
+            <td>Country:</td>
+            <td>{{ project.country.name }}</td>
+        </tr>
+        <tr>
+            <td>Reporting year:</td>
+            <td><span class="analyst-input">APR reporting year</span></td>
+        </tr>
+        <tr>
+            <td>Accounting period:</td>
+            <td>
+                {{ total_project_years }} years total = {{ implementation_years }} years implementation
+                + {{ capitalization_years }} years capitalization
+            </td>
+        </tr>
+        <tr>
+            <td>EX-ACT link:</td>
+            <td><span class="analyst-input">Project link</span></td>
+        </tr>
+    </table>
+</section>

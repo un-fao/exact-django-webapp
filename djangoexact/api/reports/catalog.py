@@ -15,6 +15,7 @@ import re
 
 REPORTS: dict[str, frozenset[str]] = {
     "fao": frozenset({"en", "es", "fr"}),
+    "gcf": frozenset({"en"}),
     "ifad": frozenset({"en"}),
 }
 
@@ -22,6 +23,7 @@ REPORTS: dict[str, frozenset[str]] = {
 # the id to its own translation and fall back to this.
 LABELS: dict[str, str] = {
     "fao": "EX-ACT report",
+    "gcf": "GCF APR annex",
     "ifad": "IFAD annex",
 }
 

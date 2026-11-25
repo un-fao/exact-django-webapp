@@ -1,0 +1,82 @@
+{% load humanize %}
+<section>
+    <h2>IV. GCF indicators</h2>
+    <p>
+        GCF reports mitigation as tCO<sub>2</sub>eq reduced, so the figures below are the EX-ACT
+        carbon balance with its sign reversed: a positive value is a mitigation benefit. Figures
+        are rounded to the nearest tonne.
+    </p>
+
+    <p class="table-caption">Table 1: Core indicator 1 / M1 &ndash; GHG emissions reduced, avoided or removed (tCO<sub>2</sub>eq)</p>
+    <table>
+        <tr>
+            <th>Target</th>
+            <th>Period</th>
+            <th class="num">tCO<sub>2</sub>eq</th>
+        </tr>
+        <tr>
+            <td>Mid-term</td>
+            <td>First {{ mid_term_years }} year{{ mid_term_years|pluralize }} of implementation</td>
+            <td class="num">{{ gcf_mitigation.mid_term|floatformat:0|intcomma }}</td>
+        </tr>
+        <tr>
+            <td>Final</td>
+            <td>{{ implementation_years }} year{{ implementation_years|pluralize }} of implementation</td>
+            <td class="num">{{ gcf_mitigation.final|floatformat:0|intcomma }}</td>
+        </tr>
+        <tr>
+            <td>Lifetime</td>
+            <td>{{ total_project_years }} years ({{ implementation_years }} implementation + {{ capitalization_years }} capitalization)</td>
+            <td class="num">{{ gcf_mitigation.lifetime|floatformat:0|intcomma }}</td>
+        </tr>
+        <tr>
+            <td>Annual value</td>
+            <td>Reporting year</td>
+            <td class="num"><span class="analyst-input">from monitoring</span></td>
+        </tr>
+    </table>
+
+    <p class="table-caption">Table 2: Core indicator 4 / M9.1 &ndash; area under improved management (ha)</p>
+    {% if land_types %}
+    <table>
+        <tr>
+            <th>Land type</th>
+            <th class="num">With project (ha)</th>
+        </tr>
+        {% for land in land_types %}
+            <tr>
+                <td>{{ land.name }}</td>
+                <td class="num">{{ land.value_w|floatformat:0|intcomma }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <th>Total project area</th>
+            <th class="num">{{ total_area|floatformat:0|intcomma }}</th>
+        </tr>
+    </table>
+    {% else %}
+        <p><span class="analyst-input">No land-use module in this project: no area to report</span></p>
+    {% endif %}
+    <span class="analyst-box">
+        <span class="box-title">Confirm the area</span>
+        Report only the area brought under improved management, mapped to the GCF land types
+        (forest land, cropland, grassland, wetlands, settlements, coastal/marine ecosystems,
+        other). The annual value comes from monitoring.
+    </span>
+
+    <p class="table-caption">Result levels</p>
+    <ul>
+        <li>
+            <b>Reduction</b> of current emissions: activities that lower emissions already taking
+            place (e.g. fertilizer reduction, fire management).
+        </li>
+        <li>
+            <b>Avoidance</b> and substitution: activities that prevent emissions that would have
+            occurred without the project (e.g. avoided deforestation, forest conservation).
+        </li>
+        <li>
+            <b>Removal</b> and sequestration: activities that take up CO<sub>2</sub> in biomass and
+            soils (e.g. forest restoration, agroforestry).
+        </li>
+    </ul>
+</section>
