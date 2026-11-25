@@ -17,7 +17,7 @@ import nh3
 from django.utils.safestring import SafeString, mark_safe
 from rest_framework import serializers
 
-CONTENT_REPORTS = frozenset({"ifad"})
+CONTENT_REPORTS = frozenset({"gcf", "ifad"})
 
 CONTENT_MAX_LENGTH = 20_000
 MAX_CELL_SPAN = 50

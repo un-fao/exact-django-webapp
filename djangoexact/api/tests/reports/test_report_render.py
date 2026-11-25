@@ -42,7 +42,7 @@ EXPECTED_BALANCE = EXPECTED_W - EXPECTED_WO                      # 420,000
 EXPECTED_DURING = (YEARLY_W - YEARLY_WO) * IMPLEMENTATION_YEARS  # 300,000
 EXPECTED_AFTER = (YEARLY_W - YEARLY_WO) * CAPITALIZATION_YEARS   # 120,000
 
-ALL_REPORT_TEMPLATES = ["fao_en", "fao_es", "fao_fr", "ifad_en"]
+ALL_REPORT_TEMPLATES = ["fao_en", "fao_es", "fao_fr", "gcf_en", "ifad_en"]
 
 
 def _make_project():
@@ -387,3 +387,31 @@ class TestIfadPageLayout(SimpleTestCase):
         self.assertNotIn("<header>", html)
         self.assertNotIn("accounting annex", html.split("</head>")[1])
         self.assertNotIn('class="page-break"', html)
+
+
+class TestGcfReportContent(SimpleTestCase):
+    """GCF reports tCO2eq reduced, so the targets are the balance with its sign reversed."""
+
+    def _render(self, **kwargs):
+        return " ".join(render_to_string("reports/gcf_en.html", _build_context(**kwargs)).split())
+
+    def test_targets_are_mitigation_positive(self):
+        # Mitigating: -60,000/yr balance. Mid-term is the first 5 // 2 = 2 years.
+        html = self._render(mitigating=True)
+        self.assertIn("First 2 years of implementation", html)
+        for value in ("120,000", "300,000", "420,000"):
+            with self.subTest(value=value):
+                self.assertIn(f'<td class="num">{value}</td>', html)
+
+    def test_emitting_project_reports_negative_mitigation(self):
+        html = self._render()
+        self.assertIn('<td class="num">-300,000</td>', html)
+        self.assertIn('<td class="num">-420,000</td>', html)
+
+    def test_analyst_notes_replace_the_placeholder(self):
+        from api.reports.narrative import clean_content
+
+        html = self._render(content=clean_content("<p>Avoided deforestation</p>"))
+        self.assertIn("<p>Avoided deforestation</p>", html)
+        self.assertNotIn("Analyst notes", html)
+        self.assertIn("Analyst notes", self._render())

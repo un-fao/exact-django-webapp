@@ -139,7 +139,7 @@ class PublicProjectViewSet(viewsets.ReadOnlyModelViewSet):
                 "content": openapi.Schema(
                     type=openapi.TYPE_STRING,
                     description="Analyst notes as HTML, at most 20000 characters. Sanitized to an allowlist "
-                                "of text, list, link and table tags. Accepted by the ifad report only.",
+                                "of text, list, link and table tags. Accepted by the gcf and ifad reports only.",
                 ),
             },
         ),

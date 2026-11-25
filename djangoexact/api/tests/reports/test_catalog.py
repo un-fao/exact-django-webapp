@@ -65,7 +65,7 @@ class ReportCatalogTestCase(SimpleTestCase):
         template. test_every_registered_pair_loads is what proves the template
         is really there; this only pins the set so a new report is a deliberate
         edit rather than a silent import."""
-        self.assertEqual(sorted(REPORTS), ["fao", "ifad"])
+        self.assertEqual(sorted(REPORTS), ["fao", "gcf", "ifad"])
 
     def test_ifad_is_english_only(self):
         """The IFAD template was delivered in English only. Without a per-report

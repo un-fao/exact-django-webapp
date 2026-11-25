@@ -1,0 +1,39 @@
+<section>
+    <h2>III. Assumptions and activities considered</h2>
+    <p>
+        The assessment covers {{ activities_total|length }} project
+        activit{{ activities_total|length|pluralize:"y,ies" }}. Project parameters were set as
+        follows: climate zone
+        {% if project.climate %}{{ project.climate.name }}{% else %}<span class="analyst-input">not set</span>{% endif %},
+        moisture regime
+        {% if project.moisture %}{{ project.moisture.name }}{% else %}<span class="analyst-input">not set</span>{% endif %},
+        soil type
+        {% if project.soil_type %}{{ project.soil_type.name }}{% else %}<span class="analyst-input">not set</span>{% endif %}.
+        {# An empty list is not "not applicable": only activity-level overrides are detectable. #}
+        Parameters were applied at Tier 1 (IPCC default values) unless otherwise
+        noted{% if tier2_parameters %}; where project-specific data was available, Tier 2 parameters were used for
+        {{ tier2_parameters|join:", " }}{% endif %}.
+    </p>
+
+    {% if activities_total %}
+    <ol>
+        {% for activity in activities_total %}
+            <li>{{ activity.name }}</li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if content %}
+        {# No |safe here, on purpose: only the output of clean_content is already marked safe. #}
+        <div class="analyst-content">
+            {{ content }}
+        </div>
+    {% else %}
+        <span class="analyst-box">
+            <span class="box-title">Analyst notes</span>
+            For each activity, describe the without-project and with-project situation and the
+            data source used. Explain any change against the FP targets or the previous APR, how
+            double counting is avoided, and whether figures are rounded.
+        </span>
+    {% endif %}
+</section>
