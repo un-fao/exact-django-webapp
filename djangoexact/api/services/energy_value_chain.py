@@ -1,10 +1,25 @@
 """Energy module results broken down by the value-chain stage of each entry."""
 
 from api.calculators import EnergyEntryCalculator, Result
-from api.models import Energy
+from api.models import Energy, EnergyEntry
+from api.services.finalization import frozen_result
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 
 VALUE_CHAIN_STAGE_AGGREGATE = "value_chain_stage"
+# Same order as Result.breakdown(TOTAL), because the live branch below returns that tuple positionally.
+TOTAL_BREAKDOWN_KEYS = ("total_w", "total_wo", "balance")
+
+
+def _entry_totals(entry: EnergyEntry) -> tuple[float, ...]:
+    """(total_w, total_wo, balance) of one entry: frozen for a finalized project, calculated otherwise.
+
+    Raises FrozenResultMissingError when the project is finalized but the entry has no snapshot.
+    """
+    frozen = frozen_result(entry)
+    if frozen is not None:
+        totals = frozen.results(BreakdownTypes.TOTAL)
+        return tuple(totals[key] for key in TOTAL_BREAKDOWN_KEYS)
+    return Result(*EnergyEntryCalculator(entry).calculate()).breakdown(by=BreakdownTypes.TOTAL)
 
 
 def results_by_value_chain_stage(energy: Energy) -> dict:
@@ -15,24 +30,20 @@ def results_by_value_chain_stage(energy: Energy) -> dict:
     """
     groups: dict = {}
     for entry in energy.entries.select_related("value_chain_stage").order_by("id"):
-        result = Result(*EnergyEntryCalculator(entry).calculate())
         stage = entry.value_chain_stage
-        groups[stage] = groups[stage] + result if stage in groups else result
+        stage_totals = groups.get(stage, (0.0, 0.0, 0.0))
+        groups[stage] = tuple(a + b for a, b in zip(stage_totals, _entry_totals(entry)))
 
-    rows = []
-    for stage in sorted(groups, key=lambda s: (s is None, s.pk if s else 0)):
-        total_w, total_wo, balance = groups[stage].breakdown(by=BreakdownTypes.TOTAL)
-        rows.append({
+    rows = [
+        {
             "id": stage.pk if stage else None,
             "name": stage.name if stage else None,
-            "total_w": total_w,
-            "total_wo": total_wo,
-            "balance": balance,
-        })
+            **dict(zip(TOTAL_BREAKDOWN_KEYS, groups[stage])),
+        }
+        for stage in sorted(groups, key=lambda s: (s is None, s.pk if s else 0))
+    ]
 
     return {
-        "total_w": sum(r["total_w"] for r in rows),
-        "total_wo": sum(r["total_wo"] for r in rows),
-        "balance": sum(r["balance"] for r in rows),
+        **{key: sum(r[key] for r in rows) for key in TOTAL_BREAKDOWN_KEYS},
         "value_chain_stages": rows,
     }
