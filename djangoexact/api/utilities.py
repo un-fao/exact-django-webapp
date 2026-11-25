@@ -198,14 +198,17 @@ def has_project_permission(permission, user, project):
     Args:
         permission (str): The codename of the permission to check, without the app name.
         user (User): The user object.
-        project (Project): The project object.
+        project (Project | None): The project object, or None when the target does not exist.
 
     Returns:
-        bool: True if the user has the permission, False otherwise.
+        bool: True if the user has the permission, False otherwise. Only a superuser has it on no project.
     """
 
     if user.is_superuser:
         return True
+
+    if project is None:
+        return False
 
     memberships: list[api_models.ProjectMembership] = project.members.filter(user=user)
 
