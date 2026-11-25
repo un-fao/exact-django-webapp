@@ -90,6 +90,15 @@ class TestSubmoduleScenarioRows(unittest.TestCase):
             result = report.compute_with_scenarios()
         self.assert_scenario_rows(result, "CO2-eq from roads")
 
+    def test_settlement_other_infrastructure(self):
+        sets = _sets("Roads")
+        module = MagicMock(submodules=[MagicMock(spec=api_models.OtherInfrastructure)])
+        report = _report(SettlementReport, module, sets)
+        with _frozen(sets), patch("api.calculators.OtherInfrastructureCalculator"), \
+                patch.object(SettlementReport, "_inventory_items_from_module", return_value=[]):
+            result = report.compute_with_scenarios()
+        self.assert_scenario_rows(result, "CO2-eq from other infrastructure")
+
     def test_each_submodule_is_computed_once_for_all_three_sheets(self):
         sets = _sets("Fuel")
         module = Mock(submodules=[Mock()])

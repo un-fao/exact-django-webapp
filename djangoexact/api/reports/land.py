@@ -1129,13 +1129,12 @@ class SettlementReport(LandModuleReport):
         infra_co2 = [0.0] * dur
 
         for submodule in self.module.submodules:
-            if isinstance(submodule, api_models.OtherInfrastructure):
-                continue
-            CalculatorClass = (
-                calculators.RoadCalculator
-                if isinstance(submodule, api_models.Road)
-                else calculators.BuildingCalculator
-            )
+            if isinstance(submodule, api_models.Road):
+                CalculatorClass = calculators.RoadCalculator
+            elif isinstance(submodule, api_models.OtherInfrastructure):
+                CalculatorClass = calculators.OtherInfrastructureCalculator
+            else:
+                CalculatorClass = calculators.BuildingCalculator
             try:
                 sub_es = self._submodule_set(submodule, CalculatorClass)
             except Exception as e:
@@ -1147,6 +1146,8 @@ class SettlementReport(LandModuleReport):
                 roads_co2 = _add(roads_co2, val)
             elif isinstance(submodule, api_models.Building):
                 buildings_co2 = _add(buildings_co2, val)
+            elif isinstance(submodule, api_models.OtherInfrastructure):
+                infra_co2 = _add(infra_co2, val)
 
         return buildings_co2, roads_co2, infra_co2
 
@@ -1157,7 +1158,7 @@ class SettlementReport(LandModuleReport):
 
         # Settlement is a land module: its balance carries land-use-change
         # emissions (biomass / SOC / SOM-N2O / fire) in addition to the
-        # roads/buildings submodules. These 5 rows were hardcoded to zeros
+        # buildings/roads/other infrastructure submodules. These 5 rows were hardcoded to zeros
         # and excluded from the total: see exact-django-webapp-jcb.
         soil_co2, soil_n2o, fire_n2o, fire_ch4 = self._extract_land_base()
         buildings_co2, roads_co2, infra_co2 = self._compute_submodule_emissions(dur)
