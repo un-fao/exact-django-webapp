@@ -940,12 +940,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
         # notes. Dropping them silently would hand back a file missing prose they wrote.
         from .reports import narrative as report_narrative
 
+        lang = utils.requested_language(request)
         report_narrative.content_from_request(request, None)
         report_narrative.sources_from_request(request, None)
 
         try:
             from .reports import generate_excel_report
-            file_bytes_buffer = generate_excel_report(project, activities=selected_activities)
+
+            # Reference names are read in the active language while the workbook is
+            # built; without this they follow Accept-Language instead of ?lang=.
+            with translation_override(lang):
+                file_bytes_buffer = generate_excel_report(project, activities=selected_activities)
         except Exception as e:
             traceback.print_exc()
             logger.error(f"Error generating report: {e}")
