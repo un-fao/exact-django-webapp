@@ -82,6 +82,25 @@ class FloodedRiceTestCase(base_module.BaseModuleTestCase):
 
         self.assertNotEqual(old_balance, new_balance)
 
+    def test_edit_drops_the_stored_results(self):
+        # The module serializer returns cached_results_* without a freshness check, so an edit must clear them.
+        self.assertEqual(self.get_results().status_code, status.HTTP_200_OK)
+        self.module.refresh_from_db()
+        self.assertIsNotNone(self.module.cached_results_total)
+
+        current = self.module.water_management_type_before_cultivation_w_id
+        validated_data = {
+            **self.validated_data,
+            "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.exclude(id=current).order_by("id").first().id,
+        }
+        response = self.edit_module(self.module, self.user, validated_data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(response.data["cached_results_total"])
+        self.module.refresh_from_db()
+        self.assertIsNone(self.module.cached_results_total)
+        self.assertIsNone(self.module.last_cached_at)
+
     def test_patch__to_not_ready(self):
 
         validated_data = copy.deepcopy(self.validated_data)
