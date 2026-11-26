@@ -1,3 +1,11 @@
+## 1.22.4 (2026-11-26)
+
+### Fix
+
+- **api**: make last_modified read-only on module serializers
+- **api**: drop the stored module results on edit
+- **api**: rice straw defaults no longer crash without an IPCC yield (#386)
+
 ## 1.22.3 (2026-11-12)
 
 ### Fix
